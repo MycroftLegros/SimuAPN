@@ -1,0 +1,417 @@
+﻿{
+   "extName": {
+      "message": "LPEF - Camera Simulator"
+   },
+   "chrome_extension_description": {
+      "message": "Modélisation simplifiée d'un appareil photo"
+   }, 
+   
+   "Vitesse": {
+      "message": "Vitesse"
+   }, 
+   "Ouverture": {
+      "message": "Ouverture"
+   },  
+   "ISO": {
+      "message": "ISO"
+   },  
+   
+   "APN": {
+      "message": "APN"
+   }, 
+   "Objectif": {
+      "message": "Objectif"
+   },
+    "Distances": {
+      "message": "Distances"
+   },
+    "Luminosite": {
+      "message": "Luminosité"
+   },
+    "3D": {
+      "message": "Interface 3D"
+   },
+	"Viseur": {
+      "message": "Interface Viseur"
+   },
+   	"Divers": {
+      "message": "Divers"
+   },
+   
+     "capteur": {
+      "message": "Capteur"
+   },  
+   "definition": {
+      "message": "Définition"
+   },   
+  "dynamique": {
+      "message": "Dynamique"
+   },  
+   
+   
+"Longueur_focale": {
+      "message": "Longueur focale"
+   }, 
+"Explication_distances": {
+      "message": "Déplacez les repères pour modifier les distances."
+   },     
+   
+   
+   
+   
+   
+  
+    "CondLum": {
+      "message": "Conditions lumineuses:"
+   },
+
+  
+    "NuitNoire": {
+      "message": "Nuit noire"
+   },
+   "PleineLune": {
+      "message": "Pleine lune"
+   },
+   "VilleNuit": {
+      "message": "Ville la nuit"
+   },
+   "Eglise": {
+      "message": "Église"
+   },
+   "Interieur": {
+      "message": "Intérieur"
+   },
+   "LasVegasNuit": {
+      "message": "Las Vegas de nuit"
+   },
+   "Nuageux": {
+      "message": "Nuageux"
+   },
+   "CoucherSoleil": {
+      "message": "Couché de soleil"
+   },
+   "CielVoile": {
+      "message": "Ciel voilé"
+   },
+   "GrandSoleil": {
+      "message": "Grand soleil"
+   },
+   "MerNeige": {
+      "message": "Plage/Montagne"
+   },
+   
+   "Cdc": {
+      "message": "Cercle de confusion"
+   },  
+   "Laxiste": {
+      "message": "Tolérant (Diag/1440)"
+   },  
+   "Normal": {
+      "message": "Classique (Diag/1730)"
+   },  
+   "Severe": {
+      "message": "Sévère (Diag/3000)"
+   },  
+"ChampsVision": {
+      "message": "Champs de vision"
+   },   
+   "FlouAvant": {
+      "message": "Flou d'avant plan"
+   },
+   "FlouArriere": {
+      "message": "Flou d'arrière plan"
+   },  
+   "ViseeReflex": {
+      "message": "Visée reflex"
+   },   
+   
+  "Reglages": {
+      "message": "Réglages"
+   },  
+   
+   "PrioOuv": {
+      "message": "Priorité ouverture"
+   },  
+      "PrioVit": {
+      "message": "Priorité vitesse"
+   },  
+	"PrioMan": {
+      "message": "Mode manuel"
+   },  
+   
+   
+   	"ObjPreDef": {
+      "message": "Objectifs pré-définis"
+   },  
+   
+	"OuvMin": {
+      "message": "Ouverture minimale"
+   },  
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+ "MenuSaisies": {
+      "message": "Données à saisir"
+   },  
+   "MenuCalculs": {
+      "message": "Données calculées"
+   },  
+   "MenuGraphs": {
+      "message": "Illustrations"
+   },   
+   
+   
+   
+   
+
+ "General": {
+      "message": "Général"
+   },  
+
+ 
+
+   "filtre_aa": {
+      "message": "Filtre anti-aliasing"
+   },  
+   "Oui": {
+      "message": "Oui"
+   },  
+   "Non": {
+      "message": "Non"
+   },
+   
+
+
+   "Anti_vibration": {
+      "message": "Anti-vibration"
+   },  
+   "Resolution": {
+      "message": "Résolution"
+   },  
+   "Aberrations_chromatiques": {
+      "message": "Aberration chromatique"
+   },
+   
+   
+   
+   "Reglages_expo": {
+      "message": "Ouverture, Vitesse, ISO"
+   },  
+
+   "Unite": {
+      "message": "Unités"
+   },    
+   "Prise_de_vue": {
+      "message": "Prise de vue"
+   },  
+   "map": {
+      "message": "Mise au point"
+   },  
+
+   "avant_plan": {
+      "message": "Avant plan"
+   },  
+   "arriere_plan": {
+      "message": "Arrière plan"
+   },  
+   "vitesse_sujet": {
+      "message": "Vitesse du sujet"
+   },  
+   
+   
+   "Lumiere": {
+      "message": "Lumière"
+   },
+   
+   
+ 
+   
+   "Tremblote": {
+      "message": "Tremblement"
+   },
+   "Faible": {
+      "message": "Faible"
+   },
+   "Normal_": {
+      "message": "Normal"
+   },
+   "Severe_": {
+      "message": "Sévère"
+   },
+   "TresSevere": {
+      "message": "Très sévère"
+   },
+   
+   
+   "VisuSurEcran": {
+      "message": "Visualisation sur un écran"
+   },
+   "diagonale": {
+      "message": "Diagonale"
+   },
+   "zoom": {
+      "message": "Zoom"
+   },
+   
+   
+   "Impression": {
+      "message": "Impression"
+   },
+   "dimensions": {
+      "message": "Dimensions"
+   },
+   "DistanceObservation": {
+      "message": "Distance d'observation"
+   },
+   
+   
+   "FormatCapteur": {
+      "message": "Format du capteur"
+   },
+   "CropFactor": {
+      "message": "Crop factor"
+   },   
+   "TaillePixel": {
+      "message": "Taille d'un pixel"
+   },
+   "FlouAA": {
+      "message": "Flou dû au filtre AA"
+   },
+   
+   
+   "FocEqu": {
+      "message": "Focale equivalente"
+   },
+   "ChampHoriz": {
+      "message": "Angle de champ horizontal"
+   },
+   "ChampVert": {
+      "message": "Angle de champ vertical"
+   },
+   "FlouDiff": {
+      "message": "Diffraction"
+   },
+   "FlouAbbChro": {
+      "message": "Abberation chromatique"
+   },
+   "FlouRes": {
+      "message": "Flou dû à la résolution"
+   },
+   
+   
+   "Exposition": {
+      "message": "Exposition"
+   },
+   "ValExposition": {
+      "message": "Valeur de l'exposition"
+   },
+   
+   
+   "PdcHyperDim": {
+      "message": "Pdc, Hyperfocale, Dimensions de la scène"
+   },
+   "DebutPdc": {
+      "message": "Début de la pdc"
+   },
+   "FinPdc": {
+      "message": "Fin de la pdc"
+   },
+   "Pdc": {
+      "message": "PDC"
+   },
+
+
+   "Hyperfocale": {
+      "message": "Hyperfocale"
+   },
+   "DimHoriz": {
+      "message": "Largeur @ arrière plan"
+   },
+   "DimVert": {
+      "message": "Hauteur @ arrière plan"
+   },
+   
+   
+   "FlousBougeMvt": {
+      "message": "Flou de bougé & flou de mouvement"
+   },
+   "VitesseSecurite": {
+      "message": "Vitesse de sécurité"
+   },
+   "FlouBouge": {
+      "message": "Flou de bougé"
+   },
+   "VitesseAntiMvt": {
+      "message": "Vitesse min @ vitesse du sujet"
+   },
+   "FlouSMvt": {
+      "message": "Flou de mouvement"
+   },
+   
+   
+   
+   "Format": {
+      "message": "Format"
+   },
+   "DistanceMinEcran": {
+      "message": "Distance min d'observation @ ppi"
+   },
+   "TirageEquEcran": {
+      "message": "Tirage équivalent @ zoom"
+   },
+   
+   "DefMinTirage": {
+      "message": "Definition min @ taille & dpi"
+   },  
+   "TailleTirage": {
+      "message": "Taille max du tirage @ dpi"
+   },
+   "DistanceMinTirage": {
+      "message": "Distance min d'observation @ dpi"
+   },
+   "DpiMinTirage": {
+      "message": "dpi min @ distance"
+   },
+   
+   "Flous": {
+      "message": "Flous"
+   },
+   
+   "OuvDiaph": {
+      "message": "Ouverture du diaphragme"
+   },
+   
+   "GraphPDC": {
+      "message": "Courbe de PDC"
+   },
+   
+   "Scene": {
+      "message": "Scène"
+   }
+   
+
+   
+   
+   
+   
+   
+   
+   
+}
