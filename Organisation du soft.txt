@@ -1,27 +1,33 @@
 manifest.json		:Pour faire une appli chrome
-BG.js			:Lance la fenetre
-
-
 window.html		: Pour construire l'interface
-window.js		: Contient la fonction appelée au chargement de la page
 style.css		: Le css
-
+BG.js			:Lance la fenetre window.html
+window.js		: Fonctions appelées au chargement de la page
 _locales		: Contient les fichiers pour traduire en fr et en
 Icones			: Les icones de l'appli en png
-
+silhouettes		: les silhouettes des vues viseur et 3D
 
 variables_globales	:Liste des variables globales
 traduction_noms		:Pour traduire les noms (appli chrome)
 
 interface_3D		: Pour gérer la 3D de façon générale
-3D_globale		: Création et dessin des polygones de l'interface 3D globale
+3D_globale		: Création et dessin des polygones de l'interface 3D globale (le nom est pourri)
 
-ev_utilisateur		: L'utilisateur modifie un slider, un input, fait une action avec la souris,..
+ev_utilisateur		: L'utilisateur modifie un slider, un input, fait une action avec la souris,.. (à éclater dans plusieurs fichiers)
 
 Calcul_val		: Lance le calul de toutes les valeurs, maj des valeurs claculées dans les champs
 
 Gestion_onglets:	:Gère ouverture et fermeture des onglets lors d'un clic
+Gestion_boutonss:	:Gère les boutons faits avec des png
 
 cvs_distances		:Gestion du canvas pour régler les distances av, map, ar
+cvs_viseur		: Canvas viseur
+cvs_roue_mode		: Canvas avec la roue Manuel, Prio Ouverture, Prio vitesse
+cvs_PDC			: Canvas pour afficher la courbe de flou de mise au point
+cvs_molette_R		: Canvas pour la molette arrière
+
+objectifs		: fonction liées au modèle 3D de l'objectif et conversion Ouverture <=> cpt
+
+
 
 traduction_noms		:Appelé au début pour traduire les textes dans le .html
