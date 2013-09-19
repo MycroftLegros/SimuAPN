@@ -89,7 +89,7 @@ function XY2xyp(X, Y, flag) {
 
 
 	//Pour tenir compte du déplacement du centre par translation
-	if (cvs_3d == "3D_globale" && flag != "pas_de_translation") {
+	if (cvs_3d === "3D_globale" && flag !== "pas_de_translation") {
 
 		var temp_x = mod_capteurCourant.cdg[0];
 		var temp_y = mod_capteurCourant.cdg[1];
@@ -107,7 +107,7 @@ function XY2xyp(X, Y, flag) {
 		var Y0 = titi.Y;
 
 		var x = (X - X0) / X0;
-		var y = (Y0 - Y) / Y0
+		var y = (Y0 - Y) / Y0;
 
 		if (((X - X0) * (X - X0) + (Y - Y0) * (Y - Y0)) < X0 * X0)
 			p = Math.sqrt(X0 * X0 - (X - X0) * (X - X0) - (Y - Y0) * (Y - Y0)) / X0;
@@ -158,7 +158,7 @@ function Rotation3D(x, y, p, flag) {
 
 
 	//Pour rester centré sur le capteur
-	if (flag != "pas_de_translation") {
+	if (flag !== "pas_de_translation") {
 		x = x + (-dX) * k_px_3D;
 		y = y - dY * k_px_3D;
 		p = p - dP * k_px_3D;
@@ -201,7 +201,7 @@ function Rotation3D(x, y, p, flag) {
 	p_p = x * Rot3_1_3D + y * Rot3_2_3D + p * Rot3_3_3D;
 
 	//Translation
-	if (flag != "pas_de_translation") {
+	if (flag !== "pas_de_translation") {
 		x_p = x_p + Tx_3D;
 		y_p = y_p + Ty_3D;
 		p_p = p_p + Tp_3D;
@@ -220,7 +220,7 @@ function Rotation3D(x, y, p, flag) {
 
 function proj_3D(x, y, p) {
 
-	if (cvs_3d == "3D_globale")
+	if (cvs_3d === "3D_globale")
 		var temp1 = Rotation3D(x, y, p);
 	else
 		var temp1 = Rotation3D(x, y, p, "pas_de_translation");
@@ -306,10 +306,10 @@ function Souris_3D(id, e) {
 	init_3D(id);
 
 	//Canvas
-	if (cvs_3d == "3D_globale")
+	if (cvs_3d === "3D_globale")
 		var cvs = document.getElementById("id_canvas_3D_globale");
 
-	if (cvs_3d == "molette_R")
+	if (cvs_3d === "molette_R")
 		var cvs = document.getElementById("id_canvas_molette_R");
 
 	var rect = cvs.getBoundingClientRect(),
@@ -318,12 +318,12 @@ function Souris_3D(id, e) {
 
 	//-COORDONNÉES DANS LE CANVAS DE LA SOURIS, AVANT/APRÉS ET DE X0,Y0
 	//Coordonnées dans le canvas de la souris à l'instant 0
-	if (cvs_3d == "3D_globale") {
+	if (cvs_3d === "3D_globale") {
 		var Xt0 = X_3D_save;
 		var Yt0 = Y_3D_save;
 	}
 
-	if (cvs_3d == "molette_R") {
+	if (cvs_3d === "molette_R") {
 		var Xt0 = X_molette_R_save;
 		var Yt0 = Hc_3D / 2;
 	}
@@ -350,9 +350,9 @@ function Souris_3D(id, e) {
 
 
 
-	if (cvs_3d == "molette_R" || flag_mvt_3D == "rotation") {
+	if (cvs_3d === "molette_R" || flag_mvt_3D === "rotation") {
 
-		if (cvs_3d == "molette_R") {
+		if (cvs_3d === "molette_R") {
 
 			var Ax_temp = (Xt0 - X0_3D) / X0_3D;
 			var Ay_temp = 0;
@@ -394,7 +394,7 @@ function Souris_3D(id, e) {
 		//on doit avoir Mx²+My²+Mp²=1
 		var normalise = Mx * Mx + My * My + Mp * Mp;
 
-		if (normalise != 0) {
+		if (normalise !== 0) {
 
 			normalise = 1 / normalise;
 			normalise = Math.sqrt(normalise);
@@ -444,7 +444,7 @@ function Souris_3D(id, e) {
 			Rot3_3_3D = Rot3_3_temp;
 
 			//Sauvegarde
-			if (cvs_3d == "3D_globale") {
+			if (cvs_3d === "3D_globale") {
 				//TBD; bloquer si tête en bas
 				//Bloque les rotations qui emmènent en dessous du niveau du sol
 				MajOrientation();
@@ -477,7 +477,7 @@ function Souris_3D(id, e) {
 
 			}
 
-			if (cvs_3d == "molette_R") {
+			if (cvs_3d === "molette_R") {
 				Rot1_1_molette_R = Rot1_1_temp;
 				Rot1_2_molette_R = Rot1_2_temp;
 				Rot1_3_molette_R = Rot1_3_temp;
@@ -510,7 +510,7 @@ Ty_3D+=(temp3.y-temp2.y)/k_px_3D;
 Tp_3D-=(temp3.p-temp2.p)/k_px_3D;
 */
 
-		if (1 || Bp - Ap != 0) {
+		if (1 || Bp - Ap !== 0) {
 			var temp2 = XY2xyp(Xt0, Yt0, "pas_de_translation");
 			var Ax = temp2.x;
 			var Ay = temp2.y;
@@ -529,7 +529,7 @@ Tp_3D-=(temp3.p-temp2.p)/k_px_3D;
 			Tp_3D += (Bp - Ap); //k_px_3D;
 		}
 
-		if (cvs_3d == "3D_globale") {
+		if (cvs_3d === "3D_globale") {
 			Tx_3D_globale = Tx_3D;
 			Ty_3D_globale = Ty_3D;
 			Tp_3D_globale = Tp_3D;
@@ -540,12 +540,12 @@ Tp_3D-=(temp3.p-temp2.p)/k_px_3D;
 
 
 	//Sauvegarde les coordonées de la souris
-	if (cvs_3d == "3D_globale") {
+	if (cvs_3d === "3D_globale") {
 		X_3D_save = Xt1;
 		Y_3D_save = Yt1;
 	}
 
-	if (cvs_3d == "molette_R") {
+	if (cvs_3d === "molette_R") {
 
 		X_molette_R_save = Xt1;
 		MAJ_triangle_expo(Xt1);
@@ -554,9 +554,9 @@ Tp_3D-=(temp3.p-temp2.p)/k_px_3D;
 
 	}
 
-	if (cvs_3d == "3D_globale")
+	if (cvs_3d === "3D_globale")
 		Draw3D_globale();
 
-	if (cvs_3d == "molette_R")
+	if (cvs_3d === "molette_R")
 		DrawMoletteR();
 }
