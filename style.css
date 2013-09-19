@@ -27,14 +27,8 @@ color: #33aaff;
 
 }
 .css_input{		
-	height: 20px;
-	/*
-	border-bottom-width: 1px;
-	border-top-width: 1px;
-	border-left-width: 1px;
-	border-right-width: 1px;
-*/		 
-	text-align : center;
+height: 20px;
+text-align : center;
 } 
 .css_liste{	
 height: 22px;	
@@ -43,7 +37,7 @@ height: 22px;
 .css_liste,.css_input{
 background-color:#444444;
 box-shadow: 3px 5px 8px rgba(0, 0, 0, 0.3) inset;
-/*background-image: url(Fond.png); */
+text-shadow: 1px 1px 2px #111111
 }
 
 
@@ -52,20 +46,36 @@ font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
 font-size:14px;
 font-style:normal;
 font-weight:normal;
-
 border: 0px;
 padding: 0px;
 border-spacing: 0px;
-
-text-shadow:  2px 2px 2px #000000;
 }
+
+
+.btn_ON,.btn_OFF{
+height:30px;
+width:30px;
+border: solid #000000 1px;
+text-align: center;
+}
+
+
+.btn_ON{
+box-shadow: -2px -2px 6px rgba(255, 255, 255, 0.3) inset; 
+}
+
+.btn_OFF{
+box-shadow: 3px 3px 6px rgba(255, 255, 255, 0.4) inset; 
+}
+
+
 
 
 
 .css_input,.css_liste,.css_radio{
 color: #ffffff;	
 }
-/* Police des noms des valeurs à saisir/modifier*/
+
 .nom_var,.menu_onglet,.MAU,.nom_ss_onglet{
 color: #cccccc;
 }
@@ -74,10 +84,10 @@ text-align:center;
 font-size:15px;
 }
 
-
 .div_globale{
 	width:800px;
 	color: #eeeeee;		
+	text-shadow:  2px 2px 2px #000000;
 } 
 #titre{
 width:100%;
@@ -92,8 +102,6 @@ text-shadow:  3px 3px 4px #000000;
 height:25px;
 width:100%;
 }
-
-
 
 #zone_vide{
 height:25px;
@@ -114,18 +122,12 @@ border-radius: 6px 6px 6px 6px;
 
 
 .nom_onglet{
-	font-size:15px;
-	
+	font-size:15px;	
 	font-weight:bold;		
 	text-align : center;
 	cursor: pointer;
 }
 .nom_onglet:hover {
-	font-size:16px;
-	color: #ffffff;
-	/*text-decoration:underline;*/
-
-	/*text-decoration : underline;*/
 }
 
 .slider-focale{
@@ -135,7 +137,12 @@ width: 300px;
 font-style:italic;
 font-size:13px;
 }
-.css_graph{
-
- 
+.css_graph{ 
 }
+
+
+
+#menu_3D{
+position:relative;
+}
+

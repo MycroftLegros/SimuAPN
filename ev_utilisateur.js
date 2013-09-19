@@ -51,30 +51,24 @@ Souris_3D("3D_globale",e);
 
 
 
-//RB 3D
-document.getElementById('btn_rotation').onclick = function() {
-flag_mvt_3D="rotation";
-/*
-document.getElementById('btn_rotation').innerHTML="<img src='Icones/R_ON.png'>";
-document.getElementById('btn_translation').innerHTML="<img src='Icones/T_OFF.png'>";
-*/
-Hide('btn_translation_ON');
-Show('btn_translation');
-Hide('btn_rotation');
-Show('btn_rotation_ON');
+//TRANSLATION VS ROTATION
+document.getElementById('btn_tra').onclick = function() {
+if(flag_mvt_3D!="translation"){
+	flag_mvt_3D="translation";
+	DrawBouton('btn_rot','id_img_rot','btn_OFF');
+	DrawBouton('btn_tra','id_img_tra','btn_ON');
+}
 }
 
-document.getElementById('btn_translation').onclick = function() {
-flag_mvt_3D="translation";
-/*
-document.getElementById('btn_rotation').innerHTML="<img src='Icones/R_OFF.png'>";
-document.getElementById('btn_translation').innerHTML="<img src='Icones/T_ON.png'>";
-*/
-Hide('btn_translation');
-Show('btn_translation_ON');
-Hide('btn_rotation_ON');
-Show('btn_rotation');
 
+
+
+document.getElementById('btn_rot').onclick = function() {
+if(flag_mvt_3D!="rotation"){
+	flag_mvt_3D="rotation";
+	DrawBouton('btn_rot','id_img_rot','btn_ON');
+	DrawBouton('btn_tra','id_img_tra','btn_OFF');
+}
 }
 
 
@@ -1191,12 +1185,36 @@ Maj_calc();
 
 
 
-//Selection du nombre de graphiques à afficher
-//MAJ des dimensions
-document.getElementById('liste_nbr_graph').addEventListener('change', function() {
-	Nbr_graph=1.0*document.getElementById('liste_nbr_graph').options[document.getElementById('liste_nbr_graph').selectedIndex].value;	
+//Nbr de graph à afficher
+document.getElementById('btn_1_graph').onclick = function() {
+if(Nbr_graph!=1){
+	Nbr_graph=1;
+	DrawBouton('btn_1_graph','id_img_1_graph','btn_ON');
+	DrawBouton('btn_2_graph','id_img_2_graph','btn_OFF');
+	DrawBouton('btn_4_graph','id_img_4_graph','btn_OFF');
 	InitDimGraph();	
-}, false);
+}
+}
+document.getElementById('btn_2_graph').onclick = function() {
+if(Nbr_graph!=2){
+	Nbr_graph=2;
+	DrawBouton('btn_1_graph','id_img_1_graph','btn_OFF');
+	DrawBouton('btn_2_graph','id_img_2_graph','btn_ON');
+	DrawBouton('btn_4_graph','id_img_4_graph','btn_OFF');
+	InitDimGraph();	
+}
+}
+document.getElementById('btn_4_graph').onclick = function() {
+if(Nbr_graph!=4){
+	Nbr_graph=4;
+	DrawBouton('btn_1_graph','id_img_1_graph','btn_OFF');
+	DrawBouton('btn_2_graph','id_img_2_graph','btn_OFF');
+	DrawBouton('btn_4_graph','id_img_4_graph','btn_ON');
+	InitDimGraph();	
+}
+}
+
+
 
 
 function InitDimGraph(){
@@ -1237,6 +1255,10 @@ function InitDimGraph(){
 	//Zone graphique totale
 	document.getElementById("id_zone_graph").style.height=h_tt+'px';
 	document.getElementById("id_zone_graph").style.width=w_tt+'px';
+	
+	var left_temp=Math.round((w_ss-207)/2);
+	document.getElementById("menu_3D").style.left=left_temp+'px';
+	
 	
 	MAJgraph('liste_graph_1_1');
 }

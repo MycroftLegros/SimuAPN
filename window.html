@@ -42,12 +42,13 @@
 
 				
 					<canvas id='id_canvas_3D_globale' class='css_graph' ></canvas>
+					
+					<div id='menu_3D'>
 					<table >					
-							<tr>							
-															
-								<td><div id='btn_rotation_ON'><img src='Icones/R_ON.png'></div><div id='btn_rotation'><img src='Icones/R_OFF.png'></div></td>
-								<td><div id='btn_translation'><img src='Icones/T_OFF.png'></div><div id='btn_translation_ON'><img src='Icones/T_ON.png'></div></td>
-
+							<tr>								
+								<td><div id='btn_rot'><img src='Icones/RO.png' id='id_img_rot'></div></td>
+								<td><div id='btn_tra'><img src='Icones/TR.png' id='id_img_tra'></div></td>								
+								
 								<td><div class='nom_var'>Camera:</div></td>
 								<td><select name="capteur" id="liste_camera" class="css_liste">
 										<option  value="-" selected="selected">-</option>
@@ -60,6 +61,7 @@
 
 							</tr>
 					</table>
+					</div>
 			
 					
 				</div>
@@ -195,45 +197,45 @@
 						<td id="nom_N_min" class="nom_var"></td>
 						<td >
 							<select name="N_min" id="liste_N_min" class="css_liste">
-								<option value='1'>0.7</option>
-								<option value='2'>0.8</option>
-								<option value='3'>0.9</option>
-								<option value='4'>1</option>
-								<option value='5'>1.1</option>
-								<option value='6'>1.2</option>
-								<option value='7'>1.4</option>
-								<option value='8'>1.6</option>
-								<option value='9' selected="selected">1.8</option>
-								<option value='10'>2</option>
-								<option value='11'>2.2</option>
-								<option value='12'>2.5</option>
-								<option value='13'>2.8</option>
-								<option value='14'>3.2</option>
-								<option value='15'>3.5</option>
-								<option value='16'>4</option>
-								<option value='17'>4.5</option>
-								<option value='18'>5</option>
-								<option value='19'>5.6</option>
-								<option value='20'>6.3</option>
-								<option value='21'>7.1</option>
-								<option value='22'>8</option>
-								<option value='23'>9</option>
-								<option value='24'>10</option>
-								<option value='25'>11</option>
-								<option value='26'>13</option>
-								<option value='27'>14</option>
-								<option value='28'>16</option>
-								<option value='29'>18</option>
-								<option value='30'>20</option>
-								<option value='31'>22</option>
-								<option value='32'>25</option>
-								<option value='33'>29</option>
-								<option value='34'>32</option>
-								<option value='35'>36</option>
-								<option value='36'>42</option>
-								<option value='37'>45</option>							
+								<option value='1'>f/0.7</option>
+								<option value='2'>f/0.8</option>
+								<option value='3'>f/0.9</option>
+								<option value='4'>f/1</option>
+								<option value='5'>f/1.1</option>
+								<option value='6'>f/1.2</option>
+								<option value='7'>f/1.4</option>
+								<option value='8'>f/1.6</option>
+								<option value='9' selected="selected">f/1.8</option>
+								<option value='10'>f/2</option>
+								<option value='11'>f/2.2</option>
+								<option value='12'>f/2.5</option>
+								<option value='13'>f/2.8</option>
+								<option value='14'>f/3.2</option>
+								<option value='15'>f/3.5</option>
+								<option value='16'>f/4</option>
+								<option value='17'>f/4.5</option>
+								<option value='18'>f/5</option>
+								<option value='19'>f/5.6</option>
+								<option value='20'>f/6.3</option>
+								<option value='21'>f/7.1</option>
+								<option value='22'>f/8</option>
+								<option value='23'>f/9</option>
+								<option value='24'>f/10</option>
+								<option value='25'>f/11</option>
+								<option value='26'>f/13</option>
+								<option value='27'>f/14</option>
+								<option value='28'>f/16</option>
+								<option value='29'>f/18</option>
+								<option value='30'>f/20</option>
+								<option value='31'>f/22</option>
+								<option value='32'>f/25</option>
+								<option value='33'>f/29</option>
+								<option value='34'>f/32</option>
+								<option value='35'>f/36</option>
+								<option value='36'>f/42</option>
+								<option value='37'>f/45</option>							
 							</select></td> 
-						<td align="left">(f/)</td>
+						
 					</tr>
 							
 						
@@ -252,14 +254,14 @@
 						<!--Resolution-->
 						<td id="nom_resolution" class="nom_var"></td>
 						<td><input name="resolution" id="input_resolution" size="3" value="17" class="css_input" /></td>
-						<td align="left">P-Mpx</td>
+						<td align="left">(P-Mpx)</td>
 					</tr>
 					
 					<tr>		
 						<!-- AC -->
 						<td id="nom_aberrations_chromatiques" class="nom_var"></td>
 						<td><input name="aberrations_chromatiques" id="input_aberrations_chromatiques" size="3" value="7" class="css_input" /></td>
-						<td align="left">µm</td>	
+						<td align="left">(µm)</td>	
 					</tr>
 										
 				</table>
@@ -333,7 +335,7 @@
 					<!-- CDC -->
 					<tr >
 						<td id="nom_cdc" class="nom_var"></td>
-						<td>
+						<td colspan='3'>
 							<select name="CDC" id="liste_cdc" class="css_liste">
 								<option value="1440"></option>
 								<option value="1730" selected="selected"></option>
@@ -345,19 +347,18 @@
 					<!-- Nbr de graph -->
 					<tr >
 						<td class="nom_var">Nombre de graphiques</td>
-						<td>
-							<select name="nbr_graph" id="liste_nbr_graph" class="css_liste">
-								<option value=1>1</option>
-								<option value=2 selected="selected">2</option>
-								<option value=4>4</option>
-							</select>
-						</td>	
+						
+						<td><div id='btn_1_graph'><img src='Icones/1_graph.png' id='id_img_1_graph'></div></td>
+						<td><div id='btn_2_graph'><img src='Icones/2_graph.png' id='id_img_2_graph'></div></td>
+						<td><div id='btn_4_graph'><img src='Icones/4_graph.png' id='id_img_4_graph'></div></td>
+						
+						
 					</tr>
 									
 					<!-- Graph 1_1 -->
 					<tr id='id_choix_graph_1_1'>
 						<td class="nom_var">Graphique 1:</td>
-						<td>
+						<td colspan='3'>
 							<select id="liste_graph_1_1" class="css_liste">
 								<option value='id_graph_3D' selected="selected">3D</option>
 								<option value='id_graph_Viseur' >Viseur</option>
@@ -370,7 +371,7 @@
 					<!-- Graph 1_2 -->
 					<tr id='id_choix_graph_1_2'>
 						<td class="nom_var">Graphique 2:</td>
-						<td>
+						<td colspan='3'>
 							<select id="liste_graph_1_2" class="css_liste">
 								<option value='id_graph_3D' >3D</option>
 								<option value='id_graph_Viseur' selected="selected">Viseur</option>
@@ -383,7 +384,7 @@
 					<!-- Graph 2_1 -->
 					<tr id='id_choix_graph_2_1'>
 						<td class="nom_var">Graphique 3:</td>
-						<td>
+						<td colspan='3'>
 							<select id="liste_graph_2_1" class="css_liste">
 								<option value='id_graph_3D' >3D</option>
 								<option value='id_graph_Viseur' >Viseur</option>
@@ -396,7 +397,7 @@
 					<!-- Graph 2_1 -->
 					<tr id='id_choix_graph_2_2'>
 						<td class="nom_var">Graphique 4:</td>
-						<td>
+						<td colspan='3'>
 							<select id="liste_graph_2_2" class="css_liste">
 								<option value='id_graph_3D' >3D</option>
 								<option value='id_graph_Viseur' >Viseur</option>
@@ -428,6 +429,7 @@
 <script src="3D_globale.js"></script>
 <script src="ev_utilisateur.js"></script>
 <script src="Gestion_onglets.js"></script>
+<script src="Gestion_boutons.js"></script>
 <script src="cvs_distances.js"></script>
 <script src="cvs_viseur.js"></script>
 <script src="cvs_molette_R.js"></script>
