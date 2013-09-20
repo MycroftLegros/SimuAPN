@@ -16,6 +16,11 @@
 <div class='div_globale' >
 
 
+
+	<div style='display:none;'>
+		<canvas id='id_cvs_viseur_merge' ></canvas>
+	</div>
+
 	<!-- Titre -->
 	<div id='titre'>
 		Camera Simulator Master Plus 3000
@@ -23,17 +28,15 @@
 
 
 	<!-- En tête -->
-	<!--
+	
 	<div id='en_tete'>
 		<table >
 			<tr>
-				<td width="200px"><a href="http://www.la-photo-en-faits.com/" title="la photo en faits" target="_blank">www.la-photo-en-faits.com</a></td>
-				<td><a href="https://chrome.google.com/webstore/detail/lpef-image-analyser/djgaeodmcpleaclcaapkolaekkfhibek/reviews" target="_blank">Rate it !</a></td>
 				<td><div id="id_info_utilisateur"></div></td>
 			</tr>		
 		</table>	
 	</div>
-	-->
+	
 	
 	<!-- Canvas 3D et canvas Viseur -->
 	<div class='zone_graphique' id='id_zone_graph'>
@@ -81,7 +84,8 @@
 				</div>
 				
 				<div id='id_graph_Histo' style='text-align:center;  vertical-align: middle;'>
-					HISTOGRAMME
+				<canvas id="id_canvas_histo_lum" class='css_graph'></canvas><br/><canvas id='id_canvas_histo_RVB'  ></canvas>
+					
 				</div>
 
 	</div>
@@ -420,21 +424,24 @@
 </div>
 
 
-<!-- Liste des fichiers javascript -->
+
 <script src="variables_globales.js"></script>
-<script src="Calcul_val.js"></script>
-<script src="traduction_noms.js"></script>
-<script src="objectifs.js"></script>
-<script src="interface_3D.js"></script>
+<script src="Filtres.js"></script>
 <script src="3D_globale.js"></script>
-<script src="ev_utilisateur.js"></script>
-<script src="Gestion_onglets.js"></script>
-<script src="Gestion_boutons.js"></script>
+<script src="cvs_histogrammes.js"></script>
 <script src="cvs_distances.js"></script>
 <script src="cvs_viseur.js"></script>
 <script src="cvs_molette_R.js"></script>
 <script src="cvs_roue_mode.js"></script>
 <script src="cvs_PDC.js"></script>
+<script src="Calcul_val.js"></script>
+<script src="traduction_noms.js"></script>
+<script src="objectifs.js"></script>
+<script src="interface_3D.js"></script>
+<script src="ev_utilisateur.js"></script>
+<script src="Gestion_onglets.js"></script>
+<script src="Gestion_boutons.js"></script>
+<script src="BenchMark.js"></script>
 <script src="window.js"></script>
 
 

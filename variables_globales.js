@@ -1,4 +1,57 @@
-﻿
+﻿//HISTOGRAMMES
+//dimension du canvas contenant l'image dont on calcul l'histogramme
+largeur_vh=100;
+hauteur_vh=100;
+
+//CALCUL DE L'HISTO
+flag_nb=1;	//à 1 si photo en noir et blanc
+
+//Nbr de pixel pour une valeur donnée (pour tracer les histos)
+R=new Array (256);	
+V=new Array (256);
+B=new Array (256);
+L=new Array (256);
+
+
+//Tableaux pour récupérer l'image
+Pix_R=new Array(10000);	
+Pix_V=new Array(10000);
+Pix_B=new Array(10000);
+Pix_T=new Array(10000);
+
+
+
+//TRACE HISTO
+ombre1='#7C7C7C';	//pour les ombres des histogrammes
+ombre2='#A9A9A9';	//pour les ombres des histogrammes
+
+color_axes_lum='#777777';
+offset_x_lum=5;
+offset_y_lum=5;
+max_y_lum=100;
+w_lum=255+2*offset_x_lum;
+h_lum=max_y_lum+2*offset_y_lum;
+
+color_axes_rvb='#777777';
+offset_x_rvb=5;
+offset_y_rvb=6;
+max_y_rvb=50;
+w_rvb=255+2*offset_x_rvb;
+h_rvb=3*max_y_rvb+4*offset_y_rvb;
+
+//DEPASSEMENTS HISTO
+pix_bouche=0;
+pix_crame=0;
+pix_R_sat=0;
+pix_V_sat=0;
+pix_B_sat=0;
+k_sat=0.35;	//% de luminosité pour mettre en évidence les zones non saturées
+seuil_blanc=180;	//limite pour dsitinguer RVB saturé ou couleur cramée
+pix_min_lum=1;
+pix_min_rvb=1;
+
+
+
 Nbr_graph=2;	//Nbr de graphiques à afficher: 1,2 ou 4
 
 

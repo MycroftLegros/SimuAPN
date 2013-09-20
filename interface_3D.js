@@ -159,7 +159,7 @@ function Rotation3D(x, y, p, flag) {
 
 	//Pour rester centré sur le capteur
 	if (flag !== "pas_de_translation") {
-		x = x + (-dX) * k_px_3D;
+		x = x - dX * k_px_3D;
 		y = y - dY * k_px_3D;
 		p = p - dP * k_px_3D;
 	}
@@ -496,38 +496,24 @@ function Souris_3D(id, e) {
 
 	//Si translation
 	else {
-		/*
-var temp_x=0;
-var temp_y=0;
-var temp_p=0;
 
-temp2=Rotation3D(Ax+temp_x,Ay+temp_y,Ap+temp_p);
-var temp3=Rotation3D(Bx+temp_x,By+temp_y,Bp+temp_p);
+		var temp2 = XY2xyp(Xt0, Yt0, "pas_de_translation");
+		var Ax = temp2.x;
+		var Ay = temp2.y;
+		var Ap = temp2.p;
 
-
-Tx_3D+=(temp3.x-temp2.x)/k_px_3D;
-Ty_3D+=(temp3.y-temp2.y)/k_px_3D;
-Tp_3D-=(temp3.p-temp2.p)/k_px_3D;
-*/
-
-		if (1 || Bp - Ap !== 0) {
-			var temp2 = XY2xyp(Xt0, Yt0, "pas_de_translation");
-			var Ax = temp2.x;
-			var Ay = temp2.y;
-			var Ap = temp2.p;
-
-			//B: point final de la souris
-			//coordonées dans x,y,p
-			temp2 = XY2xyp(Xt1, Yt1, "pas_de_translation");
-			var Bx = temp2.x;
-			var By = temp2.y;
-			var Bp = temp2.p;
+		//B: point final de la souris
+		//coordonées dans x,y,p
+		temp2 = XY2xyp(Xt1, Yt1, "pas_de_translation");
+		var Bx = temp2.x;
+		var By = temp2.y;
+		var Bp = temp2.p;
 
 
-			Tx_3D += (Bx - Ax); //k_px_3D;
-			Ty_3D += (By - Ay); //k_px_3D;
-			Tp_3D += (Bp - Ap); //k_px_3D;
-		}
+		Tx_3D += (Bx - Ax); //k_px_3D;
+		Ty_3D += (By - Ay); //k_px_3D;
+		Tp_3D += (Bp - Ap); //k_px_3D;
+
 
 		if (cvs_3d === "3D_globale") {
 			Tx_3D_globale = Tx_3D;
@@ -546,12 +532,8 @@ Tp_3D-=(temp3.p-temp2.p)/k_px_3D;
 	}
 
 	if (cvs_3d === "molette_R") {
-
 		X_molette_R_save = Xt1;
 		MAJ_triangle_expo(Xt1);
-
-
-
 	}
 
 	if (cvs_3d === "3D_globale")

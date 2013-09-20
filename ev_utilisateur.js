@@ -1231,6 +1231,7 @@ function InitDimGraph(){
 				document.getElementById("id_choix_graph_1_2").style.display='none';
 				document.getElementById("id_choix_graph_2_1").style.display='none';
 				document.getElementById("id_choix_graph_2_2").style.display='none';
+				document.getElementById("id_canvas_histo_RVB").style.display='';
 				break;
 				
 		case 2: h_tt=320; 	w_tt=800;	
@@ -1240,6 +1241,7 @@ function InitDimGraph(){
 				document.getElementById("id_choix_graph_1_2").style.display='';
 				document.getElementById("id_choix_graph_2_1").style.display='none';
 				document.getElementById("id_choix_graph_2_2").style.display='none';
+				document.getElementById("id_canvas_histo_RVB").style.display='';
 				break;	
 
 		case 4: h_tt=460; 	w_tt=800;	
@@ -1249,6 +1251,8 @@ function InitDimGraph(){
 				document.getElementById("id_choix_graph_1_2").style.display='';
 				document.getElementById("id_choix_graph_2_1").style.display='';
 				document.getElementById("id_choix_graph_2_2").style.display='';
+				document.getElementById("id_canvas_histo_RVB").style.display='none';
+				
 				break;
 	}
 	

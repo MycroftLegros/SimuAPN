@@ -1401,18 +1401,10 @@ for(var i=0;i!=Ordre.length;i++){
 						proj_temp=proj_3D(x4,y4,p4);		x4=proj_temp.X;	y4=proj_temp.Y;
 						
 						//TBD: ajouter le cadre et réduire la taille du viseur et ajouter une lentille
-						/*
-						var cvs1 = document.getElementById("id_cvs_viseur_viseur");  
+						var cvs1 = document.getElementById("id_cvs_viseur_merge");  
 						DrawImagePerspective(cvs1,x1,y1,x2,y2,x4,y4);
-						*/
-						var cvs1 = document.getElementById("id_cvs_viseur_cadre");  
-						DrawImagePerspective(cvs1,x1,y1,x2,y2,x4,y4);
-						var cvs1 = document.getElementById("id_cvs_viseur_ar");  
-						DrawImagePerspective(cvs1,x1,y1,x2,y2,x4,y4);
-						var cvs1 = document.getElementById("id_cvs_viseur_map");  
-						DrawImagePerspective(cvs1,x1,y1,x2,y2,x4,y4);
-						var cvs1 = document.getElementById("id_cvs_viseur_av");  
-						DrawImagePerspective(cvs1,x1,y1,x2,y2,x4,y4);
+						
+						
 					
 						break;					
 
