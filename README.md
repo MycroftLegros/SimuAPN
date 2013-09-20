@@ -12,6 +12,9 @@ J'ai juste configuré le projet et créé un controlleur...
  
 ## Commandes Grunt ##
 
+Commandes à lancer pour utiliser le projet... pas sûr qu'elles y soient toutes !
+
+ * Installer les deps: ```npm install```
  * Builder: ```grunt build```
  * Lancer le serveur: ```grunt server```
  * Lancer les tests unitaires: ```grunt karam:unit``` (*avoir un serveur lancé dans un autre terminal*)
