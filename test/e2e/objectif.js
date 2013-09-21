@@ -19,6 +19,9 @@ describe('SimuAPN', function() {
             expect(element('#nom').text()).toEqual('14mm f/2.8');
             expect(element('#focale').text()).toEqual('14');
             expect(element('#ouvertureMin').text()).toEqual('2.8');
+            expect(element('#vr').text()).toEqual('false');
+            expect(element('#resolution').text()).toEqual('0');
+            expect(element('#ac').text()).toEqual('0');
         });
     });
 });

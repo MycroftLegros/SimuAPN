@@ -16,6 +16,6 @@ describe('Controller: ObjectifCtrl', function() {
     }));
   
     it('should attach a list of objectif to the scope', function() {
-        expect(scope.model.objectifs.length).toBe(3);
+        expect(scope.model.objectifs.length).toBe(14);
     });
 });

@@ -9,8 +9,11 @@
         </select>
         <div id="objectif-details" ng-show="model.selected">
             Nom: <span id="nom">{{model.selected.nom}}</span>
-            <br/>Focale: <span id="focale">{{model.selected.focale}}</span>
-            <br/>Ouverture: <span id="ouvertureMin">{{model.selected.ouvertureMin}}</span>
+            <br/>Longueur de focale <span id="focale">{{model.selected.focale}}</span>
+            <br/>Ouverture minimale <span id="ouvertureMin">{{model.selected.ouvertureMin}}</span>
+            <br/>Anti-vibration: <span id="vr">{{model.selected.vr}}</span>
+            <br/>Résolution: <span id="resolution">{{model.selected.resolution}} P-Mpx</span>
+            <br/>Aberration chromatique: <span id="ac">{{model.selected.ac}} µm</span>
         </div>
     </div>
 </div>
