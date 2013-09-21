@@ -12,7 +12,7 @@ describe('SimuAPN', function() {
             expect(element('#objectif-details').css('display')).toBe('none');
             
             //When
-            select('model.selected').option('14mm f/2.8');
+            select('model.objectifSelected').option('14mm f/2.8');
             
             // Then
             expect(element('#objectif-details').css('display')).toBe('block');

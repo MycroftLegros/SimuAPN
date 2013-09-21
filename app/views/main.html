@@ -5,21 +5,30 @@
         <canvas id="display-distances"/>
     </div>
 
+    <!-- Sujets -->
+    <div>
+        <h1>Sujets</h1>
+        <li ng-repeat="sujet in model.sujets">
+            <strong>{{sujet.nom}}</strong>
+            <br/>distance <input type="number" ng-model="sujet.distance" />
+        </li>
+    </div>
+
     <!-- Objectifs -->
     <div>
-        Objectifs prédéfinis : 
+        <h1>Objectifs</h1> 
         <select 
             id="objectifSelector"                 
-            ng-model="model.selected"
+            ng-model="model.objectifSelected"
             ng-options="objectif.nom for objectif in model.objectifs">
         </select>
-        <div id="objectif-details" ng-show="model.selected">
-            Nom: <span id="nom">{{model.selected.nom}}</span>
-            <br/>Longueur de focale <span id="focale">{{model.selected.focale}}</span>
-            <br/>Ouverture minimale <span id="ouvertureMin">{{model.selected.ouvertureMin}}</span>
-            <br/>Anti-vibration: <span id="vr">{{model.selected.vr}}</span>
-            <br/>Résolution: <span id="resolution">{{model.selected.resolution}} P-Mpx</span>
-            <br/>Aberration chromatique: <span id="ac">{{model.selected.ac}} µm</span>
+        <div id="objectif-details" ng-show="model.objectifSelected">
+            Nom: <span id="nom">{{model.objectifSelected.nom}}</span>
+            <br/>Longueur de focale <span id="focale">{{model.objectifSelected.focale}}</span>
+            <br/>Ouverture minimale <span id="ouvertureMin">{{model.objectifSelected.ouvertureMin}}</span>
+            <br/>Anti-vibration: <span id="vr">{{model.objectifSelected.vr}}</span>
+            <br/>Résolution: <span id="resolution">{{model.objectifSelected.resolution}} P-Mpx</span>
+            <br/>Aberration chromatique: <span id="ac">{{model.objectifSelected.ac}} µm</span>
         </div>
     </div>
 </div>

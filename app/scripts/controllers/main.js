@@ -8,19 +8,27 @@ angular.module('testYoAngularApp').controller('MainCtrl', function($scope, dista
     $scope.model = {
         objectifs: [],
         sujets: [],
-        selected: null
+        objectifSelected: null
     };
 
 
-    this.init = function init() {
+    $scope.init = function init() {
         allObjectifs.objectifs.forEach(function(item) {
             $scope.model.objectifs.push(Objectif.fromJSON(item));
         });
-        $scope.model.sujets.push(new Sujet().init(4.9, "221,68,119"));
-        $scope.model.sujets.push(new Sujet().init(6.75, "51,102,204"));
-        $scope.model.sujets.push(new Sujet().init(11.35, "102,170,20"));
+        $scope.model.sujets.push(new Sujet().init("Chat", 4.9, "221,68,119"));
+        $scope.model.sujets.push(new Sujet().init("Femme", 6.75, "51,102,204"));
+        $scope.model.sujets.push(new Sujet().init("Arbre", 11.35, "102,170,20"));
     };
+
+    $scope.repaintDistances = function repaintDistances() {
+        distancePainter.drawDistances($scope.model.sujets);
+    };
+
+    $scope.$watch('model.sujets', function(newValue, oldValue) {
+        $scope.repaintDistances();
+    }, true);
     
-    this.init();
-    distancePainter.drawDistances($scope.model.sujets);
+    $scope.init();
+    $scope.repaintDistances();
 });

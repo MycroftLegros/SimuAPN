@@ -30,7 +30,7 @@ angular.module('testYoAngularApp').service('distancePainter', function distanceP
 
 
             sujets.forEach(function(sujet) {
-                this.printSujet(sujet, context, k_distance, MARGE_X, H_AXE, demi_h_trait_d);
+                this.paintSujet(sujet, context, k_distance, MARGE_X, H_AXE, demi_h_trait_d);
             }.bind(this));
         }
     };
@@ -56,7 +56,7 @@ angular.module('testYoAngularApp').service('distancePainter', function distanceP
         ctx.stroke();
     };
 
-    this.printSujet = function printSujet(sujet, context, k_distance, MARGE_X, H_AXE, demi_h_trait_d) {
+    this.paintSujet = function paintSujet(sujet, context, k_distance, MARGE_X, H_AXE, demi_h_trait_d) {
         context.fillStyle = 'rgb(' + sujet.couleur + ')';
         context.font = "12px 'Trebuchet MS'";
         var distance = k_distance * sujet.distance; //distance en px
