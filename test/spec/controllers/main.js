@@ -1,6 +1,6 @@
 'use strict';
 
-describe('Controller: MainCtrl', function () {
+describe('Le controller principal', function () {
 
     // load the controller's module
     beforeEach(module('testYoAngularApp'));
@@ -15,7 +15,11 @@ describe('Controller: MainCtrl', function () {
         });
     }));
   
-    it('should attach a list of objectif to the scope', function() {
+    it('doit créer une liste d\'objectifs dans le scope', function() {
         expect(scope.model.objectifs.length).toBe(14);
+    });
+
+    it('doit créer une 3 sujets dans le scope', function() {
+        expect(scope.model.sujets.length).toBe(3);
     });
 });
