@@ -8,7 +8,7 @@ describe('SimuAPN', function() {
 
         it('doit afficher les informations de l\'objectif sélectionné', function() {
             // Given
-            expect(repeater('select option').count()).toBe(4);
+            expect(repeater('select option').count()).toBe(15);
             expect(element('#objectif-details').css('display')).toBe('none');
             
             //When
@@ -20,8 +20,8 @@ describe('SimuAPN', function() {
             expect(element('#focale').text()).toEqual('14');
             expect(element('#ouvertureMin').text()).toEqual('2.8');
             expect(element('#vr').text()).toEqual('false');
-            expect(element('#resolution').text()).toEqual('0');
-            expect(element('#ac').text()).toEqual('0');
+            expect(element('#resolution').text()).toEqual('0 P-Mpx');
+            expect(element('#ac').text()).toEqual('0 µm');
         });
     });
 });
