@@ -17,6 +17,6 @@ Commandes à lancer pour utiliser le projet... pas sûr qu'elles y soient toutes
  * Installer les deps: ```npm install```
  * Builder: ```grunt build```
  * Lancer le serveur: ```grunt server```
- * Lancer les tests unitaires: ```grunt karam:unit``` (*avoir un serveur lancé dans un autre terminal*)
- * Lancer les tests e2e: ```grunt karam:e2e``` (*avoir un serveur lancé dans un autre terminal*)
+ * Lancer les tests unitaires: ```grunt karma:unit``` (*avoir un serveur lancé dans un autre terminal*)
+ * Lancer les tests e2e: ```grunt karma:e2e``` (*avoir un serveur lancé dans un autre terminal*)
  
