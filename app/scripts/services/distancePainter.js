@@ -35,31 +35,26 @@ angular.module('testYoAngularApp').service('distancePainter', function distanceP
         }
     };
 
-    this.printDemiFlecheH = function printDemiFlecheH(ctx, y_, x_1, x_2) {
+    this.printDemiFlecheH = function printDemiFlecheH(ctx, y, x_1, x_2) {
 
-        var size_f = 3;
-        var temp;
+        var size_f = 5;
 
-        if (x_2 < x_1) {
-            temp = x_1;
-            x_1 = x_2;
-            x_2 = temp;
-        }
+        y+=0.5;
 
         ctx.beginPath();
         ctx.strokeStyle = '#000000';
-        ctx.lineTo(x_1, y_);
-        ctx.lineTo(x_2, y_);
-        ctx.lineTo(x_2 - size_f, y_ - size_f);
-        ctx.lineTo(x_2, y_);
-        ctx.lineTo(x_2 - size_f, y_ + size_f);
+        ctx.moveTo(x_1, y);
+        ctx.lineTo(x_2, y);
+        ctx.lineTo(x_2 - size_f, y - size_f);
+        ctx.moveTo(x_2, y);
+        ctx.lineTo(x_2 - size_f, y + size_f);
         ctx.stroke();
     };
 
     this.paintSujet = function paintSujet(sujet, context, k_distance, MARGE_X, H_AXE, demi_h_trait_d) {
+        var distance = k_distance * sujet.distance; //distance en px
         context.fillStyle = 'rgb(' + sujet.couleur + ')';
         context.font = "12px 'Trebuchet MS'";
-        var distance = k_distance * sujet.distance; //distance en px
         context.beginPath();
         context.fillRect(MARGE_X + distance, H_AXE - demi_h_trait_d, 1, 1 + demi_h_trait_d);
         context.beginPath();

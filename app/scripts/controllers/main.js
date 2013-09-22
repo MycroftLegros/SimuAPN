@@ -30,5 +30,4 @@ angular.module('testYoAngularApp').controller('MainCtrl', function($scope, dista
     }, true);
     
     $scope.init();
-    $scope.repaintDistances();
 });
