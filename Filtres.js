@@ -2,6 +2,10 @@
 
 //IN: imageData à modifier et valeur de la luminosité
 //OUT: imageData modifiée
+<<<<<<< HEAD
+=======
+
+>>>>>>> ménage, tuning et fix
 function luminosite(imgData_src, bright) {
 
 	for (var i = 0; i < imgData_src.data.length; i += 4) {

@@ -138,11 +138,19 @@ function XY2xyp(X, Y, flag) {
 function xyp2XY(x, y, p) {
 
 	var X, Y;
+<<<<<<< HEAD
 
 	x = k_3D * x;
 	y = k_3D * y;
 	p = k_3D * p;
 
+=======
+
+	x = k_3D * x;
+	y = k_3D * y;
+	p = k_3D * p;
+
+>>>>>>> ménage, tuning et fix
 	X = X0_3D + x * X0_3D;
 	Y = Y0_3D - y * Y0_3D;
 
@@ -161,6 +169,7 @@ function xyp2XY(x, y, p) {
 //IN: xyp    dans le système sans rotation/translation
 //OUT:x'y'p' coordonées dans xyp après rotation/translation
 //TBD: claculer la matrice de rotation (p/r aux axes)à part, car elle ne change que rarement
+<<<<<<< HEAD
 
 function majCoord3D(x, y, p, flag) {
 
@@ -169,8 +178,21 @@ function majCoord3D(x, y, p, flag) {
 	x = k_3D * x;
 	y = k_3D * y;
 	p = k_3D * p;
+=======
+>>>>>>> ménage, tuning et fix
+
+function majCoord3D(x, y, p, flag) {
+
+<<<<<<< HEAD
+=======
+	var temp_x, temp_y, temp_p;
+
+	x = k_3D * x;
+	y = k_3D * y;
+	p = k_3D * p;
 
 
+>>>>>>> ménage, tuning et fix
 	//-Pour rester centré sur le centre du Capteur
 	if (flag !== "pas_de_translation") {
 		x = x - dX * k_3D;
@@ -228,10 +250,17 @@ function majCoord3D(x, y, p, flag) {
 
 //IN: xyp dans le système sans rotation/translation
 //OUT: XY dans le canvas, après rotation/translation
+<<<<<<< HEAD
 
 function xyp2XYmaj(x, y, p) {
 
 
+=======
+
+function xyp2XYmaj(x, y, p) {
+
+
+>>>>>>> ménage, tuning et fix
 	var temp_XY;
 	var temp_xyp;
 	var temp_x, temp_y, temp_p;
@@ -317,11 +346,21 @@ function drawLine3D(xd, yd, pd, xf, yf, pf) {
 //TBD: IHM pour faire comprendre la rotation (point au centre, petits arcs selon la sphère au niveau de la souris,..)
 
 function souris3D(id, e) {
+<<<<<<< HEAD
 
 
 	var Xt0, Yt0;
 	var Xt1, Yt1;
 	var temp_xyp;
+=======
+
+
+	var Xt0, Yt0;
+	var Xt1, Yt1;
+	var temp_xyp;
+	var Ax, Ay, Ap;
+	var Bx, By, Bp;
+>>>>>>> ménage, tuning et fix
 
 	//-INIT de la 3D avec le canvas adpté + MAJ des cos et sin
 	init_3D(id);
@@ -364,11 +403,20 @@ function souris3D(id, e) {
 	Bx = temp_xyp.x;
 	By = temp_xyp.y;
 	Bp = temp_xyp.p;
+<<<<<<< HEAD
 
+=======
+>>>>>>> ménage, tuning et fix
 
 	//ROTATION
 	if (cvs_3D === "MoletteReglage" || typeDeplacementFenetre3D === "rotation") {
 
+<<<<<<< HEAD
+=======
+	//ROTATION
+	if (cvs_3D === "MoletteReglage" || typeDeplacementFenetre3D === "rotation") {
+
+>>>>>>> ménage, tuning et fix
 		//Rotation autour de y
 		if (cvs_3D === "MoletteReglage") {
 
@@ -493,6 +541,7 @@ function souris3D(id, e) {
 			}
 
 			if (cvs_3D === "MoletteReglage") {
+<<<<<<< HEAD
 				Rot1_1_moletteReglage= Rot1_1_temp;
 				Rot1_2_moletteReglage= Rot1_2_temp;
 				Rot1_3_moletteReglage= Rot1_3_temp;
@@ -502,6 +551,17 @@ function souris3D(id, e) {
 				Rot3_1_moletteReglage= Rot3_1_temp;
 				Rot3_2_moletteReglage= Rot3_2_temp;
 				Rot3_3_moletteReglage= Rot3_3_temp;
+=======
+				Rot1_1_moletteReglage = Rot1_1_temp;
+				Rot1_2_moletteReglage = Rot1_2_temp;
+				Rot1_3_moletteReglage = Rot1_3_temp;
+				Rot2_1_moletteReglage = Rot2_1_temp;
+				Rot2_2_moletteReglage = Rot2_2_temp;
+				Rot2_3_moletteReglage = Rot2_3_temp;
+				Rot3_1_moletteReglage = Rot3_1_temp;
+				Rot3_2_moletteReglage = Rot3_2_temp;
+				Rot3_3_moletteReglage = Rot3_3_temp;
+>>>>>>> ménage, tuning et fix
 			}
 		}
 	}
@@ -510,6 +570,7 @@ function souris3D(id, e) {
 	else {
 
 		temp_xyp = XY2xyp(Xt0, Yt0, "pas_de_translation");
+<<<<<<< HEAD
 		var Ax = temp_xyp.x;
 		var Ay = temp_xyp.y;
 		var Ap = temp_xyp.p;
@@ -519,6 +580,17 @@ function souris3D(id, e) {
 		var Bx = temp_xyp.x;
 		var By = temp_xyp.y;
 		var Bp = temp_xyp.p;
+=======
+		Ax = temp_xyp.x;
+		Ay = temp_xyp.y;
+		Ap = temp_xyp.p;
+
+		//B: point final de la souris
+		temp_xyp = XY2xyp(Xt1, Yt1, "pas_de_translation");
+		Bx = temp_xyp.x;
+		By = temp_xyp.y;
+		Bp = temp_xyp.p;
+>>>>>>> ménage, tuning et fix
 
 		Tx_3D += (Bx - Ax);
 		Ty_3D += (By - Ay);
@@ -538,14 +610,26 @@ function souris3D(id, e) {
 		Yt0_Fenetre3D = Yt1;
 	}
 
+<<<<<<< HEAD
 	if (cvs_3D === "MoletteReglage") {
 		majTriangleExpo(Xt1);
 	}
+=======
+>>>>>>> ménage, tuning et fix
 
 	//MAJ du canvas
 	if (cvs_3D === "Fenetre3D")
 		drawFenetre3D();
 
+<<<<<<< HEAD
 	if (cvs_3D === "MoletteReglage")
 		drawMoletteReglage();
+=======
+	if (cvs_3D === "MoletteReglage") {
+		drawMoletteReglage();
+		setTimeout(function() {
+			majTriangleExpo(Xt1);
+		}, 1);
+	}
+>>>>>>> ménage, tuning et fix
 }

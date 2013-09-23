@@ -304,12 +304,20 @@ function extrapoleObjectif() {
 
 	//Cherche les 2 objectifs prédéfinis qui entourent le courant
 	for (i = 0; i < ListeObj.length; i++) {
+<<<<<<< HEAD
 		if ((focale >= ListeObj[i].foc) && ((i == ListeObj.length - 1) || (focale < ListeObj[i + 1].foc)))
+=======
+		if ((focale >= ListeObj[i].foc) && ((i === ListeObj.length - 1) || (focale < ListeObj[i + 1].foc)))
+>>>>>>> ménage, tuning et fix
 			ii = i;
 	}
 
 	//On tombe sur une valeur connue
+<<<<<<< HEAD
 	if (focale == ListeObj[ii].foc) {
+=======
+	if (focale === ListeObj[ii].foc) {
+>>>>>>> ménage, tuning et fix
 
 		ObjExtra.Npoly = ListeObj[ii].Npoly;
 		ObjExtra.bague = ListeObj[ii].bague;

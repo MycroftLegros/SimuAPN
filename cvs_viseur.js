@@ -1,5 +1,8 @@
 ﻿//Dessine le viseur
+<<<<<<< HEAD
 //TBD: faire un unique layer (possible si flou non css)
+=======
+>>>>>>> ménage, tuning et fix
 //Rq: appeler luminosité une fois sur l'imagedata globale fait passer de 77ms à 32ms (vs luminosité pour chaque layer)
 
 function drawViseur() {
@@ -17,8 +20,16 @@ function drawViseur() {
 	cvs_illu.width = w_cvs_viseur;
 	cvs_illu.height = h_cvs_Viseur;
 
+<<<<<<< HEAD
 	ct_illu.fillStyle = "#FFFFFF";
 	ct_illu.fillRect(0, 0, w_cvs_viseur, h_cvs_Viseur);
+=======
+	var my_gradient = ct_illu.createLinearGradient(0, 0, 0, 170);
+	my_gradient.addColorStop(0, "rgb(50,100,250)");
+	my_gradient.addColorStop(1, "white");
+	ct_illu.fillStyle = my_gradient;
+	ct_illu.fillRect(0, 0, w_cvs_viseur, h_cvs_Viseur / 2);
+>>>>>>> ménage, tuning et fix
 
 	document.getElementById('id_cvs_viseur_illustrations').style.cssText = 'position: absolute; left: ' + marge_x_viseur + 'px; top: ' + marge_Y_exifViseur + 'px; z-index: 2;';
 
@@ -29,6 +40,7 @@ function drawViseur() {
 	var H_viseur = h_cvs_Viseur + marge_Y_exifViseur + marge_Y_bas_exifViseur;
 	cvs_cadre.width = W_viseur;
 	cvs_cadre.height = H_viseur;
+<<<<<<< HEAD
 
 	ct_cadre.fillStyle = '#000000';
 	ct_cadre.fillRect(0, 0, W_viseur - 1, H_viseur - 1);
@@ -62,15 +74,59 @@ function drawViseur() {
 		temp2 = temp2.toFixed(1);
 	if (temp2 > 0)
 		temp2 = '+' + temp2;
+=======
+	ct_cadre.fillStyle = '#000000';
+	ct_cadre.fillRect(0, 0, W_viseur - 1, H_viseur - 1);
 
+	marge_x_viseur -= marge_X_exifViseur;
+	document.getElementById('id_cvs_viseur_cadre').style.cssText = 'position: absolute; left: ' + marge_x_viseur + 'px; top: 0px; z-index: 1;';
+	marge_x_viseur += marge_X_exifViseur;
+
+
+
+	//--INDICATIONS SOUS LE VISEUR
+	var y_text = H_viseur - 0.5 * marge_Y_bas_exifViseur + 5;
+
+	ct_cadre.font = "12px 'Trebuchet MS'";
+	ct_cadre.fillStyle = "#ffffff";
+	ct_cadre.beginPath();
+	//-vitesse
+	temp = 0.083333 * W_viseur;
+	ct_cadre.fillText(vitesse_string, temp, y_text);
+	//-ouverture
+	temp = 0.25 * W_viseur;
+	ct_cadre.fillText('f/' + ouverture, temp, y_text);
+	//-iso
+	temp = 0.75 * W_viseur;
+	ct_cadre.fillText('ISO' + ISO, temp, y_text);
+	//-exposition
+	temp = 0.5 * W_viseur;
+
+	temp2 = expo;
+	if (temp2 !== 0)
+		temp2 = temp2.toFixed(1);
+	if (temp2 > 0)
+		temp2 = '+' + temp2;
+
+>>>>>>> ménage, tuning et fix
 
 	//-Curseur d'exposition
 	var X0 = (W_viseur - 1) / 2;
 	var Y0 = y_text - 5;
 
+<<<<<<< HEAD
+	//-Curseur d'exposition
+	var X0 = (W_viseur - 1) / 2;
+	var Y0 = y_text - 5;
+=======
+	var c = 3; //côté d'un carré de l'indicateur d'EV
+	var e = 1; //espace entre 2 indications
+>>>>>>> ménage, tuning et fix
+
 	var c = 3; //côté d'un carré de l'indicateur d'EV
 	var e = 1; //espace entre 2 indications
 
+<<<<<<< HEAD
 
 	ct_cadre.beginPath();
 
@@ -117,6 +173,53 @@ function drawViseur() {
 	var Wc = w_cvs_viseur;
 	var Hc = h_cvs_Viseur;
 
+=======
+	ct_cadre.beginPath();
+
+	//trait en haut
+	ct_cadre.fillRect(X0, Y0 - c - e, c, 3 * c + e);
+
+	for (i = 1; i !== 3; i++) {
+		ct_cadre.fillRect(X0 + i * 3 * (c + e), Y0 - c - e, c, c);
+		ct_cadre.fillRect(X0 - i * 3 * (c + e), Y0 - c - e, c, c);
+	}
+
+	//ct_scene_viseur.beginPath(); 
+	ct_cadre.fillText('-', X0 - 6 * (c + e) - 4, Y0 - 2 * c);
+	ct_cadre.fillText(temp2 + 'EV', X0 - 10, Y0 - 2 * c - 2);
+	ct_cadre.fillText('+', X0 + 7 * (c + e), Y0 - 2 * c);
+
+	//traits dynamiques
+	ii = 0;
+
+	for (i = Math.abs(expo); i >= 0 & ii < 7; i -= 0.333) {
+		if (expo > 0)
+			ct_cadre.fillRect(X0 + ii * (c + e), Y0, c, 2 * c);
+		else
+			ct_cadre.fillRect(X0 - ii * (c + e), Y0, c, 2 * c);
+		ii++;
+	}
+
+	if (expo > 2) {
+		ct_cadre.moveTo(X0 + 7 * (c + e), Y0);
+		ct_cadre.lineTo(X0 + 7 * (c + e) + 1.732 * c, Y0 + c);
+		ct_cadre.lineTo(X0 + 7 * (c + e), Y0 + 2 * c);
+		ct_cadre.lineTo(X0 + 7 * (c + e), Y0);
+		ct_cadre.fill();
+	}
+	if (expo < -2) {
+		ct_cadre.moveTo(X0 - 6 * (c + e), Y0);
+		ct_cadre.lineTo(X0 - 6 * (c + e) - 1.732 * c, Y0 + c);
+		ct_cadre.lineTo(X0 - 6 * (c + e), Y0 + 2 * c);
+		ct_cadre.lineTo(X0 - 6 * (c + e), Y0);
+		ct_cadre.fill();
+	}
+
+
+	var Wc = w_cvs_viseur;
+	var Hc = h_cvs_Viseur;
+
+>>>>>>> ménage, tuning et fix
 	var Xm = (Wc - 1) / 2;
 	var Ym = (Hc - 1) / 2;
 
@@ -128,10 +231,17 @@ function drawViseur() {
 	//--GRILLE DE PERSPECTIVE
 	//Couleur de fond
 	ct_illu.fillStyle = color_sol;
+<<<<<<< HEAD
 	ct_illu.beginPath();
 	ct_illu.fillRect(0, Ym, w_cvs_viseur, h_cvs_Viseur / 2);
 
 	//Couleur des lignes
+=======
+	ct_illu.fillRect(0, h_cvs_Viseur / 2, w_cvs_viseur, h_cvs_Viseur / 2);
+
+	//Couleur des lignes
+	ct_illu.beginPath();
+>>>>>>> ménage, tuning et fix
 	ct_illu.strokeStyle = color_grillePerspective;
 	ct_illu.lineWidth = 1;
 
@@ -328,6 +438,7 @@ function drawViseur() {
 		h_img = h_img_avantPlan;
 		w_m_img = w_m_img_avantPlan;
 		offset_y = offset_y_avantPlan;
+<<<<<<< HEAD
 
 		var k = Wc / l; //px.m-1
 		var w = k * w_m_img;
@@ -355,21 +466,63 @@ function drawViseur() {
 
 	}
 
+=======
+
+		var k = Wc / l; //px.m-1
+		var w = k * w_m_img;
+		var h = k * w_m_img * h_img / w_img;
+
+		X -= w / 2;
+		Y -= (w_m_img * h_img / w_img - offset_y) * k;
+
+
+		f = flouAvantPlan * Wc / (l_capteur / 1000.0);
+		if (f > blur_max)
+			f = blur_max;
+		if (f < blur_min)
+			f = 0;
+
+		if (flag_drawFlou === 0)
+			f = 0;
+
+		if (f !== 0) {
+			stackBlurImage(img_avantPlan, 'id_cvs_inter', f, 1);
+			var cvs_temp2 = document.getElementById("id_cvs_inter");
+			ct_illu.drawImage(cvs_temp2, X, Y, w, h);
+		} else
+			ct_illu.drawImage(img_avantPlan, X, Y, w, h);
+
+	}
+
+>>>>>>> ménage, tuning et fix
 
 	//Luminosité
 
 	var imgData = ct_illu.getImageData(0, 0, w_cvs_viseur, h_cvs_Viseur);
+<<<<<<< HEAD
 
 	if (flag_drawExposition) {
 		var imgData_temp = luminosite(imgData, bright).imgData_lum;
 		ct_illu.putImageData(imgData_temp, 0, 0);
 	} else
 		var imgData_temp = imgData;
+=======
+	var imgData_temp;
+	if (flag_drawExposition) {
+		imgData_temp = luminosite(imgData, bright).imgData_lum;
+		ct_illu.putImageData(imgData_temp, 0, 0);
+	} else
+		imgData_temp = imgData;
+>>>>>>> ménage, tuning et fix
 
 
 	//Récupère les valeurs des pixels pour le calcul de l'histogramme
 	//TBD: utiliser directement imgData_temp dans calcHisto
+<<<<<<< HEAD
 	var i = 0;
+=======
+	i = 0;
+>>>>>>> ménage, tuning et fix
 	for (i = 0; i < w_cvs_viseur * h_cvs_Viseur; i++) {
 		valPixR[i] = imgData_temp.data[4 * i];
 		valPixV[i] = imgData_temp.data[4 * i + 1];
@@ -378,8 +531,14 @@ function drawViseur() {
 	}
 
 	//MAJ de l'histogramme puis le dessine
+<<<<<<< HEAD
 	//TBD: à ne lancer que si l'histo est visible
 	calcHistos();
+=======
+	//TBD: à ne lancer que si visible
+	calcHistos();
+	drawGraphPDC();
+>>>>>>> ménage, tuning et fix
 
 }
 
@@ -529,7 +688,10 @@ function initImageData() {
 	img_temp_chat.onload = function() {
 
 		//- 1 - Met l'image dans le canvas
+<<<<<<< HEAD
 		//TBD: utiliser un canvas invisible
+=======
+>>>>>>> ménage, tuning et fix
 		var cvs = document.getElementById('id_cvs_inter');
 		var ct = cvs.getContext('2d');
 		var w = img_temp_chat.width;
@@ -737,14 +899,26 @@ function initImageData() {
 
 		ct.putImageData(imageData_avantPlan, 0, 0);
 		dataURL_arbre_avantPlan = cvs.toDataURL("image/png");
+<<<<<<< HEAD
+
+		ct.putImageData(imageData_arrierePlan, 0, 0);
+		dataURL_arbre_arrierePlan = cvs.toDataURL("image/png");
+=======
 
 		ct.putImageData(imageData_arrierePlan, 0, 0);
 		dataURL_arbre_arrierePlan = cvs.toDataURL("image/png");
 
 		ct.putImageData(imageData_map, 0, 0);
 		dataURL_arbre_map = cvs.toDataURL("image/png");
+>>>>>>> ménage, tuning et fix
 
+		ct.putImageData(imageData_map, 0, 0);
+		dataURL_arbre_map = cvs.toDataURL("image/png");
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> ménage, tuning et fix
 		majIllustrations();
 	};
 
@@ -878,6 +1052,7 @@ function majIllustrationAvantPlan() {
 	};
 
 }
+<<<<<<< HEAD
 
 
 function majDistancePhotographe(Delta) {
@@ -897,6 +1072,27 @@ function majDistancePhotographe(Delta) {
 		d_avantPlan += (temp - d_map);
 		d_map = temp;
 
+=======
+
+
+function majDistancePhotographe(Delta) {
+	Delta = -0.1 * Delta; //10cm par tour
+
+	var temp = 1.0 * d_map;
+
+	if (Delta < 0)
+		temp = temp / 1.05;
+	else
+		temp = 1.05 * temp;
+
+
+	if (temp > (focale / 1000)) {
+		dP += d_map - temp;
+		d_arrierePlan += (temp - d_map);
+		d_avantPlan += (temp - d_map);
+		d_map = temp;
+
+>>>>>>> ménage, tuning et fix
 		if (d_avantPlan < 0)
 			d_avantPlan = 0;
 
@@ -922,8 +1118,13 @@ function sourisPositionPhotographe(e) {
 	var tempY = posY - Yt0_cvs_viseur;
 
 	//Dimensions de la scène
+<<<<<<< HEAD
 	tempX = tempX * w_m_avantPlan / w_cvs_viseur;
 	tempY = tempY * h_m_avantPlan / (w_cvs_viseur * h_capteur / l_capteur);
+=======
+	tempX = tempX * w_m_map / w_cvs_viseur;
+	tempY = tempY * h_m_map / (w_cvs_viseur * h_capteur / l_capteur);
+>>>>>>> ménage, tuning et fix
 
 	//1px => 1cm
 	if (flag_clicViseur) {

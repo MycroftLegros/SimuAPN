@@ -72,12 +72,31 @@ document.getElementById('id_cvs_RoueMode').addEventListener('mousemove', functio
 			switch (modeAPN) {
 				case 'manuel':
 					document.getElementById('id_nom_mode').innerHTML = chrome.i18n.getMessage("PrioMan");
+<<<<<<< HEAD
 					break;
 				case 'ouverture':
 					document.getElementById('id_nom_mode').innerHTML = chrome.i18n.getMessage("PrioOuv");
 					break;
 				case 'vitesse':
 					document.getElementById('id_nom_mode').innerHTML = chrome.i18n.getMessage("PrioVit");
+=======
+					document.getElementById('rb_triangle_vitesse').disabled = false;
+					document.getElementById('rb_triangle_ouverture').disabled = false;
+					break;
+				case 'ouverture':
+					document.getElementById('id_nom_mode').innerHTML = chrome.i18n.getMessage("PrioOuv");
+					document.getElementById('rb_triangle_vitesse').disabled = true;
+					document.getElementById('rb_triangle_ouverture').disabled = false;
+					document.getElementById('rb_triangle_ouverture').checked = true;
+					selectMoletteReglage = "ouverture";
+					break;
+				case 'vitesse':
+					document.getElementById('id_nom_mode').innerHTML = chrome.i18n.getMessage("PrioVit");
+					document.getElementById('rb_triangle_ouverture').disabled = true;
+					document.getElementById('rb_triangle_vitesse').disabled = false;
+					document.getElementById('rb_triangle_vitesse').checked = true;
+					selectMoletteReglage = "vitesse";
+>>>>>>> ménage, tuning et fix
 					break;
 			}
 

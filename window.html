@@ -42,7 +42,7 @@
 	</div>
 	
 	
-	<!-- Canvas 3D et canvas Viseur -->
+	<!-- Fenetres -->
 	<div class='zone_graphique' id='id_zone_graph'>
 
 				<div id='id_graph_3D' style='text-align:center;'>
@@ -87,7 +87,7 @@
 				</div>
 				
 				<div id='id_graph_Histo' style='text-align:center;  vertical-align: middle;'>
-				<canvas id="id_canvas_histo_lum" class='css_graph'></canvas><br/><canvas id='id_canvas_histo_RVB'  ></canvas>
+				<canvas id="id_canvas_histo_lum" class='css_graph'></canvas><canvas id='id_canvas_histo_RVB'  ></canvas>
 					
 				</div>
 
@@ -133,7 +133,7 @@
 						<td>
 							<table>
 								<tr width='100px'>
-									<td><input type="radio" name="triangle_expo" id="rb_triangle_vitesse"  ></input></td>
+									<td><input type="radio" name="triangle_expo" id="rb_triangle_vitesse" disabled></input></td>
 									<td id='id_nom_vitesse' ></td>
 								</tr>	
 									
@@ -330,8 +330,8 @@
 			<td id="id_menu_viseur">
 				<table class="onglet" >
 					<tr><td colspan='2' class="nom_ss_onglet">Afficher</td></tr>
-					<tr><td><input type="checkbox" name="chk_flou" id="id_chk_flou" ></td><td>Flou</td>	</tr>
-					<tr><td><input type="checkbox" name="chk_expo" id="id_chk_expo" ></td><td>Exposition</td></tr>
+					<tr><td><input type="checkbox" name="chk_flou" id="id_chk_flou" checked="true" ></td><td>Flou</td>	</tr>
+					<tr><td><input type="checkbox" name="chk_expo" id="id_chk_expo" checked="true"></td><td>Exposition</td></tr>
 				</table>
 			</td>
 						

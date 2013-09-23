@@ -6,6 +6,7 @@ w_Fenetre = 400;
 h_cvs = 0;
 w_cvs = 400;
 w_cvs_hiden = 100;
+<<<<<<< HEAD
 
 
 
@@ -15,21 +16,34 @@ document.getElementById('liste_scene').addEventListener('change', function() {
 	luminosite_EV = 1.0 * document.getElementById('liste_scene').options[document.getElementById('liste_scene').selectedIndex].value;
 	calculs();
 
+=======
+>>>>>>> ménage, tuning et fix
 
 	//Prio vitesse => modifie l'ouverture
 	if (modeAPN === "vitesse") {
 
 		cpt_ouverture += (Math.round(expo / (1 / 3)));
 
+<<<<<<< HEAD
 		if (cpt_ouverture < cpt_ouvertureMin)
 			cpt_ouverture = cpt_ouvertureMin;
 		if (cpt_ouverture > 37)
 			cpt_ouverture = 37;
 
+=======
+//--LUMINOSITE
+document.getElementById('liste_scene').addEventListener('change', function() {
+
+	luminosite_EV = 1.0 * document.getElementById('liste_scene').options[document.getElementById('liste_scene').selectedIndex].value;
+	calculs();
+>>>>>>> ménage, tuning et fix
 
 		ouverture = cpt2ouverture(cpt_ouverture).N;
 
+	//Prio vitesse => modifie l'ouverture
+	if (modeAPN === "vitesse") {
 
+<<<<<<< HEAD
 	}
 
 	//Prio ouverture => modifie la vitesse
@@ -46,6 +60,32 @@ document.getElementById('liste_scene').addEventListener('change', function() {
 
 		switch (cpt_vitesse) {
 
+=======
+		cpt_ouverture += (Math.round(expo / (1 / 3)));
+
+		if (cpt_ouverture < cpt_ouvertureMin)
+			cpt_ouverture = cpt_ouvertureMin;
+		if (cpt_ouverture > 37)
+			cpt_ouverture = 37;
+
+		ouverture = cpt2ouverture(cpt_ouverture).N;
+	}
+
+	//Prio ouverture => modifie la vitesse
+	if (modeAPN === "ouverture") {
+
+		cpt_vitesse -= (Math.round(expo / (1 / 3)));
+
+		if (cpt_vitesse < 1)
+			cpt_vitesse = 1;
+		if (cpt_vitesse > 58)
+			cpt_vitesse = 58;
+
+		temp = '';
+
+		switch (cpt_vitesse) {
+
+>>>>>>> ménage, tuning et fix
 			case 1:
 				temp = '1/8000';
 				vitesse = 0.000125;
@@ -279,11 +319,22 @@ document.getElementById('liste_scene').addEventListener('change', function() {
 				vitesse = 60;
 				break;
 		}
+<<<<<<< HEAD
 
 		if (temp !== '')
 			vitesse_string = temp;
 
 	}
+=======
+
+		if (temp !== '')
+			vitesse_string = temp;
+
+	}
+
+	calculs();
+	drawViseur();
+>>>>>>> ménage, tuning et fix
 
 	calculs();
 	drawViseur();
@@ -351,6 +402,7 @@ document.getElementById('id_div_BtnTranslation').onclick = function() {
 };
 
 
+<<<<<<< HEAD
 
 document.getElementById('id_div_BtnRotation').onclick = function() {
 	if (typeDeplacementFenetre3D !== "rotation") {
@@ -365,10 +417,27 @@ document.getElementById('id_div_BtnRotation').onclick = function() {
 //--ONGLETS DE REGLAGE
 
 
+=======
+
+document.getElementById('id_div_BtnRotation').onclick = function() {
+	if (typeDeplacementFenetre3D !== "rotation") {
+		typeDeplacementFenetre3D = "rotation";
+		drawBouton('id_div_BtnRotation', 'id_img_BtnRotation', 'css_BtnON');
+		drawBouton('id_div_BtnTranslation', 'id_img_BtnTranslation', 'css_BtnOFF');
+	}
+};
+
+
+
+>>>>>>> ménage, tuning et fix
 
 //RB DE SELECTION DU PARAMTERE DU TRIANGLE D'EXPOSITION
 document.getElementById('rb_triangle_vitesse').addEventListener('change', function() {
 	selectMoletteReglage = "vitesse";
+<<<<<<< HEAD
+=======
+	
+>>>>>>> ménage, tuning et fix
 }, false);
 
 document.getElementById('rb_triangle_ouverture').addEventListener('change', function() {
@@ -482,6 +551,7 @@ document.getElementById('input_dynamique').addEventListener('change', function()
 
 
 //-OBJECTIF
+<<<<<<< HEAD
 
 function majObjectif() {
 
@@ -506,12 +576,39 @@ function majObjectif() {
 		document.getElementById('input_aberrations_chromatiques').value = abberationChromatique;
 
 
+=======
+
+function majObjectif() {
+
+	var temp = 1.0 * document.getElementById("slider_focale").value;
+
+	if (flag_objectifPredefini === 0) {
+
+		focale = temp;
+		extrapoleObjectif();
+	} else {
+		cpt_objectif = temp;
+		focale = 1.0 * ListeObj[temp].foc;
+		ouvertureMin = 1.0 * ListeObj[temp].Nmin;
+		cpt_ouvertureMin = 1.0 * ouverture2cpt(ouvertureMin).cpt;
+		antiVibration = 1.0 * ListeObj[temp].VR;
+		resolution = 1.0 * ListeObj[temp].res;
+		abberationChromatique = 1.0 * ListeObj[temp].AC;
+
+		document.getElementById('liste_N_min').selectedIndex = cpt_ouvertureMin - 1;
+		document.getElementById('liste_antiVibration').selectedIndex = antiVibration;
+		document.getElementById('input_resolution').value = resolution;
+		document.getElementById('input_aberrations_chromatiques').value = abberationChromatique;
+
+
+>>>>>>> ménage, tuning et fix
 		if (ouverture < ouvertureMin) {
 			ouverture = ouvertureMin;
 			cpt_ouverture = cpt_ouvertureMin;
 		}
 
 	}
+<<<<<<< HEAD
 
 
 	if (flag_cadrageConstant) {
@@ -528,6 +625,24 @@ function majObjectif() {
 		if (d_avantPlan < 0)
 			d_avantPlan = 0;
 
+=======
+
+
+	if (flag_cadrageConstant) {
+
+		temp = w_m_map * focale / l_capteur; //nouvelle dmap
+
+		if (temp < -1 * (d_map - (focale / 1000.0 + 0.001)))
+			temp = -1 * (d_map - (focale / 1000.0 + 0.001));
+
+
+		dP += d_map - temp;
+		d_arrierePlan += (temp - d_map);
+
+		if (d_avantPlan < 0)
+			d_avantPlan = 0;
+
+>>>>>>> ménage, tuning et fix
 		d_avantPlan += (temp - d_map);
 		d_map = temp;
 	} else {
@@ -549,6 +664,10 @@ function majObjectif() {
 	if (cropFactor !== 1)
 		initPtsCapteurs();
 
+<<<<<<< HEAD
+=======
+	
+>>>>>>> ménage, tuning et fix
 	drawFenetre3D();
 
 }
@@ -731,6 +850,12 @@ document.getElementById('id_chk_expo').addEventListener('change', function() {
 document.getElementById('liste_cdc').addEventListener('change', function() {
 	cdc_denominateur = 1.0 * document.getElementById('liste_cdc').options[document.getElementById('liste_cdc').selectedIndex].value;
 	calculs();
+<<<<<<< HEAD
+=======
+	drawViseur();
+	drawFenetre3D();
+	drawDistances();
+>>>>>>> ménage, tuning et fix
 }, false);
 
 
@@ -743,6 +868,7 @@ function positionneFenetres(id_liste) {
 	hide('id_graph_Viseur');
 	hide('id_graph_PDC');
 	hide('id_graph_Histo');
+<<<<<<< HEAD
 
 	var liste_old = '';
 
@@ -758,8 +884,19 @@ function positionneFenetres(id_liste) {
 
 	if (id_liste !== 'id_lst_Fenetre22' && (document.getElementById('id_lst_Fenetre22').options[document.getElementById('id_lst_Fenetre22').selectedIndex].value === document.getElementById(id_liste).options[document.getElementById(id_liste).selectedIndex].value))
 		liste_old = 'id_lst_Fenetre22';
+=======
 
+	var liste_old = '';
 
+	//Cherche l'ancienne place du graph selectionné dans la liste courante
+	if (id_liste !== 'id_lst_Fenetre11' && (document.getElementById('id_lst_Fenetre11').options[document.getElementById('id_lst_Fenetre11').selectedIndex].value === document.getElementById(id_liste).options[document.getElementById(id_liste).selectedIndex].value))
+		liste_old = 'id_lst_Fenetre11';
+>>>>>>> ménage, tuning et fix
+
+	if (id_liste !== 'id_lst_Fenetre12' && (document.getElementById('id_lst_Fenetre12').options[document.getElementById('id_lst_Fenetre12').selectedIndex].value === document.getElementById(id_liste).options[document.getElementById(id_liste).selectedIndex].value))
+		liste_old = 'id_lst_Fenetre12';
+
+<<<<<<< HEAD
 	var graph_old = '';
 
 	if (liste_old !== '') {
@@ -826,8 +963,76 @@ function positionneFenetres(id_liste) {
 	document.getElementById((document.getElementById('id_lst_Fenetre22').options[document.getElementById('id_lst_Fenetre22').selectedIndex].value)).style.left = w_Fenetre + 'px';
 	document.getElementById((document.getElementById('id_lst_Fenetre22').options[document.getElementById('id_lst_Fenetre22').selectedIndex].value)).style.right = '0px';
 
+=======
+	if (id_liste !== 'id_lst_Fenetre21' && (document.getElementById('id_lst_Fenetre21').options[document.getElementById('id_lst_Fenetre21').selectedIndex].value === document.getElementById(id_liste).options[document.getElementById(id_liste).selectedIndex].value))
+		liste_old = 'id_lst_Fenetre21';
+
+	if (id_liste !== 'id_lst_Fenetre22' && (document.getElementById('id_lst_Fenetre22').options[document.getElementById('id_lst_Fenetre22').selectedIndex].value === document.getElementById(id_liste).options[document.getElementById(id_liste).selectedIndex].value))
+		liste_old = 'id_lst_Fenetre22';
 
 
+	var graph_old = '';
+
+	if (liste_old !== '') {
+		//Cherche le graph qui n'est plus selectionné
+		if (document.getElementById('id_lst_Fenetre11').options[document.getElementById('id_lst_Fenetre11').selectedIndex].value !== 'id_graph_3D' &&
+			document.getElementById('id_lst_Fenetre12').options[document.getElementById('id_lst_Fenetre12').selectedIndex].value !== 'id_graph_3D' &&
+			document.getElementById('id_lst_Fenetre21').options[document.getElementById('id_lst_Fenetre21').selectedIndex].value !== 'id_graph_3D' &&
+			document.getElementById('id_lst_Fenetre22').options[document.getElementById('id_lst_Fenetre22').selectedIndex].value !== 'id_graph_3D')
+			graph_old = 'id_graph_3D';
+
+		if (document.getElementById('id_lst_Fenetre11').options[document.getElementById('id_lst_Fenetre11').selectedIndex].value !== 'id_graph_Viseur' &&
+			document.getElementById('id_lst_Fenetre12').options[document.getElementById('id_lst_Fenetre12').selectedIndex].value !== 'id_graph_Viseur' &&
+			document.getElementById('id_lst_Fenetre21').options[document.getElementById('id_lst_Fenetre21').selectedIndex].value !== 'id_graph_Viseur' &&
+			document.getElementById('id_lst_Fenetre22').options[document.getElementById('id_lst_Fenetre22').selectedIndex].value !== 'id_graph_Viseur')
+			graph_old = 'id_graph_Viseur';
+
+		if (document.getElementById('id_lst_Fenetre11').options[document.getElementById('id_lst_Fenetre11').selectedIndex].value !== 'id_graph_PDC' &&
+			document.getElementById('id_lst_Fenetre12').options[document.getElementById('id_lst_Fenetre12').selectedIndex].value !== 'id_graph_PDC' &&
+			document.getElementById('id_lst_Fenetre21').options[document.getElementById('id_lst_Fenetre21').selectedIndex].value !== 'id_graph_PDC' &&
+			document.getElementById('id_lst_Fenetre22').options[document.getElementById('id_lst_Fenetre22').selectedIndex].value !== 'id_graph_PDC')
+			graph_old = 'id_graph_PDC';
+
+		if (document.getElementById('id_lst_Fenetre11').options[document.getElementById('id_lst_Fenetre11').selectedIndex].value !== 'id_graph_Histo' &&
+			document.getElementById('id_lst_Fenetre12').options[document.getElementById('id_lst_Fenetre12').selectedIndex].value !== 'id_graph_Histo' &&
+			document.getElementById('id_lst_Fenetre21').options[document.getElementById('id_lst_Fenetre21').selectedIndex].value !== 'id_graph_Histo' &&
+			document.getElementById('id_lst_Fenetre22').options[document.getElementById('id_lst_Fenetre22').selectedIndex].value !== 'id_graph_Histo')
+			graph_old = 'id_graph_Histo';
+
+
+		//Met le graph non selectionné à l'ancienne place du nouveau
+		if (graph_old === 'id_graph_3D')
+			document.getElementById(liste_old).selectedIndex = 0;
+		if (graph_old === 'id_graph_Viseur')
+			document.getElementById(liste_old).selectedIndex = 1;
+		if (graph_old === 'id_graph_PDC')
+			document.getElementById(liste_old).selectedIndex = 2;
+		if (graph_old === 'id_graph_Histo')
+			document.getElementById(liste_old).selectedIndex = 3;
+	}
+
+	//Place les graph 
+
+	document.getElementById((document.getElementById('id_lst_Fenetre11').options[document.getElementById('id_lst_Fenetre11').selectedIndex].value)).style.position = 'absolute';
+	document.getElementById((document.getElementById('id_lst_Fenetre11').options[document.getElementById('id_lst_Fenetre11').selectedIndex].value)).style.top = '0px';
+	document.getElementById((document.getElementById('id_lst_Fenetre11').options[document.getElementById('id_lst_Fenetre11').selectedIndex].value)).style.bottom = h_Fenetre + 'px';
+	document.getElementById((document.getElementById('id_lst_Fenetre11').options[document.getElementById('id_lst_Fenetre11').selectedIndex].value)).style.left = '0px';
+	document.getElementById((document.getElementById('id_lst_Fenetre11').options[document.getElementById('id_lst_Fenetre11').selectedIndex].value)).style.right = w_Fenetre + 'px';
+
+	document.getElementById((document.getElementById('id_lst_Fenetre12').options[document.getElementById('id_lst_Fenetre12').selectedIndex].value)).style.position = 'absolute';
+	document.getElementById((document.getElementById('id_lst_Fenetre12').options[document.getElementById('id_lst_Fenetre12').selectedIndex].value)).style.top = '0px';
+	document.getElementById((document.getElementById('id_lst_Fenetre12').options[document.getElementById('id_lst_Fenetre12').selectedIndex].value)).style.bottom = h_Fenetre + 'px';
+	document.getElementById((document.getElementById('id_lst_Fenetre12').options[document.getElementById('id_lst_Fenetre12').selectedIndex].value)).style.left = w_Fenetre + 'px';
+	document.getElementById((document.getElementById('id_lst_Fenetre12').options[document.getElementById('id_lst_Fenetre12').selectedIndex].value)).style.right = '0px';
+>>>>>>> ménage, tuning et fix
+
+	document.getElementById((document.getElementById('id_lst_Fenetre21').options[document.getElementById('id_lst_Fenetre21').selectedIndex].value)).style.position = 'absolute';
+	document.getElementById((document.getElementById('id_lst_Fenetre21').options[document.getElementById('id_lst_Fenetre21').selectedIndex].value)).style.top = h_Fenetre + 'px';
+	document.getElementById((document.getElementById('id_lst_Fenetre21').options[document.getElementById('id_lst_Fenetre21').selectedIndex].value)).style.bottom = '0px';
+	document.getElementById((document.getElementById('id_lst_Fenetre21').options[document.getElementById('id_lst_Fenetre21').selectedIndex].value)).style.left = '0px';
+	document.getElementById((document.getElementById('id_lst_Fenetre21').options[document.getElementById('id_lst_Fenetre21').selectedIndex].value)).style.right = w_Fenetre + 'px';
+
+<<<<<<< HEAD
 	//MAJ des dimensions
 	switch (nbrFenetres) {
 
@@ -849,10 +1054,75 @@ function positionneFenetres(id_liste) {
 			document.getElementById("id_graph_Histo").style.height = h_Fenetre + 'px';
 			document.getElementById("id_graph_Histo").style.width = w_Fenetre + 'px';
 			break;
+=======
+	document.getElementById((document.getElementById('id_lst_Fenetre22').options[document.getElementById('id_lst_Fenetre22').selectedIndex].value)).style.position = 'absolute';
+	document.getElementById((document.getElementById('id_lst_Fenetre22').options[document.getElementById('id_lst_Fenetre22').selectedIndex].value)).style.top = h_Fenetre + 'px';
+	document.getElementById((document.getElementById('id_lst_Fenetre22').options[document.getElementById('id_lst_Fenetre22').selectedIndex].value)).style.bottom = '0px';
+	document.getElementById((document.getElementById('id_lst_Fenetre22').options[document.getElementById('id_lst_Fenetre22').selectedIndex].value)).style.left = w_Fenetre + 'px';
+	document.getElementById((document.getElementById('id_lst_Fenetre22').options[document.getElementById('id_lst_Fenetre22').selectedIndex].value)).style.right = '0px';
+>>>>>>> ménage, tuning et fix
 
 
 		case 2: //1ier graph selectionné
 			switch (document.getElementById('id_lst_Fenetre11').options[document.getElementById('id_lst_Fenetre11').selectedIndex].value) {
+
+<<<<<<< HEAD
+				case 'id_graph_3D':
+					document.getElementById("id_graph_3D").style.height = h_Fenetre + 'px';
+					document.getElementById("id_graph_3D").style.width = w_Fenetre + 'px';
+					w_cvs_Fenetre3D = w_cvs;
+					break;
+
+				case 'id_graph_Viseur':
+					document.getElementById("id_graph_Viseur").style.height = h_Fenetre + 'px';
+					document.getElementById("id_graph_Viseur").style.width = w_Fenetre + 'px';
+					w_cvs_viseur = w_cvs - 2 * marge_X_exifViseur;
+					break;
+
+				case 'id_graph_PDC':
+					document.getElementById("id_graph_PDC").style.height = h_Fenetre + 'px';
+					document.getElementById("id_graph_PDC").style.width = w_Fenetre + 'px';
+					w_cvs_Pdc = w_cvs - marge_X_cvs_PDC - marge_X_fin_cvs_PDC;
+					h_cvs_Pdc = Math.round(w_cvs_Pdc * 2 / 3);
+					break;
+
+				case 'id_graph_Histo':
+					document.getElementById("id_graph_Histo").style.height = h_Fenetre + 'px';
+					document.getElementById("id_graph_Histo").style.width = w_Fenetre + 'px';
+=======
+	//MAJ des dimensions
+	switch (nbrFenetres) {
+
+		//4 graph: tous sont affichés et ont même dim
+		case 4:
+			document.getElementById("id_graph_3D").style.height = h_Fenetre + 'px';
+			document.getElementById("id_graph_3D").style.width = w_Fenetre + 'px';
+			w_cvs_Fenetre3D = w_cvs;
+
+			document.getElementById("id_graph_Viseur").style.height = h_Fenetre + 'px';
+			document.getElementById("id_graph_Viseur").style.width = w_Fenetre + 'px';
+			w_cvs_viseur = w_cvs - 2 * marge_X_exifViseur;
+
+			document.getElementById("id_graph_PDC").style.height = h_Fenetre + 'px';
+			document.getElementById("id_graph_PDC").style.width = w_Fenetre + 'px';
+			w_cvs_Pdc = w_cvs - marge_X_cvs_PDC - marge_X_fin_cvs_PDC;
+			h_cvs_Pdc = Math.round(w_cvs_Pdc * 2 / 3);
+
+			document.getElementById("id_graph_Histo").style.height = h_Fenetre + 'px';
+			document.getElementById("id_graph_Histo").style.width = w_Fenetre + 'px';
+			break;
+>>>>>>> ménage, tuning et fix
+
+					break;
+			}
+
+<<<<<<< HEAD
+			//2nd graph selectionné
+			switch (document.getElementById('id_lst_Fenetre12').options[document.getElementById('id_lst_Fenetre12').selectedIndex].value) {
+=======
+		case 2: //1ier graph selectionné
+			switch (document.getElementById('id_lst_Fenetre11').options[document.getElementById('id_lst_Fenetre11').selectedIndex].value) {
+>>>>>>> ménage, tuning et fix
 
 				case 'id_graph_3D':
 					document.getElementById("id_graph_3D").style.height = h_Fenetre + 'px';
@@ -880,31 +1150,54 @@ function positionneFenetres(id_liste) {
 					break;
 			}
 
+<<<<<<< HEAD
+			//1ier graph NON selectionné
+			switch (document.getElementById('id_lst_Fenetre21').options[document.getElementById('id_lst_Fenetre21').selectedIndex].value) {
+=======
 			//2nd graph selectionné
 			switch (document.getElementById('id_lst_Fenetre12').options[document.getElementById('id_lst_Fenetre12').selectedIndex].value) {
+>>>>>>> ménage, tuning et fix
 
 				case 'id_graph_3D':
 					document.getElementById("id_graph_3D").style.height = h_Fenetre + 'px';
 					document.getElementById("id_graph_3D").style.width = w_Fenetre + 'px';
+<<<<<<< HEAD
+					w_cvs_Fenetre3D = w_cvs_hiden;
+=======
 					w_cvs_Fenetre3D = w_cvs;
+>>>>>>> ménage, tuning et fix
 					break;
 
 				case 'id_graph_Viseur':
 					document.getElementById("id_graph_Viseur").style.height = h_Fenetre + 'px';
 					document.getElementById("id_graph_Viseur").style.width = w_Fenetre + 'px';
+<<<<<<< HEAD
+					w_cvs_viseur = w_cvs_hiden - 2 * marge_X_exifViseur;
+=======
 					w_cvs_viseur = w_cvs - 2 * marge_X_exifViseur;
+>>>>>>> ménage, tuning et fix
 					break;
 
 				case 'id_graph_PDC':
 					document.getElementById("id_graph_PDC").style.height = h_Fenetre + 'px';
 					document.getElementById("id_graph_PDC").style.width = w_Fenetre + 'px';
+<<<<<<< HEAD
+					w_cvs_Pdc = w_cvs_hiden - marge_X_cvs_PDC - marge_X_fin_cvs_PDC;
+=======
 					w_cvs_Pdc = w_cvs - marge_X_cvs_PDC - marge_X_fin_cvs_PDC;
+>>>>>>> ménage, tuning et fix
 					h_cvs_Pdc = Math.round(w_cvs_Pdc * 2 / 3);
 					break;
 
 				case 'id_graph_Histo':
 					document.getElementById("id_graph_Histo").style.height = h_Fenetre + 'px';
 					document.getElementById("id_graph_Histo").style.width = w_Fenetre + 'px';
+<<<<<<< HEAD
+
+					break;
+			}
+
+=======
 
 					break;
 			}
@@ -938,6 +1231,7 @@ function positionneFenetres(id_liste) {
 					break;
 			}
 
+>>>>>>> ménage, tuning et fix
 			//2nd graph NON selectionné
 			switch (document.getElementById('id_lst_Fenetre22').options[document.getElementById('id_lst_Fenetre22').selectedIndex].value) {
 
@@ -1115,11 +1409,66 @@ function positionneFenetres(id_liste) {
 	if (flag_init === 0) {
 		drawFenetre3D();
 		drawViseur();
+<<<<<<< HEAD
 		drawGraphPDC();
+=======
+>>>>>>> ménage, tuning et fix
 	}
 
+<<<<<<< HEAD
 }
 
+
+function init_dimensionsFenetres() {
+
+
+
+	switch (nbrFenetres) {
+
+		case 1:
+			h_ZoneFenetres = 540;
+			w_ZoneFenetres = 800;
+			h_Fenetre = 520;
+			w_Fenetre = 800;
+			h_cvs = 0;
+			w_cvs = 700;
+			document.getElementById("id_choix_graph_1_1").style.display = '';
+			document.getElementById("id_choix_graph_1_2").style.display = 'none';
+			document.getElementById("id_choix_graph_2_1").style.display = 'none';
+			document.getElementById("id_choix_graph_2_2").style.display = 'none';
+			document.getElementById("id_canvas_histo_RVB").style.display = '';
+			break;
+
+		case 2:
+			h_ZoneFenetres = 320;
+			w_ZoneFenetres = 800;
+			h_Fenetre = 300;
+			w_Fenetre = 400;
+			h_cvs = 0;
+			w_cvs = 380;
+			document.getElementById("id_choix_graph_1_1").style.display = '';
+			document.getElementById("id_choix_graph_1_2").style.display = '';
+			document.getElementById("id_choix_graph_2_1").style.display = 'none';
+			document.getElementById("id_choix_graph_2_2").style.display = 'none';
+			document.getElementById("id_canvas_histo_RVB").style.display = '';
+			break;
+
+		case 4:
+			h_ZoneFenetres = 460;
+			w_ZoneFenetres = 800;
+			h_Fenetre = 220;
+			w_Fenetre = 400;
+			h_cvs = 0;
+			w_cvs = 250;
+			document.getElementById("id_choix_graph_1_1").style.display = '';
+			document.getElementById("id_choix_graph_1_2").style.display = '';
+			document.getElementById("id_choix_graph_2_1").style.display = '';
+			document.getElementById("id_choix_graph_2_2").style.display = '';
+			document.getElementById("id_canvas_histo_RVB").style.display = 'none';
+
+			break;
+	}
+=======
 
 function init_dimensionsFenetres() {
 
@@ -1177,7 +1526,48 @@ function init_dimensionsFenetres() {
 
 	var left_temp = Math.round((w_Fenetre - 207) / 2);
 	document.getElementById("menu_3D").style.left = left_temp + 'px';
+>>>>>>> ménage, tuning et fix
 
+	//Zone graphique totale
+	document.getElementById("id_zone_graph").style.height = h_ZoneFenetres + 'px';
+	document.getElementById("id_zone_graph").style.width = w_ZoneFenetres + 'px';
+
+<<<<<<< HEAD
+	var left_temp = Math.round((w_Fenetre - 207) / 2);
+	document.getElementById("menu_3D").style.left = left_temp + 'px';
+=======
+	positionneFenetres('id_lst_Fenetre11');
+}
+>>>>>>> ménage, tuning et fix
+
+//Nbr de graph à afficher
+document.getElementById('id_div_Btn1Fenetre').onclick = function() {
+	if (nbrFenetres !== 1) {
+		nbrFenetres = 1;
+		drawBouton('id_div_Btn1Fenetre', 'id_img_Btn1Fenetre', 'css_BtnON');
+		drawBouton('id_div_Btn2Fenetres', 'id_img_Btn2Fenetres', 'css_BtnOFF');
+		drawBouton('id_div_Btn4Fenetres', 'id_img_Btn4Fenetres', 'css_BtnOFF');
+		init_dimensionsFenetres();
+	}
+};
+document.getElementById('id_div_Btn2Fenetres').onclick = function() {
+	if (nbrFenetres !== 2) {
+		nbrFenetres = 2;
+		drawBouton('id_div_Btn1Fenetre', 'id_img_Btn1Fenetre', 'css_BtnOFF');
+		drawBouton('id_div_Btn2Fenetres', 'id_img_Btn2Fenetres', 'css_BtnON');
+		drawBouton('id_div_Btn4Fenetres', 'id_img_Btn4Fenetres', 'css_BtnOFF');
+		init_dimensionsFenetres();
+	}
+};
+document.getElementById('id_div_Btn4Fenetres').onclick = function() {
+	if (nbrFenetres !== 4) {
+		nbrFenetres = 4;
+		drawBouton('id_div_Btn1Fenetre', 'id_img_Btn1Fenetre', 'css_BtnOFF');
+		drawBouton('id_div_Btn2Fenetres', 'id_img_Btn2Fenetres', 'css_BtnOFF');
+		drawBouton('id_div_Btn4Fenetres', 'id_img_Btn4Fenetres', 'css_BtnON');
+		init_dimensionsFenetres();
+	}
+};
 
 	positionneFenetres('id_lst_Fenetre11');
 }
@@ -1211,6 +1601,25 @@ document.getElementById('id_div_Btn4Fenetres').onclick = function() {
 	}
 };
 
+<<<<<<< HEAD
+=======
+//MAJ d'un choix de graphique dans une liste
+//MAJ de la position du graphique selectionné
+//MAJ de la position du graphique anciennement à la position
+//Affiche/cache
+document.getElementById('id_lst_Fenetre11').addEventListener('change', function() {
+	positionneFenetres('id_lst_Fenetre11');
+}, false);
+document.getElementById('id_lst_Fenetre12').addEventListener('change', function() {
+	positionneFenetres('id_lst_Fenetre12');
+}, false);
+document.getElementById('id_lst_Fenetre21').addEventListener('change', function() {
+	positionneFenetres('id_lst_Fenetre21');
+}, false);
+document.getElementById('id_lst_Fenetre22').addEventListener('change', function() {
+	positionneFenetres('id_lst_Fenetre22');
+}, false);
+>>>>>>> ménage, tuning et fix
 
 
 //MAJ d'un choix de graphique dans une liste
@@ -1230,8 +1639,11 @@ document.getElementById('id_lst_Fenetre22').addEventListener('change', function(
 	positionneFenetres('id_lst_Fenetre22');
 }, false);
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> ménage, tuning et fix
 //SOURIS & CANVAS VISEUR
 //--VISEUR
 //-dP = f(roulette)
