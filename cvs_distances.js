@@ -1,120 +1,210 @@
-﻿//-Dessine le canvas
-function DrawDistances(){
+﻿function drawDistances() {
 
-var cvs_distances = document.getElementById('id_canvas_distances');
-var ct_distances = cvs_distances.getContext('2d');
+	h_cvs_distances = 55; //hauteur du canvas en px
+	var Y_axe = 17; //position Y de l'axe dans le canvas
+	var h_trait = 15; //hauteur des traits, en px
+	var k = w_cvs_Distances / d_DernierPoint_cvs_pdc; //pour conversion m / px
 
-var marge_y=30;
-var temp=1.0;
-var temp2=1.0;
-var i=0;
+	var temp, temp2;
 
-cvs_distances.width  = largeur_canvas_distances+2*marge_x_distance;
-cvs_distances.height = hauteur_canvas_distances;
+	var cvs = document.getElementById('id_cvs_Distances');
+	var ct = cvs.getContext('2d');
 
-var h_axe=20;
-
-if(flag_clic_distance==0)
-d_dernier_point=1.5*d_arriere_plan;
-
-//--RAZ
-ct_distances.fillStyle ='#FFFFFF';
-ct_distances.strokeStyle ='#FFFFFF';
-ct_distances.beginPath();
-ct_distances.fillRect( 0,0, largeur_canvas_distances+2*marge_x_distance-1, hauteur_canvas_distances-1 );
-ct_distances.stroke();
-
-//--Axes
-ct_distances.fillStyle ='#777777';
-demi_fleche_H(ct_distances,h_axe,marge_x_distance,largeur_canvas_distances+marge_x_distance);
-
-//--Regarde les extrémums et calcul les coeff de flou et distance vers pixel
-var f_m=focale/1000;										//focale en m
-var k_distance=largeur_canvas_distances/d_dernier_point;	//pour passer d'une distance en m à des px
+	cvs.width = w_cvs_Distances + 2 * marge_X_distances;
+	cvs.height = h_cvs_distances;
 
 
-var demi_h_trait_d=20;
+	//on fait en sorte que le max des abscisses soit à 1.5*arrière plan, sauf lorsque la souris est cliquée
+	if (flag_clicDistances === 0)
+		d_DernierPoint_cvs_pdc = 1.5 * d_arrierePlan;
 
-//Avant plan
-ct_distances.fillStyle ='rgb('+avant_color+')';
-ct_distances.font="12px 'Trebuchet MS'";
-temp=k_distance*d_avant_plan;	//distance en px
-ct_distances.beginPath();
-ct_distances.fillRect( marge_x_distance+temp,h_axe-demi_h_trait_d, 1, 1+demi_h_trait_d);
-ct_distances.beginPath(); 
-ct_distances.fillText(d_avant_plan.toFixed(2)+'m',marge_x_distance+temp-5,h_axe+12);
+	//-FOND & AXE
+	//fond blanc
+	ct.fillStyle = '#FFFFFF';
+	ct.beginPath();
+	ct.fillRect(0, 0, w_cvs_Distances + 2 * marge_X_distances - 1, h_cvs_distances - 1);
 
-if(surbrillance=='av'){
-ct_distances.beginPath(); 
-ct_distances.arc(marge_x_distance+temp,h_axe,4,0,2*Math.PI);
-ct_distances.fill(); 
+	//Axes
+	ct.strokeStyle = '#777777';
+	demiFlecheHorizontale(ct, Y_axe, marge_X_distances, w_cvs_Distances + marge_X_distances);
+
+	//dessine les 3 distances, la distance selectionée est mise en évidence avec un petit rond
+	//TBD: faire un truc + sexy si selectionnée
+	ct.font = "12px 'Trebuchet MS'";
+
+	//Avant plan
+	ct.fillStyle = 'rgb(' + color_avantPlan + ')';
+	temp = k * d_avantPlan; //distance en px
+	ct.beginPath();
+	ct.fillRect(marge_X_distances + temp, Y_axe - h_trait, 1, 1 + h_trait);
+	ct.fillText(d_avantPlan.toFixed(2) + 'm', marge_X_distances + temp - 5, Y_axe + 12);
+
+	if (distanceSelectionnee === 'av') {
+		ct.beginPath();
+		ct.arc(marge_X_distances + temp, Y_axe, 4, 0, 2 * Math.PI);
+		ct.fill();
+	}
+
+
+	//map
+	ct.fillStyle = 'rgb(' + color_map + ')';
+	temp = k * d_map;
+	ct.beginPath();
+	ct.fillRect(marge_X_distances + temp, Y_axe - h_trait, 1, 1 + h_trait);
+	ct.fillText(d_map.toFixed(2) + 'm', marge_X_distances + temp - 5, Y_axe + 23);
+
+	if (distanceSelectionnee === 'map') {
+		ct.beginPath();
+		ct.arc(marge_X_distances + temp, Y_axe, 4, 0, 2 * Math.PI);
+		ct.fill();
+	}
+
+	//Arrière plan
+	ct.fillStyle = 'rgb(' + color_arrierePlan + ')';
+	temp = k * d_arrierePlan;
+	ct.beginPath();
+	ct.fillRect(marge_X_distances + temp, Y_axe - h_trait, 1, 1 + h_trait);
+	ct.fillText(d_arrierePlan.toFixed(2) + 'm', marge_X_distances + temp - 5, Y_axe + 34);
+
+	if (distanceSelectionnee === 'ar') {
+		ct.beginPath();
+		ct.arc(marge_X_distances + temp, Y_axe, 4, 0, 2 * Math.PI);
+		ct.fill();
+	}
+
+
+	//PDC
+	ct.fillStyle = 'rgba(' + color_cdc + ',0.3)';
+	temp = k * debutPDC;
+	temp2 = k * finPDC;
+
+	if (temp2 > w_cvs_Distances)
+		temp2 = w_cvs_Distances;
+
+	ct.beginPath();
+	ct.fillRect(marge_X_distances + temp, 0, temp2 - temp, h_cvs_distances - 1);
 }
 
+//----IHM
+//Clic
+document.getElementById('id_cvs_Distances').addEventListener('mousedown', function(e) {
 
-//Distance de map
-ct_distances.beginPath(); 
-ct_distances.fillStyle ='rgb('+map_color+')';
-temp=k_distance*d_map;	
-ct_distances.beginPath();
-ct_distances.fillRect( marge_x_distance+temp,h_axe-demi_h_trait_d, 1, 1+demi_h_trait_d);
-ct_distances.fillText(d_map.toFixed(2)+'m',marge_x_distance+temp-5,h_axe+23);
+	flag_clicDistances = 1;
 
-if(surbrillance=='map'){
-ct_distances.beginPath(); 
-ct_distances.arc(marge_x_distance+temp,h_axe,4,0,2*Math.PI);
-ct_distances.fill(); 
-}
+	//MAj de la position initiale
+	var cvs = document.getElementById('id_cvs_Distances');
+	Xt0_cvs_Distances = e.clientX - cvs.getBoundingClientRect().left - document.documentElement.scrollLeft - marge_X_distances;
 
-//Arrière plan
-ct_distances.fillStyle ='rgb('+arriere_color+')';
-temp=k_distance*d_arriere_plan;	//distance en px
-ct_distances.beginPath();
-ct_distances.fillRect( marge_x_distance+temp,h_axe-demi_h_trait_d, 1, 1+demi_h_trait_d );
-ct_distances.beginPath(); 
-ct_distances.fillText(d_arriere_plan.toFixed(2)+'m',marge_x_distance+temp-5,h_axe+34);
+}, false);
 
+//Relache clic
+document.getElementById('id_cvs_Distances').addEventListener('mouseup', function() {
+	flag_clicDistances = 0;
+	drawDistances(); //pour faire la MAJ de la largeur des abscisses
+}, false);
 
+//bouge
+document.getElementById('id_cvs_Distances').addEventListener('mousemove', function(e) {
 
-if(surbrillance=='ar'){
-ct_distances.beginPath(); 
-ct_distances.arc(marge_x_distance+temp,h_axe,4,0,2*Math.PI);
-ct_distances.fill(); 
-}
+	//pour passer d'une distance en m à des px
+	var k = w_cvs_Distances / d_DernierPoint_cvs_pdc;
 
+	//position des points sur l'axe
+	var X_avantPlan = k * d_avantPlan;
+	var X_map = k * d_map;
+	var X_arrierePlan = k * d_arrierePlan;
 
-ct_distances.font="12px 'Trebuchet MS'";
+	//position de la souris
+	var canvas = document.getElementById('id_cvs_Distances');
+	var X = e.clientX - canvas.getBoundingClientRect().left - document.documentElement.scrollLeft - marge_X_distances;
 
-//Rectangle pour marquer la PDC
-ct_distances.fillStyle ='rgba('+cdc_color+',0.3)';
-temp=k_distance*pdc_pres;	//distance en px
-temp2=k_distance*pdc_loin;	//distance en px
+	//Regarde dans qu'elle zone se situe la souris (av, map ou ar) pour faire la selection du point en surbrillance
+	var distanceSelectionnee_temp = "?";
 
-if(temp2>largeur_canvas_distances)
-temp2=largeur_canvas_distances;
+	//Pas encore cliqué: la zone selectionnée est mise à jour en fonction de la position de la souris
+	if (flag_clicDistances === 0) {
+		if (X < (X_avantPlan + X_map) / 2) {
+			distanceSelectionnee_temp = 'av';
+		} else if (X > (X_map + X_arrierePlan) / 2) {
+			distanceSelectionnee_temp = 'ar';
+		} else {
+			distanceSelectionnee_temp = 'map';
+		}
+	}
+	//Déjà cliqué: la souris bouger entre les 2 bornes
+	else {
+		if (distanceSelectionnee === 'av') {
+			if (d_avantPlan <= d_map)
+				distanceSelectionnee_temp = 'av';
+		}
+		if (distanceSelectionnee === 'map') {
+			if (d_avantPlan <= d_map <= d_arrierePlan)
+				distanceSelectionnee_temp = 'map';
+		}
+		if (distanceSelectionnee === 'ar') {
+			if (d_map <= d_arrierePlan)
+				distanceSelectionnee_temp = 'ar';
+		}
+	}
 
-ct_distances.beginPath();
-ct_distances.fillRect( marge_x_distance+temp,0,temp2-temp,h_axe+34);
+	//La souris est cliquée => modification des distances	
+	if (flag_clicDistances) {
 
-}
+		//avant plan
+		switch (distanceSelectionnee_temp) {
+			case 'av':
+				d_avantPlan += (X - Xt0_cvs_Distances) / k;
 
-//-Dessine une demie fleche horizontale
-function demi_fleche_H(ctx,y_,x_1,x_2){
+				if (d_avantPlan > d_map)
+					d_avantPlan = d_map;
 
-var size_f=3;
-var temp;
+				if (d_avantPlan < 0)
+					d_avantPlan = 0;
 
-if( x_2<x_1){
- temp=x_1;
- x_1=x_2;
- x_2=temp;
-}
+				break;
 
-ctx.beginPath();
-ctx.strokeStyle='#000000';
-ctx.lineTo(x_1, y_);
-ctx.lineTo(x_2, y_);
-ctx.lineTo( x_2-size_f, y_-size_f);
-ctx.lineTo(x_2, y_);
-ctx.lineTo( x_2-size_f, y_+size_f);
-ctx.stroke();
-}
+			case 'ar':
+
+				d_arrierePlan += (X - Xt0_cvs_Distances) / k;
+
+				if (d_arrierePlan < d_map)
+					d_arrierePlan = d_map;
+
+				break;
+
+			case 'map':
+
+				d_map += (X - Xt0_cvs_Distances) / k;
+
+				if (d_map < d_avantPlan)
+					d_map = d_avantPlan;
+
+				if (d_map > d_arrierePlan)
+					d_map = d_arrierePlan;
+
+				break;
+		}
+
+		Xt0_cvs_Distances = X;
+		calculs();
+		drawViseur();
+		drawFenetre3D();
+	}
+
+	distanceSelectionnee = distanceSelectionnee_temp;
+	drawDistances();
+}, false);
+
+//Sort
+document.getElementById('id_cvs_Distances').addEventListener('mouseout', function() {
+	distanceSelectionnee = '?';
+	document.body.style.cursor = 'auto';
+	flag_clicDistances = 0;
+	drawDistances(); //pour virer le point en surbrillance
+}, false);
+
+//Entre
+document.getElementById('id_cvs_Distances').addEventListener('mouseover', function() {
+	document.body.style.cursor = 'e-resize';
+	drawDistances();
+}, false);

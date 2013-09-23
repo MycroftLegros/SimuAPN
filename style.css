@@ -52,7 +52,7 @@ border-spacing: 0px;
 }
 
 
-.btn_ON,.btn_OFF{
+.css_BtnON,.css_BtnOFF{
 height:30px;
 width:30px;
 border: solid #000000 1px;
@@ -60,11 +60,11 @@ text-align: center;
 }
 
 
-.btn_ON{
+.css_BtnON{
 box-shadow: -2px -2px 6px rgba(255, 255, 255, 0.3) inset; 
 }
 
-.btn_OFF{
+.css_BtnOFF{
 box-shadow: 3px 3px 6px rgba(255, 255, 255, 0.4) inset; 
 }
 

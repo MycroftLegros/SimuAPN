@@ -16,6 +16,10 @@
 <div class='div_globale' >
 
 
+	<div style='display:none;'>
+		<canvas id='id_cvs_inter' ></canvas>
+	</div>
+
 
 	<div style='display:none;'>
 		<canvas id='id_cvs_viseur_merge' ></canvas>
@@ -44,16 +48,16 @@
 				<div id='id_graph_3D' style='text-align:center;'>
 
 				
-					<canvas id='id_canvas_3D_globale' class='css_graph' ></canvas>
+					<canvas id='id_cvs_Fenetre3D' class='css_graph' ></canvas>
 					
 					<div id='menu_3D'>
 					<table >					
 							<tr>								
-								<td><div id='btn_rot'><img src='Icones/RO.png' id='id_img_rot'></div></td>
-								<td><div id='btn_tra'><img src='Icones/TR.png' id='id_img_tra'></div></td>								
+								<td><div id='id_div_BtnRotation'><img src='Icones/RO.png' id='id_img_BtnRotation'></div></td>
+								<td><div id='id_div_BtnTranslation'><img src='Icones/TR.png' id='id_img_BtnTranslation'></div></td>								
 								
 								<td><div class='nom_var'>Camera:</div></td>
-								<td><select name="capteur" id="liste_camera" class="css_liste">
+								<td><select name="Capteur" id="liste_camera" class="css_liste">
 										<option  value="-" selected="selected">-</option>
 										<option  value="Derrière">Derrière</option>
 										<option  value="Côté">Côté</option>
@@ -71,11 +75,10 @@
 
 				<div id='id_graph_Viseur' style='text-align:center;  vertical-align: middle;'>
 					<div style='position: relative;'>
-						<canvas id='id_cvs_viseur_av' style='position: absolute; left: 0; top: 0; z-index: 5;'></canvas>
-						<canvas id='id_cvs_viseur_map' style='position: absolute; left: 0; top: 0; z-index: 4;'></canvas>
-						<canvas id='id_cvs_viseur_ar' style='position: absolute; left: 0; top: 0; z-index: 3;'></canvas>
-						<canvas id='id_cvs_viseur_cadre' style='position: absolute; left: 0; top: 0; z-index: 2;'></canvas>
-						<canvas id='id_cvs_viseur_viseur' style='position: absolute; left: 0; top: 0; z-index: 1;'></canvas>
+
+						<canvas id='id_cvs_viseur_illustrations' style='position: absolute; left: 0; top: 0; z-index: 2;'></canvas>
+						<canvas id='id_cvs_viseur_cadre' style='position: absolute; left: 0; top: 0; z-index: 1;'></canvas>
+
 					</div>
 				</div>
 				
@@ -123,7 +126,7 @@
 				<table class="onglet">
 					<tr>
 						<!-- Roue en 3D pour choisir M,A ou S -->
-						<td  style="vertical-align:top;" width='75px'><canvas id="id_canvas_roue_mode"  style="z-index: 0;"></canvas></td>
+						<td  style="vertical-align:top;" width='75px'><canvas id="id_cvs_RoueMode"  style="z-index: 0;"></canvas></td>
 						<td id='id_nom_mode' width='475px' ></td>					
 					
 						<!-- Radio boutons pour choisir Ouverture/Vitesse/ISO -->
@@ -147,7 +150,7 @@
 						</td>
 					
 						<!-- Molette en 3D pour régler le triangle d'exposition-->
-						<td style="vertical-align:top;"><canvas id="id_canvas_molette_R"></canvas></td>
+						<td style="vertical-align:top;"><canvas id="id_cvs_moletteReglage"></canvas></td>
 					</tr>	
 				</table>	
 			</div>
@@ -159,7 +162,7 @@
 					<tr >
 						<td align="right" id="apn_capteur" class="nom_var"></td>
 						<td align="center">
-							<select name="capteur" id="liste_capteur" class="css_liste">
+							<select name="Capteur" id="liste_capteur" class="css_liste">
 							<option value="1/2.3">1/2.3in</option>
 							<option value="1/1.8">1/1.8in</option>
 							<option value="1/1.7">1/1.7in</option>
@@ -245,9 +248,9 @@
 						
 					<tr>
 						<!--VR-->
-						<td id="nom_anti_vibration" class="nom_var"></td>
+						<td id="nom_antiVibration" class="nom_var"></td>
 						<td>
-							<select name="anti_vibration" id="liste_anti_vibration" class="css_liste">
+							<select name="antiVibration" id="liste_antiVibration" class="css_liste">
 								<option value=0 selected="selected"></option>
 								<option value=1 ></option>
 							</select>
@@ -275,7 +278,7 @@
 			<td  id="id_menu_distance">
 				<table class="onglet">
 					<tr >
-						<td><canvas id="id_canvas_distances"></canvas></td>
+						<td><canvas id="id_cvs_Distances"></canvas></td>
 						<td class="MAU" id="id_explication_distances"></td>
 					</tr>
 				</table>
@@ -315,8 +318,8 @@
 							<tr><td colspan='2' class="nom_ss_onglet">Illustrations optiques</td></tr>
 							<tr><td><input type="radio" name="3D" id="rb_3D_aucune" value="3D_aucune" checked></input></td><td id='nom_champ_auncune'>Aucune</td></tr>
 							<tr><td><input type="radio" name="3D" id="rb_3D_dim" value="3D_dim" ></input></td><td id='nom_champ_vision'></td></tr>
-							<tr><td><input type="radio" name="3D" id="rb_3D_flou_av" value="3D_flou_av"></input></td><td id='nom_flou_av'></td></tr>
-							<tr><td><input type="radio" name="3D" id="rb_3D_flou_ar" value="3D_flou_ar"></input></td><td id='nom_flou_ar'></td></tr>
+							<tr><td><input type="radio" name="3D" id="rb_3D_flou_avantPlan" value="3D_flou_avantPlan"></input></td><td id='nom_flou_avantPlan'></td></tr>
+							<tr><td><input type="radio" name="3D" id="rb_3D_flou_arrierePlan" value="3D_flou_arrierePlan"></input></td><td id='nom_flou_arrierePlan'></td></tr>
 							<tr><td><input type="radio" name="3D" id="rb_3D_visee" value="3D_visee"></input></td><td id='nom_visee_rflex'></td></tr>
 					</table></td>
 					
@@ -352,9 +355,9 @@
 					<tr >
 						<td class="nom_var">Nombre de graphiques</td>
 						
-						<td><div id='btn_1_graph'><img src='Icones/1_graph.png' id='id_img_1_graph'></div></td>
-						<td><div id='btn_2_graph'><img src='Icones/2_graph.png' id='id_img_2_graph'></div></td>
-						<td><div id='btn_4_graph'><img src='Icones/4_graph.png' id='id_img_4_graph'></div></td>
+						<td><div id='id_div_Btn1Fenetre'><img src='Icones/1_graph.png' id='id_img_Btn1Fenetre'></div></td>
+						<td><div id='id_div_Btn2Fenetres'><img src='Icones/2_graph.png' id='id_img_Btn2Fenetres'></div></td>
+						<td><div id='id_div_Btn4Fenetres'><img src='Icones/4_graph.png' id='id_img_Btn4Fenetres'></div></td>
 						
 						
 					</tr>
@@ -363,7 +366,7 @@
 					<tr id='id_choix_graph_1_1'>
 						<td class="nom_var">Graphique 1:</td>
 						<td colspan='3'>
-							<select id="liste_graph_1_1" class="css_liste">
+							<select id="id_lst_Fenetre11" class="css_liste">
 								<option value='id_graph_3D' selected="selected">3D</option>
 								<option value='id_graph_Viseur' >Viseur</option>
 								<option value='id_graph_PDC'>PDC</option>
@@ -376,7 +379,7 @@
 					<tr id='id_choix_graph_1_2'>
 						<td class="nom_var">Graphique 2:</td>
 						<td colspan='3'>
-							<select id="liste_graph_1_2" class="css_liste">
+							<select id="id_lst_Fenetre12" class="css_liste">
 								<option value='id_graph_3D' >3D</option>
 								<option value='id_graph_Viseur' selected="selected">Viseur</option>
 								<option value='id_graph_PDC'>PDC</option>
@@ -389,7 +392,7 @@
 					<tr id='id_choix_graph_2_1'>
 						<td class="nom_var">Graphique 3:</td>
 						<td colspan='3'>
-							<select id="liste_graph_2_1" class="css_liste">
+							<select id="id_lst_Fenetre21" class="css_liste">
 								<option value='id_graph_3D' >3D</option>
 								<option value='id_graph_Viseur' >Viseur</option>
 								<option value='id_graph_PDC' selected="selected">PDC</option>
@@ -402,7 +405,7 @@
 					<tr id='id_choix_graph_2_2'>
 						<td class="nom_var">Graphique 4:</td>
 						<td colspan='3'>
-							<select id="liste_graph_2_2" class="css_liste">
+							<select id="id_lst_Fenetre22" class="css_liste">
 								<option value='id_graph_3D' >3D</option>
 								<option value='id_graph_Viseur' >Viseur</option>
 								<option value='id_graph_PDC' >PDC</option>
@@ -426,12 +429,14 @@
 
 
 <script src="variables_globales.js"></script>
+<script src="Dessine.js"></script>
 <script src="Filtres.js"></script>
-<script src="3D_globale.js"></script>
+<script src="StackBlur.js"></script>
+<script src="Fenetre3D.js"></script>
 <script src="cvs_histogrammes.js"></script>
 <script src="cvs_distances.js"></script>
 <script src="cvs_viseur.js"></script>
-<script src="cvs_molette_R.js"></script>
+<script src="cvs_moletteReglage.js"></script>
 <script src="cvs_roue_mode.js"></script>
 <script src="cvs_PDC.js"></script>
 <script src="Calcul_val.js"></script>

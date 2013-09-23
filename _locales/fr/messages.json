@@ -38,7 +38,7 @@
       "message": "Divers"
    },
    
-     "capteur": {
+     "Capteur": {
       "message": "Capteur"
    },  
    "definition": {
@@ -283,7 +283,7 @@
    
    
    "FormatCapteur": {
-      "message": "Format du capteur"
+      "message": "Format du Capteur"
    },
    "CropFactor": {
       "message": "Crop factor"

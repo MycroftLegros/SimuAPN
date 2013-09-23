@@ -1,287 +1,325 @@
-﻿function fleche_H(ctx,y_,x_1,x_2){
-var size_f=3;
-var temp;
+﻿function drawGraphPDC() {
 
-if( x_2<x_1){
- temp=x_1;
- x_1=x_2;
- x_2=temp;
-}
+	var cvs = document.getElementById('id_canvas_PDC');
+	var ct = cvs.getContext('2d');
 
-ctx.beginPath();
-ctx.strokeStyle='#000000';
-ctx.moveTo( x_1+size_f, y_-size_f);
-ctx.lineTo(x_1, y_);
-ctx.lineTo( x_1+size_f, y_+size_f);
-ctx.lineTo(x_1, y_);
-ctx.lineTo(x_2, y_);
-ctx.lineTo( x_2-size_f, y_-size_f);
-ctx.lineTo(x_2, y_);
-ctx.lineTo( x_2-size_f, y_+size_f);
-ctx.stroke();
-}
+	var temp, temp2;
+	var i;
 
-function demi_fleche_H(ctx,y_,x_1,x_2){
-var size_f=3;
-var temp;
-
-if( x_2<x_1){
- temp=x_1;
- x_1=x_2;
- x_2=temp;
-}
-
-ctx.beginPath();
-ctx.strokeStyle='#000000';
-ctx.lineTo(x_1, y_);
-ctx.lineTo(x_2, y_);
-ctx.lineTo( x_2-size_f, y_-size_f);
-ctx.lineTo(x_2, y_);
-ctx.lineTo( x_2-size_f, y_+size_f);
-ctx.stroke();
-}
-
-function fleche_V(ctx,x_,y_1,y_2){
-var size_f=3;
-var temp;
-
-if( y_1<y_2){
- temp=y_1;
- y_1=y_2;
- y_2=temp;
-}
-
-ctx.beginPath();
-ctx.strokeStyle='#000000';
-ctx.moveTo( x_-size_f, y_1-size_f);
-ctx.lineTo(x_, y_1);
-ctx.lineTo(x_+size_f, y_1-size_f);
-ctx.lineTo(x_, y_1);
-ctx.lineTo(x_, y_2);
-ctx.lineTo(x_-size_f, y_2+size_f);
-ctx.lineTo(x_, y_2);
-ctx.lineTo(x_+size_f, y_2+size_f);
-
-ctx.stroke();
-
-}
-
-function demi_fleche_V(ctx,x_,y_1,y_2){
-var size_f=3;
-var temp;
-
-if( y_1<y_2){
- temp=y_1;
- y_1=y_2;
- y_2=temp;
-}
-ctx.beginPath();
-ctx.strokeStyle='#000000';
-ctx.lineTo(x_, y_1);
-ctx.lineTo(x_, y_2);
-ctx.lineTo(x_-size_f, y_2+size_f);
-ctx.lineTo(x_, y_2);
-ctx.lineTo(x_+size_f, y_2+size_f);
-
-ctx.stroke();
-
-}
+	cvs.width = w_cvs_Pdc + marge_X_cvs_PDC + marge_X_fin_cvs_PDC;
+	cvs.height = h_cvs_Pdc + marge_Y_cvs_PDC;
 
 
+	if (flag_clicPdc === 0)
+		d_DernierPoint_cvs_pdc = 1.5 * d_arrierePlan;
+
+	//Fond
+	ct.fillStyle = '#FFFFFF';
+	ct.beginPath();
+	ct.fillRect(0, 0, cvs.width - 1, cvs.height - 1);
+
+	//--Axes
+	demiFlecheHorizontale(ct, h_cvs_Pdc - 1, marge_X_cvs_PDC, w_cvs_Pdc + marge_X_cvs_PDC - 1);
+	demiFlecheVerticale(ct, marge_X_cvs_PDC, h_cvs_Pdc - 1, 0);
+
+	//--Regarde les extrémums et calcul les coeff de flou et distance vers pixel
+
+	var f_m = focale / 1000; //focale en m
+	var k_flou = h_cvs_Pdc / Y_m_cvs_pdc; //convertion m / px pour les tailles de flou
+	var k_distance = w_cvs_Pdc / d_DernierPoint_cvs_pdc; //convertion m / px pour les distances
 
 
-function DrawGraphPDC(){
+	//--Trace la courbe de flou de mise au point
+	ct.strokeStyle = 'rgb(' + color_pdc + ')';
+	ct.lineWidth = 1;
+	ct.beginPath();
 
-var cvs_graph_pdc = document.getElementById('id_canvas_PDC');
-var ct_graph_pdc = cvs_graph_pdc.getContext('2d');
+	for (i = 0; i !== w_cvs_Pdc - 1; i++) {
+
+		temp2 = i / k_distance;
+
+		//pour être sûr de placer un point à d_map
+		if (temp2 < d_map && ((i + 1) / k_distance) > d_map && ((d_map - temp2) <= ((i + 1) / k_distance - d_map)))
+			temp2 = d_map;
+		else if (i > 0 && ((i - 1) / k_distance) < d_map && temp2 > d_map && ((d_map - temp2) > ((i + 1) / k_distance - d_map)))
+			temp2 = d_map;
+
+		//calcul du flou en m
+		if (temp2 === d_map)
+			temp = 0;
+		else if (temp2 < d_map)
+			temp = (f_m * f_m * (d_map - temp2)) / (ouverture * temp2 * (d_map - f_m));
+		else
+			temp = (f_m * f_m * (temp2 - d_map)) / (ouverture * temp2 * (d_map - f_m));
+
+		//trace le point
+		if (i === 0)
+			ct.moveTo(i + marge_X_cvs_PDC, h_cvs_Pdc - k_flou * temp);
+		else
+			ct.lineTo(i + marge_X_cvs_PDC, h_cvs_Pdc - k_flou * temp);
+
+	}
+	ct.stroke();
+
+	//Trait au niveau du flou d'avant plan
+	ct.fillStyle = 'rgb(' + color_avantPlan + ')';
+	ct.font = "12px 'Trebuchet MS'";
+
+	temp = k_distance * d_avantPlan; //distance en px
+	temp2 = (f_m * f_m * (d_map - d_avantPlan)) / (ouverture * d_avantPlan * (d_map - f_m)); //flou en m
+	ct.beginPath();
+	ct.fillRect(marge_X_cvs_PDC + temp, h_cvs_Pdc - k_flou * temp2, 1, k_flou * temp2);
+
+	ct.beginPath();
+	ct.fillText(d_avantPlan.toFixed(2) + 'm', marge_X_cvs_PDC + temp - 5, h_cvs_Pdc + 10);
+
+	if (distanceSelectionnee === 'av') {
+		ct.beginPath();
+		ct.arc(marge_X_cvs_PDC + temp, h_cvs_Pdc, 3, 0, 2 * Math.PI);
+		ct.fill();
+	}
 
 
-var temp=1.0;
-var temp2=1.0;
-var i=0;
+	//Distance de map
+	ct.beginPath();
 
-cvs_graph_pdc.width  = largeur_canvas_graph_pdc+marge_x_cvs_PDC+marge_x_fin_cvs_PDC;
-cvs_graph_pdc.height = hauteur_canvas_graph_pdc+marge_y_cvs_PDC;
+	ct.fillStyle = 'rgb(' + color_map + ')';
+	temp = k_distance * d_map; //distance en px
+	ct.fillText(d_map.toFixed(2) + 'm', marge_X_cvs_PDC + temp - 5, h_cvs_Pdc + 20);
 
-
-if(flag_clic_illu_pdc==0)
-d_dernier_point=1.5*d_arriere_plan;
-
-
-
-//Fond
-ct_graph_pdc.fillStyle ='#FFFFFF';
-ct_graph_pdc.beginPath();
-ct_graph_pdc.fillRect( 0,0, cvs_graph_pdc.width-1, cvs_graph_pdc.height-1 );
+	if (distanceSelectionnee === 'map') {
+		ct.beginPath();
+		ct.arc(marge_X_cvs_PDC + temp, h_cvs_Pdc, 3, 0, 2 * Math.PI);
+		ct.fill();
+	}
 
 
-//--Axes
-demi_fleche_H(ct_graph_pdc,hauteur_canvas_graph_pdc-1,marge_x_cvs_PDC,largeur_canvas_graph_pdc+marge_x_cvs_PDC-1);
-demi_fleche_V(ct_graph_pdc,marge_x_cvs_PDC,hauteur_canvas_graph_pdc-1,0);
+	//Trait au niveau du flou d'arrière plan
 
-//--Regarde les extrémums et calcul les coeff de flou et distance vers pixel
-
-var f_m=focale/1000;						//focale en m
-var k_flou=hauteur_canvas_graph_pdc/y_reel_graph_pdc;		//20 pixels TBC
-var k_distance=largeur_canvas_graph_pdc/d_dernier_point;	//pour passer d'une distance en m à des px
+	ct.fillStyle = 'rgb(' + color_arrierePlan + ')';
+	temp = k_distance * d_arrierePlan; //distance en px
+	temp2 = (f_m * f_m * (d_arrierePlan - d_map)) / (ouverture * d_arrierePlan * (d_map - f_m));
+	ct.beginPath();
 
 
-//--Trace la courbe de flou de mise au point
-ct_graph_pdc.strokeStyle ='rgb('+color_pdc+')';
-ct_graph_pdc.lineWidth=1;
-ct_graph_pdc.beginPath();
+	ct.fillRect(marge_X_cvs_PDC + temp, h_cvs_Pdc - k_flou * temp2, 1, k_flou * temp2);
 
-for(i=0;i!=largeur_canvas_graph_pdc-1;i++){
 
-	temp2=i/k_distance;
-	
-	//pour être sûr de placer un point à d_map
-	if(temp2<d_map && ((i+1)/k_distance)>d_map && ((d_map-temp2)<=((i+1)/k_distance-d_map)))
-	temp2=d_map;
-	else if( i>0 && ((i-1)/k_distance)<d_map && temp2>d_map && ((d_map-temp2)>((i+1)/k_distance-d_map)))	
-	temp2=d_map;
-	
-	
-	
-	//calcul du flou en m
-	if(temp2==d_map)
-	temp=0;
-	else if(temp2<d_map)
-	temp=(f_m*f_m*(d_map-temp2))/(ouverture*temp2*(d_map-f_m));
+	ct.beginPath();
+	ct.fillText(d_arrierePlan.toFixed(2) + 'm', marge_X_cvs_PDC + temp - 5, h_cvs_Pdc + 30);
+
+
+	if (distanceSelectionnee === 'ar') {
+		ct.beginPath();
+		ct.arc(marge_X_cvs_PDC + temp, h_cvs_Pdc, 3, 0, 2 * Math.PI);
+		ct.fill();
+	}
+
+
+	ct.font = "12px 'Trebuchet MS'";
+
+	//Rectangle pour marquer la pdC
+	ct.fillStyle = 'rgba(' + color_cdc + ',0.15)';
+	temp = k_distance * debutPDC; //distance en px
+	temp2 = k_distance * finPDC; //distance en px
+
+	if (temp2 > w_cvs_Pdc)
+		temp2 = w_cvs_Pdc;
+
+	ct.beginPath();
+	ct.fillRect(marge_X_cvs_PDC + temp, 0, temp2 - temp, h_cvs_Pdc);
+
+
+	//Cdc
+	temp = k_flou * cdc;
+
+	if (temp < h_cvs_Pdc) {
+
+		ct.fillStyle = 'rgb(' + color_cdc + ')';
+		ct.beginPath();
+		ct.fillText('cdc', 7, h_cvs_Pdc - temp + 4);
+
+		ct.fillStyle = 'rgba(' + color_cdc + ',0.35)';
+		ct.fillRect(marge_X_cvs_PDC, h_cvs_Pdc - temp, w_cvs_Pdc, 1);
+
+
+
+	}
+
+	//Echelle: 1,10 ou 100px
+	if (Y_m_cvs_pdc > 100 * taillePixel)
+		temp = 100;
+	else if (Y_m_cvs_pdc > 10 * taillePixel)
+		temp = 10;
 	else
-	temp=(f_m*f_m*(temp2-d_map))/(ouverture*temp2*(d_map-f_m));
+		temp = 1;
 
-	//trace le point
-	if(i==0)
-	ct_graph_pdc.moveTo(i+marge_x_cvs_PDC,hauteur_canvas_graph_pdc-k_flou*temp);
+	temp2 = k_flou * temp * taillePixel;
+
+
+	flecheVerticale(ct, w_cvs_Pdc + marge_X_cvs_PDC + 5, h_cvs_Pdc, h_cvs_Pdc - temp2);
+
+	ct.fillStyle = "#333333";
+	ct.beginPath();
+	ct.fillText(temp + 'px', w_cvs_Pdc + marge_X_cvs_PDC + 10, h_cvs_Pdc - temp2 / 2 + 3);
+}
+
+
+
+//CANVAS DE PDC
+//--GRAPH DE PDC
+//Graph pdc: Roulette
+document.getElementById('id_canvas_PDC').addEventListener('mousewheel', function() {
+	var Delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
+
+	if (!e) {
+		e = window.event;
+	}
+	if (e.preventDefault) {
+		e.preventDefault();
+	}
+
+	if (Delta > 0)
+		Y_m_cvs_pdc = Y_m_cvs_pdc / 1.1;
 	else
-	ct_graph_pdc.lineTo(i+marge_x_cvs_PDC,hauteur_canvas_graph_pdc-k_flou*temp);
-	
-}
-ct_graph_pdc.stroke();
+		Y_m_cvs_pdc = 1.1 * Y_m_cvs_pdc;
 
-//Trait au niveau du flou d'avant plan
-ct_graph_pdc.fillStyle ='rgb('+avant_color+')';
-ct_graph_pdc.font="12px 'Trebuchet MS'";
+	drawGraphPDC();
 
-temp=k_distance*d_avant_plan;	//distance en px
-temp2=(f_m*f_m*(d_map-d_avant_plan))/(ouverture*d_avant_plan*(d_map-f_m));	//flou en m
-ct_graph_pdc.beginPath();
-ct_graph_pdc.fillRect( marge_x_cvs_PDC+temp,hauteur_canvas_graph_pdc-k_flou*temp2, 1, k_flou*temp2 );
-/*
-if(surbrillance=='av')
-ct_graph_pdc.font="14px 'Trebuchet MS'";
-else
-ct_graph_pdc.font="12px 'Trebuchet MS'";
-*/
-ct_graph_pdc.beginPath(); 
-ct_graph_pdc.fillText(d_avant_plan.toFixed(2)+'m',marge_x_cvs_PDC+temp-5,hauteur_canvas_graph_pdc+10);
+}, false);
 
-if(surbrillance=='av'){
-ct_graph_pdc.beginPath(); 
-ct_graph_pdc.arc(marge_x_cvs_PDC+temp,hauteur_canvas_graph_pdc,3,0,2*Math.PI);
-ct_graph_pdc.fill(); 
-}
+//Graph pdc: Clic
+//TBD: mieux gérer la position de la souris (faire comme pour les autres cvs)
+document.getElementById('id_canvas_PDC').addEventListener('mousedown', function(e) {
+	flag_clicPdc = 1;
+	document.body.style.cursor = 'move';
+	Xt0_cvs_pdc = e.clientX;
+}, false);
 
 
-//Distance de map
-ct_graph_pdc.beginPath(); 
-/*
-if(surbrillance=='map')
-ct_graph_pdc.font="14px 'Trebuchet MS'";
-else
-ct_graph_pdc.font="12px 'Trebuchet MS'";
-*/
-ct_graph_pdc.fillStyle ='rgb('+map_color+')';
-temp=k_distance*d_map;	//distance en px
-ct_graph_pdc.fillText(d_map.toFixed(2)+'m',marge_x_cvs_PDC+temp-5,hauteur_canvas_graph_pdc+20);
+//Graph pdc: Relache clic
+document.getElementById('id_canvas_PDC').addEventListener('mouseup', function() {
+	flag_clicPdc = 0;
+	document.body.style.cursor = 'auto';
+	drawGraphPDC(); //pour MAJ de la largeur des abscisses
+}, false);
 
-if(surbrillance=='map'){
-ct_graph_pdc.beginPath(); 
-ct_graph_pdc.arc(marge_x_cvs_PDC+temp,hauteur_canvas_graph_pdc,3,0,2*Math.PI);
-ct_graph_pdc.fill(); 
-}
+//Graph pdc: bouge
+document.getElementById('id_canvas_PDC').addEventListener('mousemove', function(e) {
 
+	//pour passer d'une distance en m à des px
+	var k_distance = w_cvs_Pdc / d_DernierPoint_cvs_pdc; //pour passer d'une distance en m à des px
 
-//Trait au niveau du flou d'arrière plan
-/*
-if(surbrillance=='ar')
-ct_graph_pdc.font="14px 'Trebuchet MS'";
-else
-ct_graph_pdc.font="12px 'Trebuchet MS'";
-*/
-ct_graph_pdc.fillStyle ='rgb('+arriere_color+')';
-temp=k_distance*d_arriere_plan;	//distance en px
-temp2=(f_m*f_m*(d_arriere_plan-d_map))/(ouverture*d_arriere_plan*(d_map-f_m));
-ct_graph_pdc.beginPath();
+	//MAJ de la position des points sur l'axe
+	var X_avantPlan = k_distance * d_avantPlan;
+	var X_map = k_distance * d_map;
+	var X_arrierePlan = k_distance * d_arrierePlan;
+
+	//MAJ de la position de la souris
+	var canvas = document.getElementById('id_canvas_PDC');
+	var rect = canvas.getBoundingClientRect(),
+		root = document.documentElement;
+	var posX = e.clientX;
+	var X = posX - rect.left - root.scrollLeft - marge_X_cvs_PDC;
+
+	//Regarde dans qeulle zone se situe la souris
+	var distanceSelectionnee_temp = "?";
 
 
-ct_graph_pdc.fillRect( marge_x_cvs_PDC+temp,hauteur_canvas_graph_pdc-k_flou*temp2, 1, k_flou*temp2 );
+	//Pas encore cliqué: souris entre 2 zones pour mettre en distanceSelectionnee
+	if (flag_clicPdc === 0) {
+		if (X < (X_avantPlan + X_map) / 2) {
+			distanceSelectionnee_temp = 'av';
+		} else if (X > (X_map + X_arrierePlan) / 2) {
+			distanceSelectionnee_temp = 'ar';
+		} else {
+			distanceSelectionnee_temp = 'map';
+		}
+	}
+	//Déjà cliqué: la souris peut bouger entre les 2 bornes
+	else {
+		if (distanceSelectionnee === 'av') {
+			if (d_avantPlan <= d_map)
+				distanceSelectionnee_temp = 'av';
+		}
+		if (distanceSelectionnee === 'map') {
+			if (d_avantPlan <= d_map <= d_arrierePlan)
+				distanceSelectionnee_temp = 'map';
+		}
+		if (distanceSelectionnee === 'ar') {
+			if (d_map <= d_arrierePlan)
+				distanceSelectionnee_temp = 'ar';
+		}
+	}
+
+	//La souris est cliquée => modification des distances	
+	if (flag_clicPdc) {
+
+		//avant plan
+		if (distanceSelectionnee_temp === 'av') {
+
+			d_avantPlan += (X - Xt0_cvs_pdc) / k_distance;
+
+			if (d_avantPlan > d_map)
+				d_avantPlan = d_map;
+
+			if (d_avantPlan < 0)
+				d_avantPlan = 0;
+
+			calculs();
+			drawViseur();
+			drawFenetre3D();
+
+			Xt0_cvs_pdc = X;
+		}
+		//arrière plan
+		if (distanceSelectionnee_temp === 'ar') {
+
+			d_arrierePlan += (X - Xt0_cvs_pdc) / k_distance;
+
+			if (d_arrierePlan < d_map)
+				d_arrierePlan = d_map;
+
+			Xt0_cvs_pdc = X;
+
+			calculs();
+			drawViseur();
+			drawFenetre3D();
+
+			Xt0_cvs_pdc = X;
+		}
+		//MAP
+		if (distanceSelectionnee_temp === 'map') {
+
+			d_map += (X - Xt0_cvs_pdc) / k_distance;
+
+			if (d_map < d_avantPlan)
+				d_map = d_avantPlan;
+
+			if (d_map > d_arrierePlan)
+				d_map = d_arrierePlan;
+
+			Xt0_cvs_pdc = X;
+
+			calculs();
+			drawViseur();
+			drawFenetre3D();
+
+			Xt0_cvs_pdc = X;
+		}
+	}
+
+	distanceSelectionnee = distanceSelectionnee_temp;
+
+	drawGraphPDC();
 
 
-ct_graph_pdc.beginPath(); 
-ct_graph_pdc.fillText(d_arriere_plan.toFixed(2)+'m',marge_x_cvs_PDC+temp-5,hauteur_canvas_graph_pdc+30);
-
-
-if(surbrillance=='ar'){
-ct_graph_pdc.beginPath(); 
-ct_graph_pdc.arc(marge_x_cvs_PDC+temp,hauteur_canvas_graph_pdc,3,0,2*Math.PI);
-ct_graph_pdc.fill(); 
-}
-
-
-ct_graph_pdc.font="12px 'Trebuchet MS'";
-
-//Rectangle pour marquer la pdC
-ct_graph_pdc.fillStyle ='rgba('+cdc_color+',0.15)';
-temp=k_distance*pdc_pres;	//distance en px
-temp2=k_distance*pdc_loin;	//distance en px
-
-if(temp2>largeur_canvas_graph_pdc)
-temp2=largeur_canvas_graph_pdc;
-
-ct_graph_pdc.beginPath();
-ct_graph_pdc.fillRect( marge_x_cvs_PDC+temp,0,temp2-temp,hauteur_canvas_graph_pdc);
-
-
-//Cdc
-temp=k_flou*cdc;
-
-if(temp<hauteur_canvas_graph_pdc){
-
-	ct_graph_pdc.fillStyle ='rgb('+cdc_color+')';
-	ct_graph_pdc.beginPath(); 
-	ct_graph_pdc.fillText('cdc',7,hauteur_canvas_graph_pdc-temp+4);
-	
-	ct_graph_pdc.fillStyle ='rgba('+cdc_color+',0.35)';
-	ct_graph_pdc.fillRect( marge_x_cvs_PDC,hauteur_canvas_graph_pdc-temp,largeur_canvas_graph_pdc,1);
-	
-
-	
-}
-
-//Echelle: 1,10 ou 100px
-if(y_reel_graph_pdc>100*taille_pixel)
-temp=100;
-else if(y_reel_graph_pdc>10*taille_pixel)
-temp=10;
-else 
-temp=1;
-
-hauteur_canvas_graph_pdc
-
-temp2=k_flou*temp*taille_pixel;
-
-//fleche_V(ct_graph_pdc,largeur_canvas_graph_pdc+marge_x_cvs_PDC+5,(hauteur_canvas_graph_pdc+temp2)/2,(hauteur_canvas_graph_pdc-temp2)/2)
-fleche_V(ct_graph_pdc,largeur_canvas_graph_pdc+marge_x_cvs_PDC+5,hauteur_canvas_graph_pdc,hauteur_canvas_graph_pdc-temp2)
-
-ct_graph_pdc.fillStyle="#333333";
-ct_graph_pdc.beginPath(); 
-ct_graph_pdc.fillText(temp+'px',largeur_canvas_graph_pdc+marge_x_cvs_PDC+10,hauteur_canvas_graph_pdc-temp2/2+3);
+}, false);
 
 
 
-
-
-
-}
+//Graph pdc: Sort
+document.getElementById('id_canvas_PDC').addEventListener('mouseout', function() {
+	distanceSelectionnee = '?';
+	drawGraphPDC();
+}, false);

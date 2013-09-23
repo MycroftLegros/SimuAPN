@@ -1,4 +1,518 @@
-﻿//Initialise les dataURL
+﻿//Dessine le viseur
+//TBD: faire un unique layer (possible si flou non css)
+//Rq: appeler luminosité une fois sur l'imagedata globale fait passer de 77ms à 32ms (vs luminosité pour chaque layer)
+
+function drawViseur() {
+
+	var i, ii;
+	var temp, temp2;
+
+	var marge_x_viseur = 10;
+	var h_cvs_Viseur = h_capteur * w_cvs_viseur / l_capteur;
+
+
+	//Canvas Illus
+	var cvs_illu = document.getElementById('id_cvs_viseur_illustrations');
+	var ct_illu = cvs_illu.getContext('2d');
+	cvs_illu.width = w_cvs_viseur;
+	cvs_illu.height = h_cvs_Viseur;
+
+	ct_illu.fillStyle = "#FFFFFF";
+	ct_illu.fillRect(0, 0, w_cvs_viseur, h_cvs_Viseur);
+
+	document.getElementById('id_cvs_viseur_illustrations').style.cssText = 'position: absolute; left: ' + marge_x_viseur + 'px; top: ' + marge_Y_exifViseur + 'px; z-index: 2;';
+
+	//Canvas avec les Indications
+	var cvs_cadre = document.getElementById('id_cvs_viseur_cadre');
+	var ct_cadre = cvs_cadre.getContext('2d');
+	var W_viseur = w_cvs_viseur + 2 * marge_X_exifViseur;
+	var H_viseur = h_cvs_Viseur + marge_Y_exifViseur + marge_Y_bas_exifViseur;
+	cvs_cadre.width = W_viseur;
+	cvs_cadre.height = H_viseur;
+
+	ct_cadre.fillStyle = '#000000';
+	ct_cadre.fillRect(0, 0, W_viseur - 1, H_viseur - 1);
+
+	marge_x_viseur -= marge_X_exifViseur;
+	document.getElementById('id_cvs_viseur_cadre').style.cssText = 'position: absolute; left: ' + marge_x_viseur + 'px; top: 0px; z-index: 1;';
+	marge_x_viseur += marge_X_exifViseur;
+
+
+
+	//--INDICATIONS SOUS LE VISEUR
+	var y_text = H_viseur - 0.5 * marge_Y_bas_exifViseur + 5;
+
+	ct_cadre.font = "12px 'Trebuchet MS'";
+	ct_cadre.fillStyle = "#ffffff";
+	ct_cadre.beginPath();
+	//-vitesse
+	temp = 0.083333 * W_viseur;
+	ct_cadre.fillText(vitesse_string, temp, y_text);
+	//-ouverture
+	temp = 0.25 * W_viseur;
+	ct_cadre.fillText('f/' + ouverture, temp, y_text);
+	//-iso
+	temp = 0.75 * W_viseur;
+	ct_cadre.fillText('ISO' + ISO, temp, y_text);
+	//-exposition
+	temp = 0.5 * W_viseur;
+
+	temp2 = expo;
+	if (temp2 !== 0)
+		temp2 = temp2.toFixed(1);
+	if (temp2 > 0)
+		temp2 = '+' + temp2;
+
+
+	//-Curseur d'exposition
+	var X0 = (W_viseur - 1) / 2;
+	var Y0 = y_text - 5;
+
+	var c = 3; //côté d'un carré de l'indicateur d'EV
+	var e = 1; //espace entre 2 indications
+
+
+	ct_cadre.beginPath();
+
+	//trait en haut
+	ct_cadre.fillRect(X0, Y0 - c - e, c, 3 * c + e);
+
+	for (i = 1; i !== 3; i++) {
+		ct_cadre.fillRect(X0 + i * 3 * (c + e), Y0 - c - e, c, c);
+		ct_cadre.fillRect(X0 - i * 3 * (c + e), Y0 - c - e, c, c);
+	}
+
+	//ct_scene_viseur.beginPath(); 
+	ct_cadre.fillText('-', X0 - 6 * (c + e) - 4, Y0 - 2 * c);
+	ct_cadre.fillText(temp2 + 'EV', X0 - 10, Y0 - 2 * c - 2);
+	ct_cadre.fillText('+', X0 + 7 * (c + e), Y0 - 2 * c);
+
+	//traits dynamiques
+	ii = 0;
+
+	for (i = Math.abs(expo); i >= 0 & ii < 7; i -= 0.333) {
+		if (expo > 0)
+			ct_cadre.fillRect(X0 + ii * (c + e), Y0, c, 2 * c);
+		else
+			ct_cadre.fillRect(X0 - ii * (c + e), Y0, c, 2 * c);
+		ii++;
+	}
+
+	if (expo > 2) {
+		ct_cadre.moveTo(X0 + 7 * (c + e), Y0);
+		ct_cadre.lineTo(X0 + 7 * (c + e) + 1.732 * c, Y0 + c);
+		ct_cadre.lineTo(X0 + 7 * (c + e), Y0 + 2 * c);
+		ct_cadre.lineTo(X0 + 7 * (c + e), Y0);
+		ct_cadre.fill();
+	}
+	if (expo < -2) {
+		ct_cadre.moveTo(X0 - 6 * (c + e), Y0);
+		ct_cadre.lineTo(X0 - 6 * (c + e) - 1.732 * c, Y0 + c);
+		ct_cadre.lineTo(X0 - 6 * (c + e), Y0 + 2 * c);
+		ct_cadre.lineTo(X0 - 6 * (c + e), Y0);
+		ct_cadre.fill();
+	}
+
+
+	var Wc = w_cvs_viseur;
+	var Hc = h_cvs_Viseur;
+
+	var Xm = (Wc - 1) / 2;
+	var Ym = (Hc - 1) / 2;
+
+	var d0 = focale / 1000 + dY * Math.tan((Math.PI - (angleChampVertical * 2 * Math.PI / 360.0)) / 2); //distance de la scène au bas du cadre
+	var l0 = 2 * d0 * Math.tan(angleChampHorizontal * Math.PI / 360.0); //largeur de la scène au niveau du cadre
+
+
+
+	//--GRILLE DE PERSPECTIVE
+	//Couleur de fond
+	ct_illu.fillStyle = color_sol;
+	ct_illu.beginPath();
+	ct_illu.fillRect(0, Ym, w_cvs_viseur, h_cvs_Viseur / 2);
+
+	//Couleur des lignes
+	ct_illu.strokeStyle = color_grillePerspective;
+	ct_illu.lineWidth = 1;
+
+	//-Lignes de fuite
+	var dg = 1.0 * ecartLignesSol;
+	temp = (Hc / 2) * Math.tan(0.99 * Math.PI / 2); //ecart en X à l'angle final
+	var Xi = 0;
+	var flag = 0;
+	i = 0;
+	while (flag !== 3) {
+		//Trait vers la droite
+		if (dY >= 0)
+			Xi = Xm + i * dg * Wc / l0 + dX * Wc / l0;
+		else
+			Xi = Xm + i * dg * Wc / l0 - dX * Wc / l0;
+
+
+		ct_illu.moveTo(Xm, Ym);
+		if (dY >= 0)
+			ct_illu.lineTo(Xi, Hc - 1);
+		else
+			ct_illu.lineTo(Xi, 0);
+		ct_illu.stroke();
+
+		if (Math.abs(Xm - Xi) >= temp)
+			flag |= 0x01;
+
+		//Trait vers la gauche
+		if (dY >= 0)
+			Xi = Xm - i * dg * Wc / l0 + dX * Wc / l0;
+		else
+			Xi = Xm - i * dg * Wc / l0 - dX * Wc / l0;
+
+		ct_illu.beginPath();
+		ct_illu.moveTo(Xm, Ym);
+		if (dY >= 0)
+			ct_illu.lineTo(Xi, Hc - 1);
+		else
+			ct_illu.lineTo(Xi, 0);
+		ct_illu.stroke();
+
+		if (Math.abs(Xm - Xi) >= temp)
+			flag |= 0x02;
+
+		i++;
+	}
+
+	//-Traits horizontaux
+	var Yi = 0;
+	var di = dg * Math.ceil((d0 + dP) / dg); //multiple entier de dg supérieur à d0
+	ct_illu.beginPath();
+	var Ylast = -1;
+	while (Math.abs(Yi - Ym) > 3) { //laisse 3 px entre l'horizon et le dernier trait
+		temp = 2 * (di - dP) * Math.tan(angleChampVertical * Math.PI / 360.0);
+		Yi = Ym + dY * Hc / temp;
+
+		if (Math.abs(Ylast - Yi) > 0.5) {
+			ct_illu.moveTo(0, Yi);
+			ct_illu.lineTo(Wc - 1, Yi);
+			Ylast = Yi;
+		} else {
+			Yi = Ym;
+		}
+
+		di += dg;
+	}
+	ct_illu.stroke();
+
+
+	ct_illu.fillStyle = color_grillePerspective;
+	ct_illu.beginPath();
+	ct_illu.fillRect(0, Ym, w_cvs_viseur, Ylast - Ym);
+
+
+
+	//--MAP, avant plan et arrière plan
+	var X = 1.0;
+	var Y = 1.0;
+	var l = 1.0;
+	var h = 1.0;
+	var f = 1.0;
+
+	var bright = 0;
+
+	if (dynamiqueCapteurISOCourant === 0) {
+		if (expo > 0)
+			bright = 9999;
+		if (expo < 0)
+			bright = 0;
+	} else {
+		var cal_temp = expo * 8.0 / dynamiqueCapteurISOCourant;
+		bright = Math.pow(2, cal_temp);
+	}
+
+
+	if (flag_drawExposition === 0)
+		bright = 1;
+
+
+	//-PDC
+	//TBD: mettre la PDC dans un aure canvas pour ne pas la prendre en compte dans l'histogramme et le viseur en 3D
+	temp = 2 * debutPDC * Math.tan(angleChampVertical * Math.PI / 360.0);
+	Yav = Ym + dY * Hc / temp;
+	temp = 2 * finPDC * Math.tan(angleChampVertical * Math.PI / 360.0);
+	Yar = Ym + dY * Hc / temp;
+	ct_illu.strokeStyle = 'rgba(' + color_rayonLumineux + ',0.5)';
+	ct_illu.fillStyle = 'rgba(' + color_rayonLumineux + ',0.5)';
+	ct_illu.beginPath();
+	ct_illu.moveTo(0, Yav);
+	ct_illu.lineTo(0, Yar);
+	ct_illu.lineTo(w_cvs_viseur - 1, Yar);
+	ct_illu.lineTo(w_cvs_viseur - 1, Yav);
+	ct_illu.lineTo(0, Yav);
+	ct_illu.stroke();
+	ct_illu.fill();
+
+
+
+	//--ILLUSTRATIONS
+	//-Arrière
+	var blur_min = 0.1;
+	var blur_max = 100;
+
+	if (d_arrierePlan !== 0) {
+		l = 2 * d_arrierePlan * Math.tan(angleChampHorizontal * Math.PI / 360.0);
+		h = 2 * d_arrierePlan * Math.tan(angleChampVertical * Math.PI / 360.0);
+		X = Xm + dX * Wc / l + offset_x_img_arrierePlan * Wc / l;
+		Y = Ym + dY * Hc / h;
+
+		w_img = w_img_arrierePlan;
+		h_img = h_img_arrierePlan;
+		w_m_img = w_m_img_arrierePlan;
+		offset_y = offset_y_arrierePlan;
+
+		k = Wc / l; //px.m-1
+		w = k * w_m_img;
+		h = k * w_m_img * h_img / w_img;
+
+		X -= w / 2;
+		Y -= (w_m_img * h_img / w_img - offset_y) * k;
+
+		f = flouArrierePlan * Wc / (l_capteur / 1000.0);
+		if (f > blur_max)
+			f = blur_max;
+		if (f < blur_min)
+			f = 0;
+
+		if (flag_drawFlou === 0)
+			f = 0;
+
+
+		if (f !== 0) {
+			stackBlurImage(img_arrierePlan, 'id_cvs_inter', f, 1);
+			var cvs_temp2 = document.getElementById("id_cvs_inter");
+			ct_illu.drawImage(cvs_temp2, X, Y, w, h);
+		} else
+			ct_illu.drawImage(img_arrierePlan, X, Y, w, h);
+
+
+
+	}
+
+
+
+	//-MAP
+	l = 2 * d_map * Math.tan(angleChampHorizontal * Math.PI / 360.0);
+	h = 2 * d_map * Math.tan(angleChampVertical * Math.PI / 360.0);
+	X = Xm + dX * Wc / l;
+	Y = Ym + dY * Hc / h;
+
+	var w_img = w_img_map;
+	var h_img = h_img_map;
+	var w_m_img = w_m_img_map;
+	var offset_y = offset_y_map;
+
+	var k = Wc / l;
+	var w = k * w_m_img;
+	var h = k * w_m_img * h_img / w_img;
+
+	X -= w / 2;
+	Y -= (w_m_img * h_img / w_img - offset_y) * k;
+
+	ct_illu.drawImage(img_map, X, Y, w, h);
+
+
+	//-Avant
+	if (d_avantPlan !== 0) {
+		l = 2 * d_avantPlan * Math.tan(angleChampHorizontal * Math.PI / 360.0);
+		h = 2 * d_avantPlan * Math.tan(angleChampVertical * Math.PI / 360.0);
+		X = Xm + dX * Wc / l + offset_x_img_avantPlan * Wc / l;
+		Y = Ym + dY * Hc / h;
+
+		w_img = w_img_avantPlan;
+		h_img = h_img_avantPlan;
+		w_m_img = w_m_img_avantPlan;
+		offset_y = offset_y_avantPlan;
+
+		var k = Wc / l; //px.m-1
+		var w = k * w_m_img;
+		var h = k * w_m_img * h_img / w_img;
+
+		X -= w / 2;
+		Y -= (w_m_img * h_img / w_img - offset_y) * k;
+
+
+		f = flouAvantPlan * Wc / (l_capteur / 1000.0);
+		if (f > blur_max)
+			f = blur_max;
+		if (f < blur_min)
+			f = 0;
+
+		if (flag_drawFlou === 0)
+			f = 0;
+
+		if (f !== 0) {
+			stackBlurImage(img_avantPlan, 'id_cvs_inter', f, 1);
+			var cvs_temp2 = document.getElementById("id_cvs_inter");
+			ct_illu.drawImage(cvs_temp2, X, Y, w, h);
+		} else
+			ct_illu.drawImage(img_avantPlan, X, Y, w, h);
+
+	}
+
+
+	//Luminosité
+
+	var imgData = ct_illu.getImageData(0, 0, w_cvs_viseur, h_cvs_Viseur);
+
+	if (flag_drawExposition) {
+		var imgData_temp = luminosite(imgData, bright).imgData_lum;
+		ct_illu.putImageData(imgData_temp, 0, 0);
+	} else
+		var imgData_temp = imgData;
+
+
+	//Récupère les valeurs des pixels pour le calcul de l'histogramme
+	//TBD: utiliser directement imgData_temp dans calcHisto
+	var i = 0;
+	for (i = 0; i < w_cvs_viseur * h_cvs_Viseur; i++) {
+		valPixR[i] = imgData_temp.data[4 * i];
+		valPixV[i] = imgData_temp.data[4 * i + 1];
+		valPixB[i] = imgData_temp.data[4 * i + 2];
+		ValPixA[i] = imgData_temp.data[4 * i + 3];
+	}
+
+	//MAJ de l'histogramme puis le dessine
+	//TBD: à ne lancer que si l'histo est visible
+	calcHistos();
+
+}
+
+//Maj des dataURL des img av,ar et map
+
+function majIllustrations() {
+
+	switch (cpt_illustrationAvantPlan) {
+
+		case 1:
+			img_avantPlan.src = dataURL_chat_avantPlan;
+			w_img_avantPlan = 150;
+			h_img_avantPlan = 300;
+			w_m_img_avantPlan = 0.26469;
+			offset_y_avantPlan = 0.0794;
+			break;
+
+
+		case 2:
+			img_avantPlan.src = dataURL_parapluie_avantPlan;
+			w_img_avantPlan = 133;
+			h_img_avantPlan = 300;
+			w_m_img_avantPlan = 0.8202;
+			offset_y_avantPlan = 0.0;
+			break;
+
+		case 3:
+			img_avantPlan.src = dataURL_bigben_avantPlan;
+			w_img_avantPlan = 300;
+			h_img_avantPlan = 197;
+			w_m_img_avantPlan = 147.71;
+			offset_y_avantPlan = 0;
+			break;
+
+		case 4:
+			img_avantPlan.src = dataURL_arbre_avantPlan;
+			w_img_avantPlan = 262;
+			h_img_avantPlan = 300;
+			w_m_img_avantPlan = 3.49;
+			offset_y_avantPlan = 0;
+			break;
+	}
+
+	img_avantPlan.onload = function() {
+
+		switch (cpt_illustrationArrierePlan) {
+			case 1:
+				img_arrierePlan.src = dataURL_chat_arrierePlan;
+				w_img_arrierePlan = 150;
+				h_img_arrierePlan = 300;
+				w_m_img_arrierePlan = 0.26469;
+				offset_y_arrierePlan = 0.0794;
+				break;
+
+			case 2:
+				img_arrierePlan.src = dataURL_parapluie_arrierePlan;
+				w_img_arrierePlan = 133;
+				h_img_arrierePlan = 300;
+				w_m_img_arrierePlan = 0.8202;
+				offset_y_arrierePlan = 0.0;
+				break;
+
+			case 3:
+				img_arrierePlan.src = dataURL_bigben_arrierePlan;
+				w_img_arrierePlan = 300;
+				h_img_arrierePlan = 197;
+				w_m_img_arrierePlan = 147.71;
+				offset_y_arrierePlan = 0;
+				break;
+
+			case 4:
+				img_arrierePlan.src = dataURL_arbre_arrierePlan;
+				w_img_arrierePlan = 262;
+				h_img_arrierePlan = 300;
+				w_m_img_arrierePlan = 3.49;
+				offset_y_arrierePlan = 0;
+				break;
+		}
+	};
+
+
+	img_arrierePlan.onload = function() {
+
+		switch (cpt_illustrationMap) {
+			case 1:
+				img_map.src = dataURL_chat_map;
+				w_img_map = 150;
+				h_img_map = 300;
+				w_m_img_map = 0.26469;
+				offset_y_map = 0.0794;
+				break;
+
+			case 2:
+				img_map.src = dataURL_parapluie_map;
+				w_img_map = 133;
+				h_img_map = 300;
+				w_m_img_map = 0.8202;
+				offset_y_map = 0.0;
+				break;
+
+			case 3:
+				img_map.src = dataURL_bigben_map;
+				w_img_map = 300;
+				h_img_map = 197;
+				w_m_img_map = 147.71;
+				offset_y_map = 0;
+				break;
+
+			case 4:
+				img_map.src = dataURL_arbre_map;
+				w_img_map = 262;
+				h_img_map = 300;
+				w_m_img_map = 3.49;
+				offset_y_map = 0;
+				break;
+
+		}
+	};
+
+	img_map.onload = function() {
+
+		if (flag_init) {
+			drawViseur();
+			drawFenetre3D();
+			flag_init = 0;
+		}
+
+	};
+
+}
+
+
+//Initialise les dataURL
 
 function initImageData() {
 
@@ -16,7 +530,7 @@ function initImageData() {
 
 		//- 1 - Met l'image dans le canvas
 		//TBD: utiliser un canvas invisible
-		var cvs = document.getElementById('id_cvs_viseur_av');
+		var cvs = document.getElementById('id_cvs_inter');
 		var ct = cvs.getContext('2d');
 		var w = img_temp_chat.width;
 		var h = img_temp_chat.height;
@@ -25,26 +539,26 @@ function initImageData() {
 
 		ct.drawImage(img_temp_chat, 0, 0, w, h);
 
-		var RVB_av = avant_color.split(',');
-		var RVB_ar = arriere_color.split(',');
-		var RVB_map = map_color.split(',');
+		var RVB_avantPlan = color_avantPlan.split(',');
+		var RVB_arrierePlan = color_arrierePlan.split(',');
+		var RVB_map = color_map.split(',');
 		//- 2 - Récupère l'image dans un imageData
-		var imageData_av = ct.getImageData(0, 0, w, h);
-		var imageData_ar = ct.getImageData(0, 0, w, h);
+		var imageData_avantPlan = ct.getImageData(0, 0, w, h);
+		var imageData_arrierePlan = ct.getImageData(0, 0, w, h);
 		var imageData_map = ct.getImageData(0, 0, w, h);
 
 		// - 3 - Change la couleur de l'image data
-		for (var i = 0; i < imageData_av.data.length; i += 4) {
+		for (var i = 0; i < imageData_avantPlan.data.length; i += 4) {
 
-			if (imageData_av.data[i] === 0 && imageData_av.data[i + 1] === 0 && imageData_av.data[i + 2] === 0 && imageData_av.data[i + 3] !== 1) {
+			if (imageData_avantPlan.data[i] === 0 && imageData_avantPlan.data[i + 1] === 0 && imageData_avantPlan.data[i + 2] === 0 && imageData_avantPlan.data[i + 3] !== 1) {
 
-				imageData_av.data[i] = RVB_av[0];
-				imageData_av.data[i + 1] = RVB_av[1];
-				imageData_av.data[i + 2] = RVB_av[2];
+				imageData_avantPlan.data[i] = RVB_avantPlan[0];
+				imageData_avantPlan.data[i + 1] = RVB_avantPlan[1];
+				imageData_avantPlan.data[i + 2] = RVB_avantPlan[2];
 
-				imageData_ar.data[i] = RVB_ar[0];
-				imageData_ar.data[i + 1] = RVB_ar[1];
-				imageData_ar.data[i + 2] = RVB_ar[2];
+				imageData_arrierePlan.data[i] = RVB_arrierePlan[0];
+				imageData_arrierePlan.data[i + 1] = RVB_arrierePlan[1];
+				imageData_arrierePlan.data[i + 2] = RVB_arrierePlan[2];
 
 				imageData_map.data[i] = RVB_map[0];
 				imageData_map.data[i + 1] = RVB_map[1];
@@ -52,11 +566,11 @@ function initImageData() {
 			}
 		}
 
-		ct.putImageData(imageData_av, 0, 0);
-		dataURL_chat_av = cvs.toDataURL("image/png");
+		ct.putImageData(imageData_avantPlan, 0, 0);
+		dataURL_chat_avantPlan = cvs.toDataURL("image/png");
 
-		ct.putImageData(imageData_ar, 0, 0);
-		dataURL_chat_ar = cvs.toDataURL("image/png");
+		ct.putImageData(imageData_arrierePlan, 0, 0);
+		dataURL_chat_arrierePlan = cvs.toDataURL("image/png");
 
 		ct.putImageData(imageData_map, 0, 0);
 		dataURL_chat_map = cvs.toDataURL("image/png");
@@ -71,37 +585,37 @@ function initImageData() {
 	img_temp_bigben.onload = function() {
 
 		//- 1 - Met l'image dans le canvas
-		var cvs = document.getElementById('id_cvs_viseur_ar');
+		var cvs = document.getElementById('id_cvs_inter');
 		var ct = cvs.getContext('2d');
 		var w = img_temp_bigben.width;
 		var h = img_temp_bigben.height;
 		cvs.width = w;
 		cvs.height = h;
 
-		
+
 
 		ct.drawImage(img_temp_bigben, 0, 0, w, h);
 
-		var RVB_av = avant_color.split(',');
-		var RVB_ar = arriere_color.split(',');
-		var RVB_map = map_color.split(',');
+		var RVB_avantPlan = color_avantPlan.split(',');
+		var RVB_arrierePlan = color_arrierePlan.split(',');
+		var RVB_map = color_map.split(',');
 		//- 2 - Récupère l'image dans un imageData
-		var imageData_av = ct.getImageData(0, 0, w, h);
-		var imageData_ar = ct.getImageData(0, 0, w, h);
+		var imageData_avantPlan = ct.getImageData(0, 0, w, h);
+		var imageData_arrierePlan = ct.getImageData(0, 0, w, h);
 		var imageData_map = ct.getImageData(0, 0, w, h);
 
 		// - 3 - Change la couleur de l'image data
-		for (var i = 0; i < imageData_av.data.length; i += 4) {
+		for (var i = 0; i < imageData_avantPlan.data.length; i += 4) {
 
-			if (imageData_av.data[i] === 0 && imageData_av.data[i + 1] === 0 && imageData_av.data[i + 2] === 0 && imageData_av.data[i + 3] !== 1) {
+			if (imageData_avantPlan.data[i] === 0 && imageData_avantPlan.data[i + 1] === 0 && imageData_avantPlan.data[i + 2] === 0 && imageData_avantPlan.data[i + 3] !== 1) {
 
-				imageData_av.data[i] = RVB_av[0];
-				imageData_av.data[i + 1] = RVB_av[1];
-				imageData_av.data[i + 2] = RVB_av[2];
+				imageData_avantPlan.data[i] = RVB_avantPlan[0];
+				imageData_avantPlan.data[i + 1] = RVB_avantPlan[1];
+				imageData_avantPlan.data[i + 2] = RVB_avantPlan[2];
 
-				imageData_ar.data[i] = RVB_ar[0];
-				imageData_ar.data[i + 1] = RVB_ar[1];
-				imageData_ar.data[i + 2] = RVB_ar[2];
+				imageData_arrierePlan.data[i] = RVB_arrierePlan[0];
+				imageData_arrierePlan.data[i + 1] = RVB_arrierePlan[1];
+				imageData_arrierePlan.data[i + 2] = RVB_arrierePlan[2];
 
 				imageData_map.data[i] = RVB_map[0];
 				imageData_map.data[i + 1] = RVB_map[1];
@@ -109,11 +623,11 @@ function initImageData() {
 			}
 		}
 
-		ct.putImageData(imageData_av, 0, 0);
-		dataURL_bigben_av = cvs.toDataURL("image/png");
+		ct.putImageData(imageData_avantPlan, 0, 0);
+		dataURL_bigben_avantPlan = cvs.toDataURL("image/png");
 
-		ct.putImageData(imageData_ar, 0, 0);
-		dataURL_bigben_ar = cvs.toDataURL("image/png");
+		ct.putImageData(imageData_arrierePlan, 0, 0);
+		dataURL_bigben_arrierePlan = cvs.toDataURL("image/png");
 
 		ct.putImageData(imageData_map, 0, 0);
 		dataURL_bigben_map = cvs.toDataURL("image/png");
@@ -128,37 +642,37 @@ function initImageData() {
 	img_temp_parapluie.onload = function() {
 
 		//- 1 - Met l'image dans le canvas
-		var cvs = document.getElementById('id_cvs_viseur_map');
+		var cvs = document.getElementById('id_cvs_inter');
 		var ct = cvs.getContext('2d');
 		var w = img_temp_parapluie.width;
 		var h = img_temp_parapluie.height;
 		cvs.width = w;
 		cvs.height = h;
 
-		
+
 
 		ct.drawImage(img_temp_parapluie, 0, 0, w, h);
 
-		var RVB_av = avant_color.split(',');
-		var RVB_ar = arriere_color.split(',');
-		var RVB_map = map_color.split(',');
+		var RVB_avantPlan = color_avantPlan.split(',');
+		var RVB_arrierePlan = color_arrierePlan.split(',');
+		var RVB_map = color_map.split(',');
 		//- 2 - Récupère l'image dans un imageData
-		var imageData_av = ct.getImageData(0, 0, w, h);
-		var imageData_ar = ct.getImageData(0, 0, w, h);
+		var imageData_avantPlan = ct.getImageData(0, 0, w, h);
+		var imageData_arrierePlan = ct.getImageData(0, 0, w, h);
 		var imageData_map = ct.getImageData(0, 0, w, h);
 
 		// - 3 - Change la couleur de l'image data
-		for (var i = 0; i < imageData_av.data.length; i += 4) {
+		for (var i = 0; i < imageData_avantPlan.data.length; i += 4) {
 
-			if (imageData_av.data[i] === 0 && imageData_av.data[i + 1] === 0 && imageData_av.data[i + 2] === 0 && imageData_av.data[i + 3] !== 1) {
+			if (imageData_avantPlan.data[i] === 0 && imageData_avantPlan.data[i + 1] === 0 && imageData_avantPlan.data[i + 2] === 0 && imageData_avantPlan.data[i + 3] !== 1) {
 
-				imageData_av.data[i] = RVB_av[0];
-				imageData_av.data[i + 1] = RVB_av[1];
-				imageData_av.data[i + 2] = RVB_av[2];
+				imageData_avantPlan.data[i] = RVB_avantPlan[0];
+				imageData_avantPlan.data[i + 1] = RVB_avantPlan[1];
+				imageData_avantPlan.data[i + 2] = RVB_avantPlan[2];
 
-				imageData_ar.data[i] = RVB_ar[0];
-				imageData_ar.data[i + 1] = RVB_ar[1];
-				imageData_ar.data[i + 2] = RVB_ar[2];
+				imageData_arrierePlan.data[i] = RVB_arrierePlan[0];
+				imageData_arrierePlan.data[i + 1] = RVB_arrierePlan[1];
+				imageData_arrierePlan.data[i + 2] = RVB_arrierePlan[2];
 
 				imageData_map.data[i] = RVB_map[0];
 				imageData_map.data[i + 1] = RVB_map[1];
@@ -166,11 +680,11 @@ function initImageData() {
 			}
 		}
 
-		ct.putImageData(imageData_av, 0, 0);
-		dataURL_parapluie_av = cvs.toDataURL("image/png");
+		ct.putImageData(imageData_avantPlan, 0, 0);
+		dataURL_parapluie_avantPlan = cvs.toDataURL("image/png");
 
-		ct.putImageData(imageData_ar, 0, 0);
-		dataURL_parapluie_ar = cvs.toDataURL("image/png");
+		ct.putImageData(imageData_arrierePlan, 0, 0);
+		dataURL_parapluie_arrierePlan = cvs.toDataURL("image/png");
 
 		ct.putImageData(imageData_map, 0, 0);
 		dataURL_parapluie_map = cvs.toDataURL("image/png");
@@ -185,7 +699,7 @@ function initImageData() {
 	img_temp_arbre.onload = function() {
 
 		//- 1 - Met l'image dans le canvas
-		var cvs = document.getElementById('id_cvs_viseur_av');
+		var cvs = document.getElementById('id_cvs_inter');
 		var ct = cvs.getContext('2d');
 		var w = img_temp_arbre.width;
 		var h = img_temp_arbre.height;
@@ -194,26 +708,26 @@ function initImageData() {
 
 		ct.drawImage(img_temp_arbre, 0, 0, w, h);
 
-		var RVB_av = avant_color.split(',');
-		var RVB_ar = arriere_color.split(',');
-		var RVB_map = map_color.split(',');
+		var RVB_avantPlan = color_avantPlan.split(',');
+		var RVB_arrierePlan = color_arrierePlan.split(',');
+		var RVB_map = color_map.split(',');
 		//- 2 - Récupère l'image dans un imageData
-		var imageData_av = ct.getImageData(0, 0, w, h);
-		var imageData_ar = ct.getImageData(0, 0, w, h);
+		var imageData_avantPlan = ct.getImageData(0, 0, w, h);
+		var imageData_arrierePlan = ct.getImageData(0, 0, w, h);
 		var imageData_map = ct.getImageData(0, 0, w, h);
 
 		// - 3 - Change la couleur de l'image data
-		for (var i = 0; i < imageData_av.data.length; i += 4) {
+		for (var i = 0; i < imageData_avantPlan.data.length; i += 4) {
 
-			if (imageData_av.data[i] === 0 && imageData_av.data[i + 1] === 0 && imageData_av.data[i + 2] === 0 && imageData_av.data[i + 3] !== 1) {
+			if (imageData_avantPlan.data[i] === 0 && imageData_avantPlan.data[i + 1] === 0 && imageData_avantPlan.data[i + 2] === 0 && imageData_avantPlan.data[i + 3] !== 1) {
 
-				imageData_av.data[i] = RVB_av[0];
-				imageData_av.data[i + 1] = RVB_av[1];
-				imageData_av.data[i + 2] = RVB_av[2];
+				imageData_avantPlan.data[i] = RVB_avantPlan[0];
+				imageData_avantPlan.data[i + 1] = RVB_avantPlan[1];
+				imageData_avantPlan.data[i + 2] = RVB_avantPlan[2];
 
-				imageData_ar.data[i] = RVB_ar[0];
-				imageData_ar.data[i + 1] = RVB_ar[1];
-				imageData_ar.data[i + 2] = RVB_ar[2];
+				imageData_arrierePlan.data[i] = RVB_arrierePlan[0];
+				imageData_arrierePlan.data[i + 1] = RVB_arrierePlan[1];
+				imageData_arrierePlan.data[i + 2] = RVB_arrierePlan[2];
 
 				imageData_map.data[i] = RVB_map[0];
 				imageData_map.data[i + 1] = RVB_map[1];
@@ -221,158 +735,30 @@ function initImageData() {
 			}
 		}
 
-		ct.putImageData(imageData_av, 0, 0);
-		dataURL_arbre_av = cvs.toDataURL("image/png");
+		ct.putImageData(imageData_avantPlan, 0, 0);
+		dataURL_arbre_avantPlan = cvs.toDataURL("image/png");
 
-		ct.putImageData(imageData_ar, 0, 0);
-		dataURL_arbre_ar = cvs.toDataURL("image/png");
+		ct.putImageData(imageData_arrierePlan, 0, 0);
+		dataURL_arbre_arrierePlan = cvs.toDataURL("image/png");
 
 		ct.putImageData(imageData_map, 0, 0);
 		dataURL_arbre_map = cvs.toDataURL("image/png");
 
 
-		MAJ_illus();
-	};
-
-}
-
-//Maj des dataURL des img av,ar et map
-
-function MAJ_illus() {
-
-	switch (cpt_choix_illu_av) {
-
-		case 1:
-			img_av.src = dataURL_chat_av;
-			w_img_av = 150;
-			h_img_av = 300;
-			l_img_av = 0.26469;
-			offset_y_av = 0.0794;
-			break;
-
-
-		case 2:
-			img_av.src = dataURL_parapluie_av;
-			w_img_av = 133;
-			h_img_av = 300;
-			l_img_av = 0.8202;
-			offset_y_av = 0.0;
-			break;
-
-		case 3:
-			img_av.src = dataURL_bigben_av;
-			w_img_av = 300;
-			h_img_av = 197;
-			l_img_av = 147.71;
-			offset_y_av = 0;
-			break;
-
-		case 4:
-			img_av.src = dataURL_arbre_av;
-			w_img_av = 262;
-			h_img_av = 300;
-			l_img_av = 3.49;
-			offset_y_av = 0;
-			break;
-	}
-
-	img_av.onload = function() {
-
-		switch (cpt_choix_illu_ar) {
-			case 1:
-				img_ar.src = dataURL_chat_ar;
-				w_img_ar = 150;
-				h_img_ar = 300;
-				l_img_ar = 0.26469;
-				offset_y_ar = 0.0794;
-				break;
-
-			case 2:
-				img_ar.src = dataURL_parapluie_ar;
-				w_img_ar = 133;
-				h_img_ar = 300;
-				l_img_ar = 0.8202;
-				offset_y_ar = 0.0;
-				break;
-
-			case 3:
-				img_ar.src = dataURL_bigben_ar;
-				w_img_ar = 300;
-				h_img_ar = 197;
-				l_img_ar = 147.71;
-				offset_y_ar = 0;
-				break;
-
-			case 4:
-				img_ar.src = dataURL_arbre_ar;
-				w_img_ar = 262;
-				h_img_ar = 300;
-				l_img_ar = 3.49;
-				offset_y_ar = 0;
-				break;
-		}
-	};
-
-
-	img_ar.onload = function() {
-
-		switch (cpt_choix_illu_map) {
-			case 1:
-				img_map.src = dataURL_chat_map;
-				w_img_map = 150;
-				h_img_map = 300;
-				l_img_map = 0.26469;
-				offset_y_map = 0.0794;
-				break;
-
-			case 2:
-				img_map.src = dataURL_parapluie_map;
-				w_img_map = 133;
-				h_img_map = 300;
-				l_img_map = 0.8202;
-				offset_y_map = 0.0;
-				break;
-
-			case 3:
-				img_map.src = dataURL_bigben_map;
-				w_img_map = 300;
-				h_img_map = 197;
-				l_img_map = 147.71;
-				offset_y_map = 0;
-				break;
-
-			case 4:
-				img_map.src = dataURL_arbre_map;
-				w_img_map = 262;
-				h_img_map = 300;
-				l_img_map = 3.49;
-				offset_y_map = 0;
-				break;
-
-		}
-	};
-
-	img_map.onload = function() {
-
-		if (flag_init) {
-			DrawViseur();
-			Draw3D_globale();
-			flag_init = 0;
-		}
-
+		majIllustrations();
 	};
 
 }
 
 
-function MAJ_illu_map() {
+function majIllustrationMap() {
 
-	switch (cpt_choix_illu_map) {
+	switch (cpt_illustrationMap) {
 		case 1:
 			img_map.src = dataURL_chat_map;
 			w_img_map = 150;
 			h_img_map = 300;
-			l_img_map = 0.26469;
+			w_m_img_map = 0.26469;
 			offset_y_map = 0.0794;
 			break;
 
@@ -380,7 +766,7 @@ function MAJ_illu_map() {
 			img_map.src = dataURL_parapluie_map;
 			w_img_map = 133;
 			h_img_map = 300;
-			l_img_map = 0.8202;
+			w_m_img_map = 0.8202;
 			offset_y_map = 0.0;
 			break;
 
@@ -388,7 +774,7 @@ function MAJ_illu_map() {
 			img_map.src = dataURL_bigben_map;
 			w_img_map = 300;
 			h_img_map = 197;
-			l_img_map = 147.71;
+			w_m_img_map = 147.71;
 			offset_y_map = 0;
 			break;
 
@@ -396,560 +782,218 @@ function MAJ_illu_map() {
 			img_map.src = dataURL_arbre_map;
 			w_img_map = 262;
 			h_img_map = 300;
-			l_img_map = 3.49;
+			w_m_img_map = 3.49;
 			offset_y_map = 0;
 			break;
 
 	}
 
 	img_map.onload = function() {
-		DrawViseur();
+		drawViseur();
 	};
 
 }
 
-function MAJ_illu_ar() {
+function majIllustrationArrierePlan() {
 
-	switch (cpt_choix_illu_ar) {
+	switch (cpt_illustrationArrierePlan) {
 		case 1:
-			img_ar.src = dataURL_chat_ar;
-			w_img_ar = 150;
-			h_img_ar = 300;
-			l_img_ar = 0.26469;
-			offset_y_ar = 0.0794;
+			img_arrierePlan.src = dataURL_chat_arrierePlan;
+			w_img_arrierePlan = 150;
+			h_img_arrierePlan = 300;
+			w_m_img_arrierePlan = 0.26469;
+			offset_y_arrierePlan = 0.0794;
 			break;
 
 		case 2:
-			img_ar.src = dataURL_parapluie_ar;
-			w_img_ar = 133;
-			h_img_ar = 300;
-			l_img_ar = 0.8202;
-			offset_y_ar = 0.0;
+			img_arrierePlan.src = dataURL_parapluie_arrierePlan;
+			w_img_arrierePlan = 133;
+			h_img_arrierePlan = 300;
+			w_m_img_arrierePlan = 0.8202;
+			offset_y_arrierePlan = 0.0;
 			break;
 
 		case 3:
-			img_ar.src = dataURL_bigben_ar;
-			w_img_ar = 300;
-			h_img_ar = 197;
-			l_img_ar = 147.71;
-			offset_y_ar = 0;
+			img_arrierePlan.src = dataURL_bigben_arrierePlan;
+			w_img_arrierePlan = 300;
+			h_img_arrierePlan = 197;
+			w_m_img_arrierePlan = 147.71;
+			offset_y_arrierePlan = 0;
 			break;
 
 		case 4:
-			img_ar.src = dataURL_arbre_ar;
-			w_img_ar = 262;
-			h_img_ar = 300;
-			l_img_ar = 3.49;
-			offset_y_ar = 0;
+			img_arrierePlan.src = dataURL_arbre_arrierePlan;
+			w_img_arrierePlan = 262;
+			h_img_arrierePlan = 300;
+			w_m_img_arrierePlan = 3.49;
+			offset_y_arrierePlan = 0;
 			break;
 	}
 
-	img_ar.onload = function() {
-		DrawViseur();
+	img_arrierePlan.onload = function() {
+		drawViseur();
 	};
 
 }
 
-function MAJ_illu_av() {
+function majIllustrationAvantPlan() {
 
-	switch (cpt_choix_illu_av) {
+	switch (cpt_illustrationAvantPlan) {
 
 		case 1:
-			img_av.src = dataURL_chat_av;
-			w_img_av = 150;
-			h_img_av = 300;
-			l_img_av = 0.26469;
-			offset_y_av = 0.0794;
+			img_avantPlan.src = dataURL_chat_avantPlan;
+			w_img_avantPlan = 150;
+			h_img_avantPlan = 300;
+			w_m_img_avantPlan = 0.26469;
+			offset_y_avantPlan = 0.0794;
 			break;
 
 		case 2:
-			img_av.src = dataURL_parapluie_av;
-			w_img_av = 133;
-			h_img_av = 300;
-			l_img_av = 0.8202;
-			offset_y_av = 0.0;
+			img_avantPlan.src = dataURL_parapluie_avantPlan;
+			w_img_avantPlan = 133;
+			h_img_avantPlan = 300;
+			w_m_img_avantPlan = 0.8202;
+			offset_y_avantPlan = 0.0;
 			break;
 
 		case 3:
-			img_av.src = dataURL_bigben_av;
-			w_img_av = 300;
-			h_img_av = 197;
-			l_img_av = 147.71;
-			offset_y_av = 0;
+			img_avantPlan.src = dataURL_bigben_avantPlan;
+			w_img_avantPlan = 300;
+			h_img_avantPlan = 197;
+			w_m_img_avantPlan = 147.71;
+			offset_y_avantPlan = 0;
 			break;
 
 		case 4:
-			img_av.src = dataURL_arbre_av;
-			w_img_av = 262;
-			h_img_av = 300;
-			l_img_av = 3.49;
-			offset_y_av = 0;
+			img_avantPlan.src = dataURL_arbre_avantPlan;
+			w_img_avantPlan = 262;
+			h_img_avantPlan = 300;
+			w_m_img_avantPlan = 3.49;
+			offset_y_avantPlan = 0;
 			break;
 	}
 
-	img_av.onload = function() {
-		DrawViseur();
+	img_avantPlan.onload = function() {
+		drawViseur();
 	};
 
 }
 
 
-//Dessine le viseur
-//TBD: faire un unique layer (possible si flou non css)
-//Rq: appeler luminosité une fois sur l'imagedata globale fait passer de 77ms à 32ms (vs luminosité pour chaque layer)
+function majDistancePhotographe(Delta) {
+	Delta = -0.1 * Delta; //10cm par tour
 
-function DrawViseur() {
+	var temp = 1.0 * d_map;
 
-	//-OUVERTURE DES CANVAS
-	//Hauteur du canvas dépend de la largeur et du format du capteur
-	var hauteur_canvas_viseur = h_capteur * largeur_canvas_viseur / l_capteur;
-
-	//Dimensions des canvas
-	var cvs_scene_cadre = document.getElementById('id_cvs_viseur_cadre');
-	var ct_scene_cadre = cvs_scene_cadre.getContext('2d');
-	cvs_scene_cadre.width = largeur_canvas_viseur;
-	cvs_scene_cadre.height = hauteur_canvas_viseur;
-
-	ct_scene_cadre.fillStyle = "#FFFFFF";
-	ct_scene_cadre.fillRect(0, 0, largeur_canvas_viseur, hauteur_canvas_viseur);
-
-	var cvs_scene_av = document.getElementById('id_cvs_viseur_av');
-	var ct_scene_av = cvs_scene_av.getContext('2d');
-	cvs_scene_av.width = largeur_canvas_viseur;
-	cvs_scene_av.height = hauteur_canvas_viseur;
-
-	var cvs_scene_map = document.getElementById('id_cvs_viseur_map');
-	var ct_scene_map = cvs_scene_map.getContext('2d');
-	cvs_scene_map.width = largeur_canvas_viseur;
-	cvs_scene_map.height = hauteur_canvas_viseur;
-
-	var cvs_scene_ar = document.getElementById('id_cvs_viseur_ar');
-	var ct_scene_ar = cvs_scene_ar.getContext('2d');
-	cvs_scene_ar.width = largeur_canvas_viseur;
-	cvs_scene_ar.height = hauteur_canvas_viseur;
-
-	//--VISEUR
-	var marge_x_viseur = 10;
-
-	document.getElementById('id_cvs_viseur_cadre').style.cssText = 'position: absolute; left: ' + marge_x_viseur + 'px; top: ' + marge_Y + 'px; z-index: 2;';
-	document.getElementById('id_cvs_viseur_av').style.cssText = 'position: absolute; left: ' + marge_x_viseur + 'px; top: ' + marge_Y + 'px; z-index: 5;';
-	document.getElementById('id_cvs_viseur_map').style.cssText = 'position: absolute; left: ' + marge_x_viseur + 'px; top: ' + marge_Y + 'px; z-index: 4;';
-	document.getElementById('id_cvs_viseur_ar').style.cssText = 'position: absolute; left: ' + marge_x_viseur + 'px; top: ' + marge_Y + 'px; z-index: 3;';
-	marge_x_viseur -= marge_X;
-	document.getElementById('id_cvs_viseur_viseur').style.cssText = 'position: absolute; left: ' + marge_x_viseur + 'px; top: 0px; z-index: 1;';
-	marge_x_viseur += marge_X;
-
-	var cvs_scene_viseur = document.getElementById('id_cvs_viseur_viseur');
-	var ct_scene_viseur = cvs_scene_viseur.getContext('2d');
-
-	var W_viseur = largeur_canvas_viseur + 2 * marge_X;
-	var H_viseur = hauteur_canvas_viseur + marge_Y + marge_Y_bas;
-	cvs_scene_viseur.width = W_viseur;
-	cvs_scene_viseur.height = H_viseur;
+	if (Delta < 0)
+		temp = temp / 1.05;
+	else
+		temp = 1.05 * temp;
 
 
-	ct_scene_viseur.fillStyle = '#000000';
-	ct_scene_viseur.fillRect(0, 0, W_viseur - 1, H_viseur - 1);
+	if (temp > (focale / 1000)) {
+		dP += d_map - temp;
+		d_arrierePlan += (temp - d_map);
+		d_avantPlan += (temp - d_map);
+		d_map = temp;
+
+		if (d_avantPlan < 0)
+			d_avantPlan = 0;
+
+		calculs();
+		drawDistances();
+		drawViseur();
+		initPtsFenetre3D();
+		drawFenetre3D();
+	}
+}
 
 
-	//--INDICATIONS SOUS LE VISEUR
-	var y_text = H_viseur - 0.5 * marge_Y_bas + 5;
+//-dX et dY = f(déplacement de la souris)
 
-	ct_scene_viseur.font = "12px 'Trebuchet MS'";
-	ct_scene_viseur.fillStyle = "#ffffff";
-	ct_scene_viseur.beginPath();
-	//-vitesse
-	temp = 0.083333 * W_viseur;
-	ct_scene_viseur.fillText(vitesse_string, temp, y_text);
-	//-ouverture
-	temp = 0.25 * W_viseur;
-	ct_scene_viseur.fillText('f/' + ouverture, temp, y_text);
-	//-iso
-	temp = 0.75 * W_viseur;
-	ct_scene_viseur.fillText('ISO' + ISO, temp, y_text);
-	//-exposition
-	temp = 0.5 * W_viseur;
-	var temp2 = expo;
-	if (temp2 !== 0)
-		temp2 = temp2.toFixed(1);
-	if (temp2 > 0)
-		temp2 = '+' + temp2;
+function sourisPositionPhotographe(e) {
 
 
-	//-Curseur d'exposition
-	var X0 = (W_viseur - 1) / 2;
-	var Y0 = y_text - 5;
+	//Déplacement de la souris
+	var posX = e.clientX;
+	var posY = e.clientY;
 
-	var c = 3; //côté d'un carré de l'indicateur d'EV
-	var e = 1; //espace entre 2 indications
+	var tempX = posX - Xt0_cvs_viseur;
+	var tempY = posY - Yt0_cvs_viseur;
 
+	//Dimensions de la scène
+	tempX = tempX * w_m_avantPlan / w_cvs_viseur;
+	tempY = tempY * h_m_avantPlan / (w_cvs_viseur * h_capteur / l_capteur);
 
-	ct_scene_viseur.beginPath();
-
-	//trait en haut
-	ct_scene_viseur.fillRect(X0, Y0 - c - e, c, 3 * c + e);
-
-	for (i = 1; i !== 3; i++) {
-		ct_scene_viseur.fillRect(X0 + i * 3 * (c + e), Y0 - c - e, c, c);
-		ct_scene_viseur.fillRect(X0 - i * 3 * (c + e), Y0 - c - e, c, c);
+	//1px => 1cm
+	if (flag_clicViseur) {
+		dX += tempX;
+		dY += tempY;
 	}
 
-	//ct_scene_viseur.beginPath(); 
-	ct_scene_viseur.fillText('-', X0 - 6 * (c + e) - 4, Y0 - 2 * c);
-	ct_scene_viseur.fillText(temp2 + 'EV', X0 - 10, Y0 - 2 * c - 2);
-	ct_scene_viseur.fillText('+', X0 + 7 * (c + e), Y0 - 2 * c);
+	if (dY < h_capteur / 2000)
+		dY = h_capteur / 2000;
 
-	//traits dynamiques
-	var ii = 0;
 
-	for (i = Math.abs(expo); i >= 0 & ii < 7; i -= 0.333) {
-		if (expo > 0)
-			ct_scene_viseur.fillRect(X0 + ii * (c + e), Y0, c, 2 * c);
-		else
-			ct_scene_viseur.fillRect(X0 - ii * (c + e), Y0, c, 2 * c);
-		ii++;
+	Xt0_cvs_viseur = posX;
+	Yt0_cvs_viseur = posY;
+
+	drawViseur();
+	initPtsFenetre3D();
+	drawFenetre3D();
+
+}
+
+
+function rouletteViseur(e) {
+	var Delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
+
+	if (!e) {
+		e = window.event;
+	}
+	if (e.preventDefault) {
+		e.preventDefault();
 	}
 
-	if (expo > 2) {
-		ct_scene_viseur.moveTo(X0 + 7 * (c + e), Y0);
-		ct_scene_viseur.lineTo(X0 + 7 * (c + e) + 1.732 * c, Y0 + c);
-		ct_scene_viseur.lineTo(X0 + 7 * (c + e), Y0 + 2 * c);
-		ct_scene_viseur.lineTo(X0 + 7 * (c + e), Y0);
-		ct_scene_viseur.fill();
-	}
-	if (expo < -2) {
-		ct_scene_viseur.moveTo(X0 - 6 * (c + e), Y0);
-		ct_scene_viseur.lineTo(X0 - 6 * (c + e) - 1.732 * c, Y0 + c);
-		ct_scene_viseur.lineTo(X0 - 6 * (c + e), Y0 + 2 * c);
-		ct_scene_viseur.lineTo(X0 - 6 * (c + e), Y0);
-		ct_scene_viseur.fill();
-	}
+	majDistancePhotographe(Delta);
 
-	var temp = 1.0;
-
-	var Wc = largeur_canvas_viseur;
-	var Hc = hauteur_canvas_viseur;
-
-	var Xm = (Wc - 1) / 2;
-	var Ym = (Hc - 1) / 2;
-
-	var d0 = focale / 1000 + dY * Math.tan((Math.PI - (angle_vert * 2 * Math.PI / 360.0)) / 2); //distance de la scène au bas du cadre
-	var l0 = 2 * d0 * Math.tan(angle_horiz * Math.PI / 360.0); //largeur de la scène au niveau du cadre
-
-
-	//--GRILLE DE PERSPECTIVE
-	//Couleur de fond
-	ct_scene_cadre.fillStyle = color_fond_perspective;
-	ct_scene_cadre.beginPath();
-	ct_scene_cadre.fillRect(0, Ym, largeur_canvas_viseur, hauteur_canvas_viseur / 2);
-
-	//Couleur des lignes
-	ct_scene_cadre.strokeStyle = color_grille_perspective;
-	ct_scene_cadre.lineWidth = 1;
-
-	//-Lignes de fuite
-	var dg = 1.0 * pas_perspective;
-	temp = (Hc / 2) * Math.tan(0.99 * Math.PI / 2); //ecart en X à l'angle final
-	var Xi = 0;
-	var flag = 0;
-	i = 0;
-	while (flag !== 3) {
-		//Trait vers la droite
-		if (dY >= 0)
-			Xi = Xm + i * dg * Wc / l0 + dX * Wc / l0;
-		else
-			Xi = Xm + i * dg * Wc / l0 - dX * Wc / l0;
-
-		//ct_scene_cadre.beginPath();
-		ct_scene_cadre.moveTo(Xm, Ym);
-		if (dY >= 0)
-			ct_scene_cadre.lineTo(Xi, Hc - 1);
-		else
-			ct_scene_cadre.lineTo(Xi, 0);
-		ct_scene_cadre.stroke();
-
-		if (Math.abs(Xm - Xi) >= temp)
-			flag |= 0x01;
-
-		//Trait vers la gauche
-		if (dY >= 0)
-			Xi = Xm - i * dg * Wc / l0 + dX * Wc / l0;
-		else
-			Xi = Xm - i * dg * Wc / l0 - dX * Wc / l0;
-
-		ct_scene_cadre.beginPath();
-		ct_scene_cadre.moveTo(Xm, Ym);
-		if (dY >= 0)
-			ct_scene_cadre.lineTo(Xi, Hc - 1);
-		else
-			ct_scene_cadre.lineTo(Xi, 0);
-		ct_scene_cadre.stroke();
-
-		if (Math.abs(Xm - Xi) >= temp)
-			flag |= 0x02;
-
-		i++;
-	}
-
-	//-Traits horizontaux
-	var Yi = 0;
-	var di = dg * Math.ceil((d0 + dP) / dg); //multiple entier de dg supérieur à d0
-	ct_scene_cadre.beginPath();
-	var Ylast = -1;
-	while (Math.abs(Yi - Ym) > 3) { //laisse 3 px entre l'horizon et le dernier trait
-		temp = 2 * (di - dP) * Math.tan(angle_vert * Math.PI / 360.0);
-		Yi = Ym + dY * Hc / temp;
-
-		if (Math.abs(Ylast - Yi) > 0.5) {
-			ct_scene_cadre.moveTo(0, Yi);
-			ct_scene_cadre.lineTo(Wc - 1, Yi);
-			Ylast = Yi;
-		} else {
-			Yi = Ym;
-		}
-
-		di += dg;
-	}
-	ct_scene_cadre.stroke();
-
-
-	ct_scene_cadre.fillStyle = color_grille_perspective;
-	ct_scene_cadre.beginPath();
-	ct_scene_cadre.fillRect(0, Ym, largeur_canvas_viseur, Ylast - Ym);
-
-
-
-	//--MAP, avant plan et arrière plan
-	var X = 1.0;
-	var Y = 1.0;
-	var l = 1.0;
-	var h = 1.0;
-	var f = 1.0;
-
-	var bright = 0;
-
-	if (dynamique_capteur === 0) {
-		if (expo > 0)
-			bright = 9999;
-		if (expo < 0)
-			bright = 0;
-	} else {
-		var cal_temp = expo * 8.0 / dynamique_capteur;
-		bright = Math.pow(2, cal_temp);
-	}
-
-
-	if (flag_draw_expo === 0)
-		bright = 1;
-
-
-	//-PDC
-	//TBD: mettre la PDC dans un aure canvas pour ne pas la prendre en compte dans l'histogramme et le viseur en 3D
-	temp = 2 * pdc_pres * Math.tan(angle_vert * Math.PI / 360.0);
-	Yav = Ym + dY * Hc / temp;
-	temp = 2 * pdc_loin * Math.tan(angle_vert * Math.PI / 360.0);
-	Yar = Ym + dY * Hc / temp;
-	ct_scene_cadre.strokeStyle = 'rgba(' + rayon_color + ',0.5)';
-	ct_scene_cadre.fillStyle = 'rgba(' + rayon_color + ',0.5)';
-	ct_scene_cadre.beginPath();
-	ct_scene_cadre.moveTo(0, Yav);
-	ct_scene_cadre.lineTo(0, Yar);
-	ct_scene_cadre.lineTo(largeur_canvas_viseur - 1, Yar);
-	ct_scene_cadre.lineTo(largeur_canvas_viseur - 1, Yav);
-	ct_scene_cadre.lineTo(0, Yav);
-	ct_scene_cadre.stroke();
-	ct_scene_cadre.fill();
-
-
-
-	//--ILLUSTRATIONS
-	//-MAP
-	l = 2 * d_map * Math.tan(angle_horiz * Math.PI / 360.0);
-	h = 2 * d_map * Math.tan(angle_vert * Math.PI / 360.0);
-	X = Xm + dX * Wc / l;
-	Y = Ym + dY * Hc / h;
-
-	var w_img = w_img_map;
-	var h_img = h_img_map;
-	var l_img = l_img_map;
-	var offset_y = offset_y_map;
-
-	var k = Wc / l; //px.m-1
-	var w = k * l_img;
-	var h = k * l_img * h_img / w_img;
-
-	X -= w / 2;
-	Y -= (l_img * h_img / w_img - offset_y) * k;
-
-	ct_scene_map.drawImage(img_map, X, Y, w, h);
-
-
-
-	//-Arrière
-	var blur_min = 0.1;
-	var blur_max = 100;
-
-	if (d_arriere_plan !== 0) {
-		l = 2 * d_arriere_plan * Math.tan(angle_horiz * Math.PI / 360.0);
-		h = 2 * d_arriere_plan * Math.tan(angle_vert * Math.PI / 360.0);
-		X = Xm + dX * Wc / l + dX_img_ar * Wc / l;
-		Y = Ym + dY * Hc / h;
-
-		w_img = w_img_ar;
-		h_img = h_img_ar;
-		l_img = l_img_ar;
-		offset_y = offset_y_ar;
-
-		k = Wc / l; //px.m-1
-		w = k * l_img;
-		h = k * l_img * h_img / w_img;
-
-		X -= w / 2;
-		Y -= (l_img * h_img / w_img - offset_y) * k;
-
-		f = flou_arriere * Wc / (l_capteur / 1000.0);
-		if (f > blur_max)
-			f = blur_max;
-		if (f < blur_min)
-			f = 0;
-
-		if (flag_draw_flou === 0)
-			f = 0;
-
-
-/*
-		if (f !== 0)
-			cvs_scene_ar.style.webkitFilter = 'blur(' + f + 'px)';
-		else
-			cvs_scene_ar.style.webkitFilter = '';
-*/
-		if (f !== 0)
-			var img_temp=Flou(img_ar,f).img_flou;
-		else
-			var img_temp=img_ar;
-		
-
-		ct_scene_ar.drawImage(img_temp, X, Y, w, h);
-	}
-
-
-
-	//-Avant
-	if (d_avant_plan !== 0) {
-		l = 2 * d_avant_plan * Math.tan(angle_horiz * Math.PI / 360.0);
-		h = 2 * d_avant_plan * Math.tan(angle_vert * Math.PI / 360.0);
-		X = Xm + dX * Wc / l + dX_img_av * Wc / l;
-		Y = Ym + dY * Hc / h;
-
-		w_img = w_img_av;
-		h_img = h_img_av;
-		l_img = l_img_av;
-		offset_y = offset_y_av;
-
-		var k = Wc / l; //px.m-1
-		var w = k * l_img;
-		var h = k * l_img * h_img / w_img;
-
-		X -= w / 2;
-		Y -= (l_img * h_img / w_img - offset_y) * k;
-
-
-		f = flou_avant * Wc / (l_capteur / 1000.0);
-		if (f > blur_max)
-			f = blur_max;
-		if (f < blur_min)
-			f = 0;
-
-		if (flag_draw_flou === 0)
-			f = 0;
-
-/*
-
-		if(f!==0)
-		cvs_scene_ar.style.webkitFilter = 'blur('+f+'px)';
-		else
-		cvs_scene_ar.style.webkitFilter = '';
-*/
-
-		if (f !== 0)
-			var img_temp=Flou(img_av,f).img_flou;
-		else
-			var img_temp=img_av;
-		
-
-		ct_scene_ar.drawImage(img_temp, X, Y, w, h);
-
-	}
-
-
-
-	//-Envirronement
-	ct_scene_cadre.fillStyle = '#000000';
-	ct_scene_cadre.beginPath();
-	ct_scene_cadre.fillRect(0, 0, largeur_canvas_viseur, 1);
-	ct_scene_cadre.fillRect(0, hauteur_canvas_viseur - 1, largeur_canvas_viseur, 1);
-	ct_scene_cadre.fillRect(0, 0, 1, hauteur_canvas_viseur);
-	ct_scene_cadre.fillRect(largeur_canvas_viseur - 1, 0, 1, hauteur_canvas_viseur);
-
-
-	//Récupère les différents canvas dans une image pour dessiner le viseur et calculer l'histogramme
-	var cvs_viseur_merge = document.getElementById("id_cvs_viseur_merge");
-	var ct_viseur_merge = cvs_viseur_merge.getContext('2d');
-	cvs_viseur_merge.width = largeur_canvas_viseur;
-	cvs_viseur_merge.height = hauteur_canvas_viseur;
-
-
-	largeur_vh = largeur_canvas_viseur;
-	hauteur_vh = hauteur_canvas_viseur;
-
-
-	var cvs_temp = document.getElementById("id_cvs_viseur_cadre");
-	ct_viseur_merge.drawImage(cvs_temp, 0, 0);
-	cvs_temp = document.getElementById("id_cvs_viseur_ar");
-	ct_viseur_merge.drawImage(cvs_temp, 0, 0);
-	cvs_temp = document.getElementById("id_cvs_viseur_map");
-	ct_viseur_merge.drawImage(cvs_temp, 0, 0);
-	cvs_temp = document.getElementById("id_cvs_viseur_av");
-	ct_viseur_merge.drawImage(cvs_temp, 0, 0);
-
-
-	var imgData = ct_viseur_merge.getImageData(0, 0, largeur_vh, hauteur_vh);
-
-
-	var imgData_temp = Luminosite(imgData, bright).imgData_lum;
-
-
-	//TBD: ne plus avoir à dégager des layers
-	cvs_scene_av.width = largeur_canvas_viseur;
-	cvs_scene_av.height = hauteur_canvas_viseur;
-
-	cvs_scene_map.width = largeur_canvas_viseur;
-	cvs_scene_map.height = hauteur_canvas_viseur;
-
-	cvs_scene_ar.width = largeur_canvas_viseur;
-	cvs_scene_ar.height = hauteur_canvas_viseur;
-
-
-	ct_scene_cadre.putImageData(imgData_temp, 0, 0);
-
-
-	//Récupère les valeurs des pixels pour le calcul de l'histogramme
-	//TBD: utiliser directement imgData_temp dans calcHisto
-	var i = 0;
-	for (i = 0; i < largeur_vh * hauteur_vh; i++) {
-		Pix_R[i] = imgData_temp.data[4 * i];
-		Pix_V[i] = imgData_temp.data[4 * i + 1];
-		Pix_B[i] = imgData_temp.data[4 * i + 2];
-		Pix_T[i] = imgData_temp.data[4 * i + 3];
-	}
-
-	//MAJ de l'histogramme puis le dessine
-	Calc_histograms();
-
-
-	//MAJ pour le dessin dans le modèle 3D
-	ct_viseur_merge.putImageData(imgData_temp, 0, 0);
+	flag_cadrageConstant = 0;
+	//document.getElementById('id_chk_cadrage_cst').checked=false;
 }
 
 
 
+//Viseur: Roulette (chrome)
+document.getElementById('id_cvs_viseur_illustrations').addEventListener('mousewheel', function(e) {
+	rouletteViseur(e);
+}, false);
+
+//Viseur: Clic
+document.getElementById('id_cvs_viseur_illustrations').addEventListener('mousedown', function(e) {
+	flag_clicViseur = 1;
+	Xt0_cvs_viseur = e.clientX;
+	Yt0_cvs_viseur = e.clientY;
+	document.body.style.cursor = 'all-scroll';
+}, false);
+
+//Viseur: Relache clic
+document.getElementById('id_cvs_viseur_illustrations').addEventListener('mouseup', function() {
+	flag_clicViseur = 0;
+	document.body.style.cursor = 'all-scroll';
+}, false);
+
+//Viseur: Souris bouge
+document.getElementById('id_cvs_viseur_illustrations').addEventListener('mousemove', function(e) {
+	if (flag_clicViseur)
+		sourisPositionPhotographe(e);
+}, false);
+
+//Viseur: Souris entre
+document.getElementById('id_cvs_viseur_illustrations').addEventListener('mouseover', function() {
+	document.body.style.cursor = 'all-scroll';
+}, false);
+
+//Viseur: Souris sort
+document.getElementById('id_cvs_viseur_illustrations').addEventListener('mouseout', function() {
+	document.body.style.cursor = 'auto';
+}, false);

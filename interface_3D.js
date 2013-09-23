@@ -1,83 +1,83 @@
 ﻿//Met à jour les variables utiles à la 3D en fonction du canvas traité
+//TBD: voir si ça ne craint pas (traitemant assynchone des canvas et ce genre de couille)
 
 function init_3D(id) {
 
 	switch (id) {
 
-		case "3D_globale":
-			Wc_3D = Wc_3D_globale;
-			Hc_3D = 2 * Wc_3D / 3;
+		case "Fenetre3D":
+			w_cvs_3D = w_cvs_Fenetre3D;
+			h_cvs_3D = 2 * w_cvs_3D / 3;
 
-			X0_3D = 1 * Wc_3D / 3;
-			Y0_3D = (Hc_3D - 1) / 2;
+			X0_3D = 1 * w_cvs_3D / 3;
+			Y0_3D = (h_cvs_3D - 1) / 2;
 
-			hc_3D = h_cvs_3D_globale;
+			h_m_3D = h_m_Fenetre3D;
 
-			k_px_3D = 1 / (hc_3D / 2);
+			k_3D = 1 / (h_m_3D / 2);
 
-			cos_x_3D = Math.cos(theta_x_3D_globale);
-			sin_x_3D = Math.sin(theta_x_3D_globale);
-			cos_y_3D = Math.cos(theta_y_3D_globale);
-			sin_y_3D = Math.sin(theta_y_3D_globale);
-			cos_z_3D = Math.cos(theta_p_3D_globale);
-			sin_z_3D = Math.sin(theta_p_3D_globale);
+			cos_x_3D = Math.cos(theta_x_Fenetre3D);
+			sin_x_3D = Math.sin(theta_x_Fenetre3D);
+			cos_y_3D = Math.cos(theta_y_Fenetre3D);
+			sin_y_3D = Math.sin(theta_y_Fenetre3D);
+			cos_z_3D = Math.cos(theta_p_Fenetre3D);
+			sin_z_3D = Math.sin(theta_p_Fenetre3D);
 
-			cvs_3d = "3D_globale";
+			cvs_3D = "Fenetre3D";
 
-			Rot1_1_3D = Rot1_1_3D_globale;
-			Rot1_2_3D = Rot1_2_3D_globale;
-			Rot1_3_3D = Rot1_3_3D_globale;
-			Rot2_1_3D = Rot2_1_3D_globale;
-			Rot2_2_3D = Rot2_2_3D_globale;
-			Rot2_3_3D = Rot2_3_3D_globale;
-			Rot3_1_3D = Rot3_1_3D_globale;
-			Rot3_2_3D = Rot3_2_3D_globale;
-			Rot3_3_3D = Rot3_3_3D_globale;
+			Rot1_1_3D = Rot1_1_Fenetre3D;
+			Rot1_2_3D = Rot1_2_Fenetre3D;
+			Rot1_3_3D = Rot1_3_Fenetre3D;
+			Rot2_1_3D = Rot2_1_Fenetre3D;
+			Rot2_2_3D = Rot2_2_Fenetre3D;
+			Rot2_3_3D = Rot2_3_Fenetre3D;
+			Rot3_1_3D = Rot3_1_Fenetre3D;
+			Rot3_2_3D = Rot3_2_Fenetre3D;
+			Rot3_3_3D = Rot3_3_Fenetre3D;
 
-			Tx_3D = Tx_3D_globale;
-			Ty_3D = Ty_3D_globale;
-			Tp_3D = Tp_3D_globale;
+			Tx_3D = Tx_Fenetre3D;
+			Ty_3D = Ty_Fenetre3D;
+			Tp_3D = Tp_Fenetre3D;
 
-			ct_3D = document.getElementById("id_canvas_3D_globale").getContext("2d");
+			ct_3D = document.getElementById("id_cvs_Fenetre3D").getContext("2d"); //TBD: à sécuriser, pointer sur le cvs plutot que le contexte
 			break;
 
 
-		case "molette_R":
-			Wc_3D = Wc_molette_R;
-			Hc_3D = Wc_3D;
+		case "MoletteReglage":
+			w_cvs_3D = w_cvs_moletteReglage;
+			h_cvs_3D = w_cvs_3D;
 
+			X0_3D = (w_cvs_3D - 1) / 2;
+			Y0_3D = (h_cvs_3D - 1) / 2;
 
-			X0_3D = (Wc_3D - 1) / 2;
-			Y0_3D = (Hc_3D - 1) / 2;
+			h_m_3D = h_m_moletteReglage;
 
-			hc_3D = h_cvs_molette_R;
+			k_3D = 1 / (h_m_3D / 2);
 
-			k_px_3D = 1 / (hc_3D / 2);
+			cos_x_3D = Math.cos(theta_x_moletteReglage);
+			sin_x_3D = Math.sin(theta_x_moletteReglage);
+			cos_y_3D = Math.cos(theta_y_moletteReglage);
+			sin_y_3D = Math.sin(theta_y_moletteReglage);
+			cos_z_3D = Math.cos(theta_p_moletteReglage);
+			sin_z_3D = Math.sin(theta_p_moletteReglage);
 
-			cos_x_3D = Math.cos(theta_x_molette_R);
-			sin_x_3D = Math.sin(theta_x_molette_R);
-			cos_y_3D = Math.cos(theta_y_molette_R);
-			sin_y_3D = Math.sin(theta_y_molette_R);
-			cos_z_3D = Math.cos(theta_p_molette_R);
-			sin_z_3D = Math.sin(theta_p_molette_R);
+			cvs_3D = "MoletteReglage";
 
-			cvs_3d = "molette_R";
-
-			Rot1_1_3D = Rot1_1_molette_R;
-			Rot1_2_3D = Rot1_2_molette_R;
-			Rot1_3_3D = Rot1_3_molette_R;
-			Rot2_1_3D = Rot2_1_molette_R;
-			Rot2_2_3D = Rot2_2_molette_R;
-			Rot2_3_3D = Rot2_3_molette_R;
-			Rot3_1_3D = Rot3_1_molette_R;
-			Rot3_2_3D = Rot3_2_molette_R;
-			Rot3_3_3D = Rot3_3_molette_R;
+			Rot1_1_3D = Rot1_1_moletteReglage;
+			Rot1_2_3D = Rot1_2_moletteReglage;
+			Rot1_3_3D = Rot1_3_moletteReglage;
+			Rot2_1_3D = Rot2_1_moletteReglage;
+			Rot2_2_3D = Rot2_2_moletteReglage;
+			Rot2_3_3D = Rot2_3_moletteReglage;
+			Rot3_1_3D = Rot3_1_moletteReglage;
+			Rot3_2_3D = Rot3_2_moletteReglage;
+			Rot3_3_3D = Rot3_3_moletteReglage;
 
 			Tx_3D = 0;
 			Ty_3D = 0;
 			Tp_3D = 0;
 
-			ct_3D = document.getElementById("id_canvas_molette_R").getContext("2d");
+			ct_3D = document.getElementById("id_cvs_moletteReglage").getContext("2d");
 			break;
 	}
 }
@@ -87,45 +87,48 @@ function init_3D(id) {
 
 function XY2xyp(X, Y, flag) {
 
+	var temp_x, temp_y, temp_p;
+	var temp_xyp;
+	var temp_XY;
+	var X0, Y0;
+
 
 	//Pour tenir compte du déplacement du centre par translation
-	if (cvs_3d === "3D_globale" && flag !== "pas_de_translation") {
+	if (cvs_3D === "Fenetre3D" && flag !== "pas_de_translation") {
 
-		var temp_x = mod_capteurCourant.cdg[0];
-		var temp_y = mod_capteurCourant.cdg[1];
-		var temp_p = mod_capteurCourant.cdg[2];
+		temp_x = mod_capteurCourant.CDG[0];
+		temp_y = mod_capteurCourant.CDG[1];
+		temp_p = mod_capteurCourant.CDG[2];
 
+		temp_xyp = majCoord3D(temp_x, temp_y, temp_p);
+		temp_x = temp_xyp.x / k_3D;
+		temp_y = temp_xyp.y / k_3D;
+		temp_p = temp_xyp.p / k_3D;
 
-		var toto = Rotation3D(temp_x, temp_y, temp_p);
-		temp_x = toto.x / k_px_3D;
-		temp_y = toto.y / k_px_3D;
-		temp_p = toto.p / k_px_3D;
+		temp_XY = xyp2XY(temp_x, temp_y, temp_p);
+		X0 = temp_XY.X;
+		Y0 = temp_XY.Y;
 
-		var titi = xyp2XY(temp_x, temp_y, temp_p);
-
-		var X0 = titi.X;
-		var Y0 = titi.Y;
-
-		var x = (X - X0) / X0;
-		var y = (Y0 - Y) / Y0;
+		temp_x = (X - X0) / X0;
+		temp_y = (Y0 - Y) / Y0;
 
 		if (((X - X0) * (X - X0) + (Y - Y0) * (Y - Y0)) < X0 * X0)
-			p = Math.sqrt(X0 * X0 - (X - X0) * (X - X0) - (Y - Y0) * (Y - Y0)) / X0;
+			temp_p = Math.sqrt(X0 * X0 - (X - X0) * (X - X0) - (Y - Y0) * (Y - Y0)) / X0;
 		else
-			p = 0;
+			temp_p = 0;
 	} else {
-		var x = (X - X0_3D) / X0_3D;
-		var y = (Y0_3D - Y) / Y0_3D
+		temp_x = (X - X0_3D) / X0_3D;
+		temp_y = (Y0_3D - Y) / Y0_3D;
 
 		if (((X - X0_3D) * (X - X0_3D) + (Y - Y0_3D) * (Y - Y0_3D)) < X0_3D * X0_3D)
-			p = Math.sqrt(X0_3D * X0_3D - (X - X0_3D) * (X - X0_3D) - (Y - Y0_3D) * (Y - Y0_3D)) / X0_3D;
+			temp_p = Math.sqrt(X0_3D * X0_3D - (X - X0_3D) * (X - X0_3D) - (Y - Y0_3D) * (Y - Y0_3D)) / X0_3D;
 		else
-			p = 0;
+			temp_p = 0;
 	}
 	return {
-		x: x,
-		y: y,
-		p: p
+		x: temp_x,
+		y: temp_y,
+		p: temp_p
 	};
 }
 
@@ -134,12 +137,14 @@ function XY2xyp(X, Y, flag) {
 
 function xyp2XY(x, y, p) {
 
-	x = k_px_3D * x;
-	y = k_px_3D * y;
-	p = k_px_3D * p;
+	var X, Y;
 
-	var X = X0_3D + x * X0_3D;
-	var Y = Y0_3D - y * Y0_3D;
+	x = k_3D * x;
+	y = k_3D * y;
+	p = k_3D * p;
+
+	X = X0_3D + x * X0_3D;
+	Y = Y0_3D - y * Y0_3D;
 
 	return {
 		X: X,
@@ -147,95 +152,104 @@ function xyp2XY(x, y, p) {
 	};
 }
 
-//IN: xyp    dans le système sans rotation
-//OUT:x'y'p' coordonées dans xyp après rotation
-
-function Rotation3D(x, y, p, flag) {
-
-	x = k_px_3D * x;
-	y = k_px_3D * y;
-	p = k_px_3D * p;
 
 
-	//Pour rester centré sur le capteur
+//3 types de changements possibles: 
+// - rotation autour d'un axe (x,y,p)
+// - rotation autour d'un vecteur (fonction type arcball)
+// - translation
+//IN: xyp    dans le système sans rotation/translation
+//OUT:x'y'p' coordonées dans xyp après rotation/translation
+//TBD: claculer la matrice de rotation (p/r aux axes)à part, car elle ne change que rarement
+
+function majCoord3D(x, y, p, flag) {
+
+	var temp_x, temp_y, temp_p;
+
+	x = k_3D * x;
+	y = k_3D * y;
+	p = k_3D * p;
+
+
+	//-Pour rester centré sur le centre du Capteur
 	if (flag !== "pas_de_translation") {
-		x = x - dX * k_px_3D;
-		y = y - dY * k_px_3D;
-		p = p - dP * k_px_3D;
+		x = x - dX * k_3D;
+		y = y - dY * k_3D;
+		p = p - dP * k_3D;
 	}
 
 
+	//-Rotations selon les axes
 	//tetha_x
-	var x_p = x;
-	var y_p = y * cos_x_3D - p * sin_x_3D;
-	var p_p = y * sin_x_3D + p * cos_x_3D;
-
-	x = x_p;
-	y = y_p;
-	p = p_p;
-
+	temp_x = x;
+	temp_y = y * cos_x_3D - p * sin_x_3D;
+	temp_p = y * sin_x_3D + p * cos_x_3D;
+	x = temp_x;
+	y = temp_y;
+	p = temp_p;
 
 	//tetha_y
-	x_p = x * cos_y_3D + p * sin_y_3D;
-	y_p = y;
-	p_p = -1 * x * sin_y_3D + p * cos_y_3D;
-
-	x = x_p;
-	y = y_p;
-	p = p_p;
-
+	temp_x = x * cos_y_3D + p * sin_y_3D;
+	temp_y = y;
+	temp_p = -1 * x * sin_y_3D + p * cos_y_3D;
+	x = temp_x;
+	y = temp_y;
+	p = temp_p;
 
 	//tetha_p
-	x_p = x * cos_z_3D - y * sin_z_3D;
-	y_p = x * sin_z_3D + y * cos_z_3D;
-	p_p = p;
+	temp_x = x * cos_z_3D - y * sin_z_3D;
+	temp_y = x * sin_z_3D + y * cos_z_3D;
+	temp_p = p;
+	x = temp_x;
+	y = temp_y;
+	p = temp_p;
 
-	x = x_p;
-	y = y_p;
-	p = p_p;
+
+	//-Rotation autour d'un vecteur qq (arcball)
+	temp_x = x * Rot1_1_3D + y * Rot1_2_3D + p * Rot1_3_3D;
+	temp_y = x * Rot2_1_3D + y * Rot2_2_3D + p * Rot2_3_3D;
+	temp_p = x * Rot3_1_3D + y * Rot3_2_3D + p * Rot3_3_3D;
 
 
-	//rotation autour d"un axe
-	x_p = x * Rot1_1_3D + y * Rot1_2_3D + p * Rot1_3_3D;
-	y_p = x * Rot2_1_3D + y * Rot2_2_3D + p * Rot2_3_3D;
-	p_p = x * Rot3_1_3D + y * Rot3_2_3D + p * Rot3_3_3D;
-
-	//Translation
+	//-Translation
 	if (flag !== "pas_de_translation") {
-		x_p = x_p + Tx_3D;
-		y_p = y_p + Ty_3D;
-		p_p = p_p + Tp_3D;
+		temp_x = temp_x + Tx_3D;
+		temp_y = temp_y + Ty_3D;
+		temp_p = temp_p + Tp_3D;
 	}
 
 
 	return {
-		x: x_p,
-		y: y_p,
-		p: p_p
+		x: temp_x,
+		y: temp_y,
+		p: temp_p
 	};
 }
 
-//IN: xyp dans le système sans rotation
-//OUT: XY dans le canvas, après rotation
+//IN: xyp dans le système sans rotation/translation
+//OUT: XY dans le canvas, après rotation/translation
 
-function proj_3D(x, y, p) {
+function xyp2XYmaj(x, y, p) {
 
-	if (cvs_3d === "3D_globale")
-		var temp1 = Rotation3D(x, y, p);
+
+	var temp_XY;
+	var temp_xyp;
+	var temp_x, temp_y, temp_p;
+	var X, Y;
+
+	if (cvs_3D === "Fenetre3D")
+		temp_xyp = majCoord3D(x, y, p);
 	else
-		var temp1 = Rotation3D(x, y, p, "pas_de_translation");
+		temp_xyp = majCoord3D(x, y, p, "pas_de_translation");
 
-	var xp = temp1.x;
-	var yp = temp1.y;
-	var pp = temp1.p;
+	temp_x = (temp_xyp.x) / k_3D;
+	temp_y = (temp_xyp.y) / k_3D;
+	temp_p = (temp_xyp.p) / k_3D;
 
-	xp = xp / k_px_3D;
-	yp = yp / k_px_3D;
-	pp = pp / k_px_3D;
 
-	var temp2 = xyp2XY(xp, yp, pp);
-	X = temp2.X;
-	Y = temp2.Y;
+	temp_XY = xyp2XY(temp_x, temp_y, temp_p);
+	X = temp_XY.X;
+	Y = temp_XY.Y;
 
 	return {
 		X: X,
@@ -243,12 +257,12 @@ function proj_3D(x, y, p) {
 	};
 }
 
-//IN: x,y,p sans rotation
+//IN: x,y,p sans rotation/translation
 //OUT: dessine un point en X,Y = (x,y,p) après rotation
 
-function Point3D(x, y, p) {
+function drawPoint3D(x, y, p) {
 
-	var coord_3D = proj_3D(x, y, p);
+	var coord_3D = xyp2XYmaj(x, y, p);
 	var X = coord_3D.X;
 	var Y = coord_3D.Y;
 
@@ -258,101 +272,105 @@ function Point3D(x, y, p) {
 	ct_3D.fill();
 }
 
-//IN: (xd,yd,pd) et (xf,yf,pf) coordonées des points sans rotation
+//IN: (xd,yd,pd) et (xf,yf,pf) coordonées des points sans rotation/translation
 //OUT: tracé d'une ligne d'un point à l'autre
 
-function Line3D(xd, yd, pd, xf, yf, pf) {
+function drawLine3D(xd, yd, pd, xf, yf, pf) {
 
 	//1ier point
-	var temp1 = Rotation3D(xd, yd, pd);
-	var xp = temp1.x;
-	var yp = temp1.y;
-	var pp = temp1.p;
+	var temp_xyp = majCoord3D(xd, yd, pd);
+	var temp_x = temp_xyp.x;
+	var temp_y = temp_xyp.y;
+	var temp_p = temp_xyp.p;
 
-	xp = xp / k_px_3D;
-	yp = yp / k_px_3D;
-	pp = pp / k_px_3D;
+	temp_x = temp_x / k_3D;
+	temp_y = temp_y / k_3D;
+	temp_p = temp_p / k_3D;
 
-	var temp2 = xyp2XY(xp, yp, pp);
-	X = temp2.X;
-	Y = temp2.Y;
+	var temp_XY = xyp2XY(temp_x, temp_y, temp_p);
+	X = temp_XY.X;
+	Y = temp_XY.Y;
 
 	ct_3D.beginPath();
 	ct_3D.moveTo(X, Y);
 
 	//2nd point
-	temp1 = Rotation3D(xf, yf, pf);
-	xp = temp1.x;
-	yp = temp1.y;
-	pp = temp1.p;
+	temp_xyp = majCoord3D(xf, yf, pf);
+	temp_x = temp_xyp.x;
+	temp_y = temp_xyp.y;
+	temp_p = temp_xyp.p;
 
-	xp = xp / k_px_3D;
-	yp = yp / k_px_3D;
-	pp = pp / k_px_3D;
+	temp_x = temp_x / k_3D;
+	temp_y = temp_y / k_3D;
+	temp_p = temp_p / k_3D;
 
-	temp2 = xyp2XY(xp, yp, pp);
-	X = temp2.X;
-	Y = temp2.Y;
+	temp_XY = xyp2XY(temp_x, temp_y, temp_p);
+	X = temp_XY.X;
+	Y = temp_XY.Y;
 
 	ct_3D.lineTo(X, Y);
 	ct_3D.stroke();
 }
 
-//Gère la rotation de la sphère selon arc ball
+//Gère la rotation de la sphère selon arc ball ou gère la translation
+//TBD: choisir un rayon plus grand pour la sphère (necessaire si translation importante du centre)
+//TBD: IHM pour faire comprendre la rotation (point au centre, petits arcs selon la sphère au niveau de la souris,..)
 
-function Souris_3D(id, e) {
+function souris3D(id, e) {
+
+
+	var Xt0, Yt0;
+	var Xt1, Yt1;
+	var temp_xyp;
 
 	//-INIT de la 3D avec le canvas adpté + MAJ des cos et sin
 	init_3D(id);
 
 	//Canvas
-	if (cvs_3d === "3D_globale")
-		var cvs = document.getElementById("id_canvas_3D_globale");
+	if (cvs_3D === "Fenetre3D")
+		var cvs = document.getElementById("id_cvs_Fenetre3D");
 
-	if (cvs_3d === "molette_R")
-		var cvs = document.getElementById("id_canvas_molette_R");
+	if (cvs_3D === "MoletteReglage")
+		var cvs = document.getElementById("id_cvs_moletteReglage");
 
 	var rect = cvs.getBoundingClientRect(),
 		root = document.documentElement;
 
 
-	//-COORDONNÉES DANS LE CANVAS DE LA SOURIS, AVANT/APRÉS ET DE X0,Y0
 	//Coordonnées dans le canvas de la souris à l'instant 0
-	if (cvs_3d === "3D_globale") {
-		var Xt0 = X_3D_save;
-		var Yt0 = Y_3D_save;
+	if (cvs_3D === "Fenetre3D") {
+		Xt0 = Xt0_Fenetre3D;
+		Yt0 = Yt0_Fenetre3D;
 	}
 
-	if (cvs_3d === "molette_R") {
-		var Xt0 = X_molette_R_save;
-		var Yt0 = Hc_3D / 2;
+	if (cvs_3D === "MoletteReglage") {
+		Xt0 = Xt0_cvs_moletteReglage;
+		Yt0 = h_cvs_3D / 2; //rotation selon y uniquement
 	}
 
 	//Coordonnées dans le canvas de la souris à l'instant courant
-	var Xt1 = e.clientX - rect.left - root.scrollLeft;
-	var Yt1 = e.clientY - rect.top - root.scrollTop;
-
+	Xt1 = e.clientX - rect.left - root.scrollLeft;
+	Yt1 = e.clientY - rect.top - root.scrollTop;
 
 
 	//A: point de départ de la souris (à l'instant précédent)
-	//coordonées dans x,y,p
-	var temp2 = XY2xyp(Xt0, Yt0);
-	var Ax = temp2.x;
-	var Ay = temp2.y;
-	var Ap = temp2.p;
+	temp_xyp = XY2xyp(Xt0, Yt0);
+	Ax = temp_xyp.x;
+	Ay = temp_xyp.y;
+	Ap = temp_xyp.p;
 
 	//B: point final de la souris
-	//coordonées dans x,y,p
-	temp2 = XY2xyp(Xt1, Yt1);
-	var Bx = temp2.x;
-	var By = temp2.y;
-	var Bp = temp2.p;
+	temp_xyp = XY2xyp(Xt1, Yt1);
+	Bx = temp_xyp.x;
+	By = temp_xyp.y;
+	Bp = temp_xyp.p;
 
 
+	//ROTATION
+	if (cvs_3D === "MoletteReglage" || typeDeplacementFenetre3D === "rotation") {
 
-	if (cvs_3d === "molette_R" || flag_mvt_3D === "rotation") {
-
-		if (cvs_3d === "molette_R") {
+		//Rotation autour de y
+		if (cvs_3D === "MoletteReglage") {
 
 			var Ax_temp = (Xt0 - X0_3D) / X0_3D;
 			var Ay_temp = 0;
@@ -362,15 +380,15 @@ function Souris_3D(id, e) {
 			var By_temp = 0;
 			var Bp_temp = 1;
 
-			var toto = Rotation3D(Ax_temp, Ay_temp, Ap_temp, "pas_de_translation");
-			Ax = toto.x;
-			Ay = toto.y;
-			Ap = toto.p;
+			temp_xyp = majCoord3D(Ax_temp, Ay_temp, Ap_temp, "pas_de_translation");
+			Ax = temp_xyp.x;
+			Ay = temp_xyp.y;
+			Ap = temp_xyp.p;
 
-			var tata = Rotation3D(Bx_temp, By_temp, Bp_temp, "pas_de_translation");
-			Bx = tata.x;
-			By = tata.y;
-			Bp = tata.p;
+			temp_xyp = majCoord3D(Bx_temp, By_temp, Bp_temp, "pas_de_translation");
+			Bx = temp_xyp.x;
+			By = temp_xyp.y;
+			Bp = temp_xyp.p;
 		}
 
 
@@ -444,101 +462,90 @@ function Souris_3D(id, e) {
 			Rot3_3_3D = Rot3_3_temp;
 
 			//Sauvegarde
-			if (cvs_3d === "3D_globale") {
+			if (cvs_3D === "Fenetre3D") {
 				//TBD; bloquer si tête en bas
 				//Bloque les rotations qui emmènent en dessous du niveau du sol
-				MajOrientation();
+				majOrientationFenetre3D();
 
 				if (haut) {
-					Rot1_1_3D_globale = Rot1_1_temp;
-					Rot1_2_3D_globale = Rot1_2_temp;
-					Rot1_3_3D_globale = Rot1_3_temp;
-					Rot2_1_3D_globale = Rot2_1_temp;
-					Rot2_2_3D_globale = Rot2_2_temp;
-					Rot2_3_3D_globale = Rot2_3_temp;
-					Rot3_1_3D_globale = Rot3_1_temp;
-					Rot3_2_3D_globale = Rot3_2_temp;
-					Rot3_3_3D_globale = Rot3_3_temp;
+					Rot1_1_Fenetre3D = Rot1_1_temp;
+					Rot1_2_Fenetre3D = Rot1_2_temp;
+					Rot1_3_Fenetre3D = Rot1_3_temp;
+					Rot2_1_Fenetre3D = Rot2_1_temp;
+					Rot2_2_Fenetre3D = Rot2_2_temp;
+					Rot2_3_Fenetre3D = Rot2_3_temp;
+					Rot3_1_Fenetre3D = Rot3_1_temp;
+					Rot3_2_Fenetre3D = Rot3_2_temp;
+					Rot3_3_Fenetre3D = Rot3_3_temp;
 				} else {
-					Rot1_1_3D = Rot1_1_3D_globale;
-					Rot1_2_3D = Rot1_2_3D_globale;
-					Rot1_3_3D = Rot1_3_3D_globale;
-					Rot2_1_3D = Rot2_1_3D_globale;
-					Rot2_2_3D = Rot2_2_3D_globale;
-					Rot2_3_3D = Rot2_3_3D_globale;
-					Rot3_1_3D = Rot3_1_3D_globale;
-					Rot3_2_3D = Rot3_2_3D_globale;
-					Rot3_3_3D = Rot3_3_3D_globale;
+					Rot1_1_3D = Rot1_1_Fenetre3D;
+					Rot1_2_3D = Rot1_2_Fenetre3D;
+					Rot1_3_3D = Rot1_3_Fenetre3D;
+					Rot2_1_3D = Rot2_1_Fenetre3D;
+					Rot2_2_3D = Rot2_2_Fenetre3D;
+					Rot2_3_3D = Rot2_3_Fenetre3D;
+					Rot3_1_3D = Rot3_1_Fenetre3D;
+					Rot3_2_3D = Rot3_2_Fenetre3D;
+					Rot3_3_3D = Rot3_3_Fenetre3D;
 
-					MajOrientation();
-
+					majOrientationFenetre3D();
 				}
-
-
 			}
 
-			if (cvs_3d === "molette_R") {
-				Rot1_1_molette_R = Rot1_1_temp;
-				Rot1_2_molette_R = Rot1_2_temp;
-				Rot1_3_molette_R = Rot1_3_temp;
-				Rot2_1_molette_R = Rot2_1_temp;
-				Rot2_2_molette_R = Rot2_2_temp;
-				Rot2_3_molette_R = Rot2_3_temp;
-				Rot3_1_molette_R = Rot3_1_temp;
-				Rot3_2_molette_R = Rot3_2_temp;
-				Rot3_3_molette_R = Rot3_3_temp;
+			if (cvs_3D === "MoletteReglage") {
+				Rot1_1_moletteReglage= Rot1_1_temp;
+				Rot1_2_moletteReglage= Rot1_2_temp;
+				Rot1_3_moletteReglage= Rot1_3_temp;
+				Rot2_1_moletteReglage= Rot2_1_temp;
+				Rot2_2_moletteReglage= Rot2_2_temp;
+				Rot2_3_moletteReglage= Rot2_3_temp;
+				Rot3_1_moletteReglage= Rot3_1_temp;
+				Rot3_2_moletteReglage= Rot3_2_temp;
+				Rot3_3_moletteReglage= Rot3_3_temp;
 			}
-
 		}
+	}
 
-
-	} //si rotation
-
-	//Si translation
+	//TRANSLATION
 	else {
 
-		var temp2 = XY2xyp(Xt0, Yt0, "pas_de_translation");
-		var Ax = temp2.x;
-		var Ay = temp2.y;
-		var Ap = temp2.p;
+		temp_xyp = XY2xyp(Xt0, Yt0, "pas_de_translation");
+		var Ax = temp_xyp.x;
+		var Ay = temp_xyp.y;
+		var Ap = temp_xyp.p;
 
 		//B: point final de la souris
-		//coordonées dans x,y,p
-		temp2 = XY2xyp(Xt1, Yt1, "pas_de_translation");
-		var Bx = temp2.x;
-		var By = temp2.y;
-		var Bp = temp2.p;
+		temp_xyp = XY2xyp(Xt1, Yt1, "pas_de_translation");
+		var Bx = temp_xyp.x;
+		var By = temp_xyp.y;
+		var Bp = temp_xyp.p;
 
+		Tx_3D += (Bx - Ax);
+		Ty_3D += (By - Ay);
+		Tp_3D += (Bp - Ap);
 
-		Tx_3D += (Bx - Ax); //k_px_3D;
-		Ty_3D += (By - Ay); //k_px_3D;
-		Tp_3D += (Bp - Ap); //k_px_3D;
-
-
-		if (cvs_3d === "3D_globale") {
-			Tx_3D_globale = Tx_3D;
-			Ty_3D_globale = Ty_3D;
-			Tp_3D_globale = Tp_3D;
+		if (cvs_3D === "Fenetre3D") {
+			Tx_Fenetre3D = Tx_3D;
+			Ty_Fenetre3D = Ty_3D;
+			Tp_Fenetre3D = Tp_3D;
 		}
-
-
 	}
 
 
 	//Sauvegarde les coordonées de la souris
-	if (cvs_3d === "3D_globale") {
-		X_3D_save = Xt1;
-		Y_3D_save = Yt1;
+	if (cvs_3D === "Fenetre3D") {
+		Xt0_Fenetre3D = Xt1;
+		Yt0_Fenetre3D = Yt1;
 	}
 
-	if (cvs_3d === "molette_R") {
-		X_molette_R_save = Xt1;
-		MAJ_triangle_expo(Xt1);
+	if (cvs_3D === "MoletteReglage") {
+		majTriangleExpo(Xt1);
 	}
 
-	if (cvs_3d === "3D_globale")
-		Draw3D_globale();
+	//MAJ du canvas
+	if (cvs_3D === "Fenetre3D")
+		drawFenetre3D();
 
-	if (cvs_3d === "molette_R")
-		DrawMoletteR();
+	if (cvs_3D === "MoletteReglage")
+		drawMoletteReglage();
 }
