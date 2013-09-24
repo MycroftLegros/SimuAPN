@@ -957,12 +957,9 @@ document.getElementById('calc_distance_min_tirage').innerHTML=temp+'m';
 temp=Math.round(dpi_min_tirage);
 document.getElementById('calc_dpi_a_distance').innerHTML=temp+'dpi';
 */
-<<<<<<< HEAD
-=======
 
 
 
-document.getElementById('val_focale').innerHTML = focale.toFixed(0) + "mm";
+	document.getElementById('val_focale').innerHTML = focale.toFixed(0) + "mm";
 
->>>>>>> ménage, tuning et fix
 }

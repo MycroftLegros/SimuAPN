@@ -275,9 +275,9 @@ function Objectif(Nom, foc, Nmin, VR, res, AC, Npoly, l, d, e, bague) {
 }
 
 
-var ListeObj = new Array(14);	//Liste contenant tous les objectifs
+var ListeObj = new Array(14); //Liste contenant tous les objectifs
 
-var ObjExtra = new Objectif("TBD", 0, 0, 0, 0, 0, 0, [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0], 0);	//L'objectif extrapolé
+var ObjExtra = new Objectif("TBD", 0, 0, 0, 0, 0, 0, [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0], 0); //L'objectif extrapolé
 
 ListeObj[0] = new Objectif('14mm f/2.8', 14, 2.8, 0, 0, 0, 7, [10.3, 23.5, 17.5, 24.9], [63.8, 76.9, 76.9, 87], [5.9, 0, 4.4], 4);
 ListeObj[1] = new Objectif('16mm f/2.8', 16, 2.8, 0, 0, 0, 7, [9, 21, 9, 17], [63, 61.9, 61.9, 60.8], [0, 0, 1], 4);
@@ -304,20 +304,16 @@ function extrapoleObjectif() {
 
 	//Cherche les 2 objectifs prédéfinis qui entourent le courant
 	for (i = 0; i < ListeObj.length; i++) {
-<<<<<<< HEAD
-		if ((focale >= ListeObj[i].foc) && ((i == ListeObj.length - 1) || (focale < ListeObj[i + 1].foc)))
-=======
+
 		if ((focale >= ListeObj[i].foc) && ((i === ListeObj.length - 1) || (focale < ListeObj[i + 1].foc)))
->>>>>>> ménage, tuning et fix
+
 			ii = i;
 	}
 
 	//On tombe sur une valeur connue
-<<<<<<< HEAD
-	if (focale == ListeObj[ii].foc) {
-=======
+
 	if (focale === ListeObj[ii].foc) {
->>>>>>> ménage, tuning et fix
+
 
 		ObjExtra.Npoly = ListeObj[ii].Npoly;
 		ObjExtra.bague = ListeObj[ii].bague;

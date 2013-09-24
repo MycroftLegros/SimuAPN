@@ -21,15 +21,15 @@ flag_init = 1; //à 1 au début du soft, pour les init
 //----Saisies
 modeAPN = "ouverture"; //modes: ouverture, vitesse ou manuel
 selectMoletteReglage = "ouverture"; //vitesse, ouverture ou ISO
-vitesse = 0.004; //durée de l'exposition
+vitesse = 0.005; //durée de l'exposition
 ISO = 320; //sensibilité ISO
 //----Calculées
 vitesseSecurite = 1.0;
 vitesseSecuriteMvt = 1.0;
-cpt_vitesse = 15;
+cpt_vitesse = 17;
 cpt_ISO = 7;
 //----IHM
-vitesse_string = '1/250';
+vitesse_string = '1/200';
 //----#define
 
 
@@ -130,11 +130,10 @@ d_map = 6.75; //distance de map en m
 vitesseSujet = 0.0; //vitesse de déplacement du sujet en km/h
 //----Calculées
 flouMvt = 1.0;
-<<<<<<< HEAD
-=======
+
 w_m_map = 1.0;
 h_m_map = 1.0;
->>>>>>> ménage, tuning et fix
+
 //----IHM
 img_map = document.createElement("IMG");
 var cvs_temp_map = document.getElementById('id_cvs_inter');
@@ -229,11 +228,7 @@ offset_x_img_arrierePlan = -0.5;
 
 //--------CANVAS HISTOGRAMMES
 //----#define
-<<<<<<< HEAD
-color_axeHisto = '#777777';
-=======
 color_axeHisto = '#000000';
->>>>>>> ménage, tuning et fix
 offset_X_histoLum = 5;
 offset_Y_histoLum = 5;
 max_Y_histoLum = 100;
@@ -409,11 +404,9 @@ flag_clicPdc = 0;
 w_cvs_Pdc = 300;
 h_cvs_Pdc = 200;
 Xt0_cvs_pdc = 0;
-<<<<<<< HEAD
-d_DernierPoint_cvs_pdc = 1.5 * d_arrierePlan;
-=======
+
 d_DernierPoint = 1.5 * d_arrierePlan;
->>>>>>> ménage, tuning et fix
+
 Y_m_cvs_pdc = -1; //taille de l'axe des ordonnées
 //----#define
 marge_X_cvs_PDC = 30;
@@ -437,13 +430,10 @@ marge_X_distances = 10;
 
 //--------CANVAS VISEUR
 //----Saisies
-<<<<<<< HEAD
-flag_drawExposition = 0; //à 1 si la luminosité des illustrations doit changer avec l'expo
-flag_drawFlou = 0; //à 1 si le flou des illustrations doit changer avec le flou de mise au point
-=======
+
 flag_drawExposition = 1; //à 1 si la luminosité des illustrations doit changer avec l'expo
 flag_drawFlou = 1; //à 1 si le flou des illustrations doit changer avec le flou de mise au point
->>>>>>> ménage, tuning et fix
+
 //----Calculées
 //----IHM
 flag_clicViseur = 0; //à 1 si l'on maintient le clic dans la zone scène

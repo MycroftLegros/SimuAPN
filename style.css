@@ -70,8 +70,6 @@ box-shadow: 3px 3px 6px rgba(255, 255, 255, 0.4) inset;
 
 
 
-
-
 .css_input,.css_liste,.css_radio{
 color: #ffffff;	
 }
@@ -99,12 +97,12 @@ font-style:italic;
 text-shadow:  3px 3px 4px #000000;
 }
 #en_tete{
-height:25px;
+height:0px;
 width:100%;
 }
 
 #zone_vide{
-height:25px;
+height:15px;
 }
 #zone_vide_2{
 height:25px;

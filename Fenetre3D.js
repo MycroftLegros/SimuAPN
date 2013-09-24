@@ -1,7 +1,6 @@
 ﻿var grand = 50; //TEMP pour limiter le tracé du sol en 3D: taille en m des demis largeurs et profondeur du sol
 
 
-
 DeltaAngleObjectif = Math.PI / 20; //Incrément angulaire entre 2 faces (pour la construction du modèle 3D)
 NbrPolygonesParCylindre = 2 * Math.PI / DeltaAngleObjectif; //Nombre de polygones pour faire un cylindre
 
@@ -11,11 +10,7 @@ for (var iv = 0; iv !== 9; iv++)
 	PolynomesObjectifTT[iv] = new Array(NbrPolygonesParCylindre);
 
 PolynomesObjectif = new Array(NbrPolygonesParCylindre);
-
-//MOLETTE
-
 PolygomesMolette = new Array(2 + 4 * delta_angleMoletteReglage);
-
 
 
 function Polygone(Nom, FondMax, FondMin, Contour, Pts, PtsMaj, CDG, CDGMaj, VecteurNormale, VecteurNormaleMaj, init_pts, rot_pts, draw, RayonAffichage) {
@@ -37,8 +32,119 @@ function Polygone(Nom, FondMax, FondMin, Contour, Pts, PtsMaj, CDG, CDGMaj, Vect
 }
 
 
-//--DEFINITION DES DIFFERENTS OBJECTS (Capteur,miroirs,boitier,objectif,diaphragme,molette)
+//--DESSIN D'UN POLYGONE
+function drawPolynome() {
 
+	//Regarde si le polynome est dans la zone d'affichage
+
+	//Rayon d'affichage (affiche le polygone si la sphere de rayon R centrée sur le CDG est au moins en partie visible)
+	var R = this.RayonAffichage;
+
+	//vecteur vers le CDG
+	var vx = this.CDG[0];
+	var vy = this.CDG[1];
+	var vp = this.CDG[2];
+
+
+	var coord;
+
+	if (cvs_3D === "Fenetre3D")
+		coord = majCoord3D(vx, vy, vp);
+	else
+		coord = majCoord3D(vx, vy, vp, "pas_de_translation");
+
+
+
+	vx = coord.x;
+	vy = coord.y;
+	vp = coord.p;
+
+	var n = Math.sqrt(vx * vx + vy * vy + vp * vp);
+
+	//vecteur vers la limite d'affichage
+	if (n !== 0) {
+		vx = vx * (n - R) / n;
+		vy = vy * (n - R) / n;
+		vp = vp * (n - R) / n;
+	}
+
+	vx = vx / k_3D;
+	vy = vy / k_3D;
+	vp = vp / k_3D;
+
+
+	//regarde si le vecteur limite est dans la zone d'impression
+
+	coord = xyp2XY(vx, vy, vp);
+
+
+
+	if (coord.X >= 0 && coord.X < w_cvs_3D && coord.Y >= 0 && coord.Y < h_cvs_3D) {
+
+		ct_3D.beginPath();
+
+		//Relie tous les sommets et revient au premier
+		ct_3D.moveTo(this.PtsMaj[0][0], this.PtsMaj[0][1]);
+
+		for (i = 1; i !== this.PtsMaj.length; i++)
+			ct_3D.lineTo(this.PtsMaj[i][0], this.PtsMaj[i][1]);
+
+		ct_3D.lineTo(this.PtsMaj[0][0], this.PtsMaj[0][1]);
+
+		//Remplissage: Calcul de la couleur en fonction de la luminosité
+		if (this.FondMax[3] !== 0) {
+
+			var lum_temp = this.VecteurNormaleMaj[0] * lum_x + this.VecteurNormaleMaj[1] * lum_y + this.VecteurNormaleMaj[2] * lum_p; //produit scalaire vecteur VecteurNormale / vecteur lumière
+
+			if (lum_temp < 0)
+				lum_temp = 0;
+
+			var temp_R = Math.round(this.FondMin[0] + lum_temp * (this.FondMax[0] - this.FondMin[0]));
+			var temp_V = Math.round(this.FondMin[1] + lum_temp * (this.FondMax[1] - this.FondMin[1]));
+			var temp_B = Math.round(this.FondMin[2] + lum_temp * (this.FondMax[2] - this.FondMin[2]));
+			ct_3D.fillStyle = 'rgba(' + temp_R + ',' + temp_V + ',' + temp_B + ',' + this.FondMax[3] + ')';
+			ct_3D.fill();
+		}
+		//Contour
+		if (this.Contour[3] !== 0) {
+			ct_3D.strokeStyle = 'rgba(' + this.Contour[0] + ',' + this.Contour[1] + ',' + this.Contour[2] + ',' + this.Contour[3] + ')';
+			ct_3D.stroke();
+		}
+
+	}
+}
+
+
+//--ROTATION DES POLYGONES
+function majPtsPolygones() {
+
+	//Rotation des sommets
+	for (var i = 0; i !== this.Pts.length; i++) {
+		var coord_3D = xyp2XYmaj(this.Pts[i][0], this.Pts[i][1], this.Pts[i][2]);
+		this.PtsMaj[i][0] = coord_3D.X;
+		this.PtsMaj[i][1] = coord_3D.Y;
+	}
+
+	//Rotation du CDG
+	this.CDGMaj = 1.0 * (majCoord3D(this.CDG[0], this.CDG[1], this.CDG[2]).p.toFixed(6));
+
+
+	//Rotation de la VecteurNormale à la surface
+	var coord = majCoord3D(this.VecteurNormale[0], this.VecteurNormale[1], this.VecteurNormale[2], "pas_de_translation");
+	var normalise = coord.x * coord.x + coord.y * coord.y + coord.p * coord.p;
+	if (normalise !== 0) {
+		normalise = 1 / normalise;
+		normalise = Math.sqrt(normalise);
+		coord.x = coord.x * normalise;
+		coord.y = coord.y * normalise;
+		coord.p = coord.p * normalise;
+	}
+
+	this.VecteurNormaleMaj = [coord.x, coord.y, coord.p];
+}
+
+
+//--DEFINITION DES DIFFERENTS OBJECTS (Capteur,miroirs,boitier,objectif,diaphragme,molette)
 function initPts() {} //à virer, ne sert à rien
 
 //-Capteur courant
@@ -500,19 +606,7 @@ var mod_Boitier_m = {
 };
 
 
-//--CREATION DES POINTS DES POLYGONES
-//Appelle tous les initPts
-
-function initPtsFenetre3D() {
-	initPtsBoitier();
-	initPtsCapteurs();
-	initPtsObjectif();
-	initPtsMolette();
-	initPtsViseeReflex();
-}
-
 //Polygones de la visée reflex
-
 function initPtsViseeReflex() {
 
 	//Sommets
@@ -605,7 +699,6 @@ function initPtsViseeReflex() {
 }
 
 //Polygones du boitier
-
 function initPtsBoitier() {
 
 	//-BOITIER
@@ -832,7 +925,6 @@ function initPtsBoitier() {
 }
 
 //Polygones des capteurs
-
 function initPtsCapteurs() {
 
 	//Pour les calculs
@@ -840,7 +932,6 @@ function initPtsCapteurs() {
 	var feq_m = focaleEquivalente / 1000;
 	var df = (f_m * f_m) / (d_map - f_m);
 	var dfeq = (feq_m * feq_m) / (d_map - feq_m);
-	var p_f = df + f_m;
 
 	//Sommets
 	var ff1_x = -0.018 - (-dX);
@@ -892,7 +983,6 @@ function initPtsCapteurs() {
 }
 
 //Polygones de l'objectif
-
 function initPtsObjectif() {
 
 	//dimensions pour construire les cylindres
@@ -970,27 +1060,17 @@ function initPtsObjectif() {
 
 	//Fait en sorte que le diaphragme ne dépace pas de l'objectif (en longueur)
 	var f_m = focale / 1000;
-	var feq_m = focaleEquivalente / 1000;
 	var df = (f_m * f_m) / (d_map - f_m);
-	var dfeq = (feq_m * feq_m) / (d_map - feq_m);
 	var p_f = df + f_m;
-<<<<<<< HEAD
-	var p_diaff = p_f + dP;
-=======
 	var p_diaff = p_f; // + dP;
 	var k;
->>>>>>> ménage, tuning et fix
+
 
 	var l_temp = p_diaff - (p_corps - p_foyer_corps) - (l1 + l2 + l3 + l4 + l5 + e1 + e2 + e3 + e4);
 
 	if (l_temp > 0) {
 
-<<<<<<< HEAD
-		var k = (p_diaff - (p_corps - p_foyer_corps)) / (l1 + l2 + l3 + l4 + l5 + e1 + e2 + e3 + e4);
-=======
 		k = (p_diaff - (p_corps - p_foyer_corps)) / (l1 + l2 + l3 + l4 + l5 + e1 + e2 + e3 + e4);
->>>>>>> ménage, tuning et fix
-
 		l1 = k * l1;
 
 		if (nbrPolygonesObjectif >= 3) {
@@ -1015,29 +1095,21 @@ function initPtsObjectif() {
 	}
 
 
-
 	//Module les diamètres en fonction de l'ouverture min
 	var d_temp = f_m / ouvertureMin;
 
-<<<<<<< HEAD
-	if (nbrPolygonesObjectif == 3) {
-=======
 	if (nbrPolygonesObjectif === 3) {
->>>>>>> ménage, tuning et fix
+
 		k = d_temp / d2;
 		if (k > 1)
 			d2 = k * d2;
 
 		if (d1 > d2)
 			d1 = d2;
-
-
 	}
-<<<<<<< HEAD
-	if (nbrPolygonesObjectif == 5) {
-=======
+
 	if (nbrPolygonesObjectif === 5) {
->>>>>>> ménage, tuning et fix
+
 		k = d_temp / d3;
 		if (k > 1) {
 			d3 = k * d3;
@@ -1049,13 +1121,10 @@ function initPtsObjectif() {
 
 		if (d1 > d2)
 			d1 = d2;
-
 	}
-<<<<<<< HEAD
-	if (nbrPolygonesObjectif == 7) {
-=======
+
 	if (nbrPolygonesObjectif === 7) {
->>>>>>> ménage, tuning et fix
+
 		k = d_temp / d4;
 		if (k > 1) {
 			d4 = k * d4;
@@ -1072,11 +1141,9 @@ function initPtsObjectif() {
 		if (d1 > d2)
 			d1 = d2;
 	}
-<<<<<<< HEAD
-	if (nbrPolygonesObjectif == 9) {
-=======
+
 	if (nbrPolygonesObjectif === 9) {
->>>>>>> ménage, tuning et fix
+
 		k = d_temp / d5;
 		if (k > 1) {
 			d5 = k * d5;
@@ -1084,7 +1151,6 @@ function initPtsObjectif() {
 			d3 = k * d3;
 			d2 = k * d2;
 		}
-
 
 		if (d4 > d5)
 			d4 = d5;
@@ -1097,39 +1163,29 @@ function initPtsObjectif() {
 
 		if (d1 > d2)
 			d1 = d2;
-
-
-
 	}
 
 
 
 	//Fait en sorte que les diamètres soient croissants
-<<<<<<< HEAD
-	if (nbrPolygonesObjectif == 3) {
-=======
+
 	if (nbrPolygonesObjectif === 3) {
->>>>>>> ménage, tuning et fix
 		if (d2 < d1)
 			d2 = d1;
 	}
 
-<<<<<<< HEAD
-	if (nbrPolygonesObjectif == 5) {
-=======
+
 	if (nbrPolygonesObjectif === 5) {
->>>>>>> ménage, tuning et fix
+
 		if (d2 < d1)
 			d2 = d1;
 
 		if (d3 < d2)
 			d3 = d2;
 	}
-<<<<<<< HEAD
-	if (nbrPolygonesObjectif == 7) {
-=======
+
 	if (nbrPolygonesObjectif === 7) {
->>>>>>> ménage, tuning et fix
+
 		if (d2 < d1)
 			d2 = d1;
 
@@ -1139,11 +1195,9 @@ function initPtsObjectif() {
 		if (d4 < d3)
 			d4 = d3;
 	}
-<<<<<<< HEAD
-	if (nbrPolygonesObjectif == 9) {
-=======
+
 	if (nbrPolygonesObjectif === 9) {
->>>>>>> ménage, tuning et fix
+
 		if (d2 < d1)
 			d2 = d1;
 
@@ -1156,7 +1210,6 @@ function initPtsObjectif() {
 		if (d5 < d4)
 			d5 = d4;
 	}
-
 
 
 	var p0 = dP + p_corps - p_foyer_corps;
@@ -1227,8 +1280,6 @@ function initPtsObjectif() {
 	var e4_y = 0;
 	var e4_p = 0;
 
-
-
 	var i = 0;
 	var u_x = 0;
 	var u_y = 1;
@@ -1240,10 +1291,6 @@ function initPtsObjectif() {
 	var w_y = 1;
 	var w_p = 0;
 
-
-	var coord = majCoord3D(v_x, v_y, v_p);
-
-	var temp_R = 0;
 
 	for (i = 0; i * DeltaAngleObjectif < 2 * Math.PI; i++) {
 
@@ -1569,16 +1616,10 @@ function initPtsObjectif() {
 			if (N_bague !== 8)
 				PolynomesObjectifTT[8][i].Contour[3] = 0;
 		}
-
-
 	}
-
-
-
 }
 
 //Polygones de la molette
-
 function initPtsMolette() {
 
 	var d_theta = Math.PI / delta_angleMoletteReglage;
@@ -1607,7 +1648,6 @@ function initPtsMolette() {
 
 
 	//Mémorise les coordonées des sommets
-	var ii = 0;
 	for (i = 0; i !== 2 * delta_angleMoletteReglage; i += 2) {
 		ii = 2 * i;
 		Face_temp_haut[ii][0] = x0 - R * Math.cos(i * d_theta);
@@ -1764,37 +1804,18 @@ function initPtsMolette() {
 	], [xg, yg, pg], 0, [w_x, w_y, w_p], [0, 0, 0], initPts, majPtsPolygones, drawPolynome, e);
 }
 
-//--ROTATION DES POLYGONES
 
-function majPtsPolygones() {
-
-	//Rotation des sommets
-	for (var i = 0; i !== this.Pts.length; i++) {
-		var coord_3D = xyp2XYmaj(this.Pts[i][0], this.Pts[i][1], this.Pts[i][2]);
-		this.PtsMaj[i][0] = coord_3D.X;
-		this.PtsMaj[i][1] = coord_3D.Y;
-	}
-
-	//Rotation du CDG
-	this.CDGMaj = 1.0 * (majCoord3D(this.CDG[0], this.CDG[1], this.CDG[2]).p.toFixed(6));
-
-
-	//Rotation de la VecteurNormale à la surface
-	var coord = majCoord3D(this.VecteurNormale[0], this.VecteurNormale[1], this.VecteurNormale[2], "pas_de_translation");
-	var normalise = coord.x * coord.x + coord.y * coord.y + coord.p * coord.p;
-	if (normalise !== 0) {
-		normalise = 1 / normalise;
-		normalise = Math.sqrt(normalise);
-		coord.x = coord.x * normalise;
-		coord.y = coord.y * normalise;
-		coord.p = coord.p * normalise;
-	}
-
-	this.VecteurNormaleMaj = [coord.x, coord.y, coord.p];
+//--CREATION DES POINTS DES POLYGONES
+//Appelle tous les initPts
+function initPtsFenetre3D() {
+	initPtsBoitier();
+	initPtsCapteurs();
+	initPtsObjectif();
+	initPtsMolette();
+	initPtsViseeReflex();
 }
 
 //Appelle toutes les rotations
-
 function majPtsFenetre3D() {
 
 	mod_capteurFF.rot_pts();
@@ -1848,112 +1869,21 @@ function majPtsFenetre3D() {
 	mod_miroir.rot_pts();
 	mod_miroir_haut.rot_pts();
 	mod_miroir_bas.rot_pts();
-
-}
-
-//--DESSIN D'UN POLYGONE
-
-function drawPolynome() {
-
-	//Regarde si le polynome est dans la zone d'affichage
-
-	//Rayon d'affichage (affiche le polygone si la sphere de rayon R centrée sur le CDG est au moins en partie visible)
-	var R = this.RayonAffichage;
-
-	//vecteur vers le CDG
-	var vx = this.CDG[0];
-	var vy = this.CDG[1];
-	var vp = this.CDG[2];
-
-<<<<<<< HEAD
-	if (cvs_3D == "Fenetre3D")
-		var coord = majCoord3D(vx, vy, vp);
-	else
-		var coord = majCoord3D(vx, vy, vp, "pas_de_translation");
-=======
-	var coord;
-
-	if (cvs_3D === "Fenetre3D")
-		coord = majCoord3D(vx, vy, vp);
-	else
-		coord = majCoord3D(vx, vy, vp, "pas_de_translation");
->>>>>>> ménage, tuning et fix
-
-
-	vx = coord.x;
-	vy = coord.y;
-	vp = coord.p;
-
-	var n = Math.sqrt(vx * vx + vy * vy + vp * vp);
-
-	//vecteur vers la limite d'affichage
-	if (n !== 0) {
-		vx = vx * (n - R) / n;
-		vy = vy * (n - R) / n;
-		vp = vp * (n - R) / n;
-	}
-
-	vx = vx / k_3D;
-	vy = vy / k_3D;
-	vp = vp / k_3D;
-
-
-	//regarde si le vecteur limite est dans la zone d'impression
-<<<<<<< HEAD
-	var coord = xyp2XY(vx, vy, vp);
-=======
-	coord = xyp2XY(vx, vy, vp);
->>>>>>> ménage, tuning et fix
-
-
-	if (coord.X >= 0 && coord.X < w_cvs_3D && coord.Y >= 0 && coord.Y < h_cvs_3D) {
-
-		ct_3D.beginPath();
-
-		//Relie tous les sommets et revient au premier
-		ct_3D.moveTo(this.PtsMaj[0][0], this.PtsMaj[0][1]);
-
-		for (i = 1; i !== this.PtsMaj.length; i++)
-			ct_3D.lineTo(this.PtsMaj[i][0], this.PtsMaj[i][1]);
-
-		ct_3D.lineTo(this.PtsMaj[0][0], this.PtsMaj[0][1]);
-
-		//Remplissage: Calcul de la couleur en fonction de la luminosité
-		if (this.FondMax[3] !== 0) {
-
-			var lum_temp = this.VecteurNormaleMaj[0] * lum_x + this.VecteurNormaleMaj[1] * lum_y + this.VecteurNormaleMaj[2] * lum_p; //produit scalaire vecteur VecteurNormale / vecteur lumière
-
-			if (lum_temp < 0)
-				lum_temp = 0;
-
-			var temp_R = Math.round(this.FondMin[0] + lum_temp * (this.FondMax[0] - this.FondMin[0]));
-			var temp_V = Math.round(this.FondMin[1] + lum_temp * (this.FondMax[1] - this.FondMin[1]));
-			var temp_B = Math.round(this.FondMin[2] + lum_temp * (this.FondMax[2] - this.FondMin[2]));
-			ct_3D.fillStyle = 'rgba(' + temp_R + ',' + temp_V + ',' + temp_B + ',' + this.FondMax[3] + ')';
-			ct_3D.fill();
-		}
-		//Contour
-		if (this.Contour[3] !== 0) {
-			ct_3D.strokeStyle = 'rgba(' + this.Contour[0] + ',' + this.Contour[1] + ',' + this.Contour[2] + ',' + this.Contour[3] + ')';
-			ct_3D.stroke();
-		}
-
-	}
 }
 
 //Pour pouvoir faire un tri avec des nombres négatifs
-
 function sortNumber(a, b) {
 	return a - b;
 }
 
 //Maj de haut;bas,gauche,droite,devant,derriere en fonction de l'orientation de la scène
 //variables lues ailleurs pour simplifier certaines choses
-
 function majOrientationFenetre3D() {
 
-	var pp = majCoord3D(0, 1, 0, 'pas_de_translation').p;
-	if (pp > 0) {
+	var p_temp;
+
+	p_temp = majCoord3D(0, 1, 0, 'pas_de_translation').p;
+	if (p_temp > 0) {
 		haut = 1;
 		bas = 0;
 	} else {
@@ -1961,8 +1891,8 @@ function majOrientationFenetre3D() {
 		bas = 1;
 	}
 
-	var pp = majCoord3D(0, 0, 1, 'pas_de_translation').p;
-	if (pp > 0) {
+	p_temp = majCoord3D(0, 0, 1, 'pas_de_translation').p;
+	if (p_temp > 0) {
 		devant = 1;
 		derriere = 0;
 	} else {
@@ -1970,443 +1900,14 @@ function majOrientationFenetre3D() {
 		derriere = 1;
 	}
 
-	var pp = majCoord3D(1, 0, 0, 'pas_de_translation').p;
-	if (pp < 0) {
+	p_temp = majCoord3D(1, 0, 0, 'pas_de_translation').p;
+	if (p_temp < 0) {
 		gauche = 1;
 		droite = 0;
 	} else {
 		gauche = 0;
 		droite = 1;
 	}
-
-}
-
-function drawFenetre3D() {
-
-	//INIT
-	init_3D("Fenetre3D");
-<<<<<<< HEAD
-	majVecteursLuminosite()
-=======
-	majVecteursLuminosite();
->>>>>>> ménage, tuning et fix
-	majOrientationFenetre3D();
-	majPtsFenetre3D();
-
-
-	var i = 0;
-
-	//Dimensions du canvas
-	var cvs = document.getElementById('id_cvs_Fenetre3D');
-	var ct = cvs.getContext('2d');
-	cvs.width = w_cvs_3D;
-	cvs.height = h_cvs_3D;
-
-	//RAZ et fond blanc
-	ct.fillStyle = '#FFFFFF';
-	ct.beginPath();
-	ct.fillRect(0, 0, w_cvs_3D - 1, h_cvs_3D - 1);
-
-
-	//-MAJ DES CDG
-	var cdg_a = mod_Boitier_a.CDGMaj;
-	var cdg_b = mod_Boitier_b.CDGMaj;
-	var cdg_c = mod_Boitier_c.CDGMaj;
-	var cdg_d = mod_Boitier_d.CDGMaj;
-	var cdg_e = mod_Boitier_e.CDGMaj;
-	var cdg_f = mod_Boitier_f.CDGMaj;
-	var cdg_g = mod_Boitier_g.CDGMaj;
-	var cdg_h = mod_Boitier_h.CDGMaj;
-	var cdg_i = mod_Boitier_i.CDGMaj;
-	var cdg_ii = mod_Boitier_ii.CDGMaj;
-	var cdg_j = mod_Boitier_j.CDGMaj;
-	var cdg_k = mod_Boitier_k.CDGMaj;
-	var cdg_l = mod_Boitier_l.CDGMaj;
-	var cdg_m = mod_Boitier_m.CDGMaj;
-
-	//--Capteurs
-	var cdg_ff = mod_capteurFF.CDGMaj;
-	var cdg_ca = mod_capteurCourant.CDGMaj;
-
-
-
-	//--Diaphragme
-	var f_m = focale / 1000;
-	var df = (f_m * f_m) / (d_map - f_m);
-	var p_f = df + f_m;
-	var dia_x = -(-dX);
-	var dia_y = 0 + dY;
-	var dia_p = p_f + dP - p_foyer_corps;
-	var cdg_dia = majCoord3D(dia_x, dia_y, dia_p).p.toFixed(6);
-
-
-	//--Silhouttes
-	var cdg_avantPlan = majCoord3D(0, 0, d_avantPlan + dP + p_f).p.toFixed(6);
-	var cdg_map = majCoord3D(0, 0, d_map + dP + p_f).p.toFixed(6);
-	var cdg_arrierePlan = majCoord3D(0, 0, d_arrierePlan + dP + p_f).p.toFixed(6);
-
-	//--PDC
-<<<<<<< HEAD
-	var cdg_pdc = majCoord3D(0, 0, debutPDC + dP + p_f).p.toFixed(6);
-=======
-	var cdg_pdc = majCoord3D(0, 0, finPDC + dP + p_f).p.toFixed(6);
->>>>>>> ménage, tuning et fix
-
-
-	//1ier maj du tableau
-	var nbr_cdg_init = 21;
-	Ordre = new Array(nbr_cdg_init + nbrPolygonesObjectif * NbrPolygonesParCylindre + 2 + 4 * delta_angleMoletteReglage + 3 + 1);
-
-	Ordre[0] = cdg_a;
-	Ordre[1] = cdg_b;
-	Ordre[2] = cdg_c;
-	Ordre[3] = cdg_d;
-	Ordre[4] = cdg_e;
-	Ordre[5] = cdg_f;
-	Ordre[6] = cdg_g;
-	Ordre[7] = cdg_h;
-	Ordre[8] = cdg_i;
-	Ordre[9] = cdg_ii;
-	Ordre[10] = cdg_j;
-	Ordre[11] = cdg_k;
-	Ordre[12] = cdg_l;
-	Ordre[13] = cdg_m;
-	Ordre[14] = cdg_ff;
-	Ordre[15] = cdg_ca;
-	Ordre[16] = cdg_dia;
-	Ordre[17] = cdg_avantPlan;
-	Ordre[18] = cdg_map;
-	Ordre[19] = cdg_arrierePlan;
-	Ordre[20] = cdg_pdc;
-
-
-	//Ajout de l'objectif
-	for (var i = 0; i !== NbrPolygonesParCylindre; i++) {
-		Ordre[nbr_cdg_init + i] = PolynomesObjectifTT[0][i].CDGMaj;
-	}
-
-	if (nbrPolygonesObjectif >= 3) {
-		for (var i = 0; i !== NbrPolygonesParCylindre; i++)
-			Ordre[nbr_cdg_init + NbrPolygonesParCylindre + i] = PolynomesObjectifTT[1][i].CDGMaj;
-
-		for (var i = 0; i !== NbrPolygonesParCylindre; i++)
-			Ordre[nbr_cdg_init + 2 * NbrPolygonesParCylindre + i] = PolynomesObjectifTT[2][i].CDGMaj;
-	}
-
-	if (nbrPolygonesObjectif >= 5) {
-		for (var i = 0; i !== NbrPolygonesParCylindre; i++)
-			Ordre[nbr_cdg_init + 3 * NbrPolygonesParCylindre + i] = PolynomesObjectifTT[3][i].CDGMaj;
-
-		for (var i = 0; i !== NbrPolygonesParCylindre; i++)
-			Ordre[nbr_cdg_init + 4 * NbrPolygonesParCylindre + i] = PolynomesObjectifTT[4][i].CDGMaj;
-	}
-
-	if (nbrPolygonesObjectif >= 7) {
-		for (var i = 0; i !== NbrPolygonesParCylindre; i++)
-			Ordre[nbr_cdg_init + 5 * NbrPolygonesParCylindre + i] = PolynomesObjectifTT[5][i].CDGMaj;
-
-		for (var i = 0; i !== NbrPolygonesParCylindre; i++)
-			Ordre[nbr_cdg_init + 6 * NbrPolygonesParCylindre + i] = PolynomesObjectifTT[6][i].CDGMaj;
-	}
-
-	if (nbrPolygonesObjectif >= 9) {
-		for (var i = 0; i !== NbrPolygonesParCylindre; i++)
-			Ordre[nbr_cdg_init + 7 * NbrPolygonesParCylindre + i] = PolynomesObjectifTT[7][i].CDGMaj;
-
-		for (var i = 0; i !== NbrPolygonesParCylindre; i++)
-			Ordre[nbr_cdg_init + 8 * NbrPolygonesParCylindre + i] = PolynomesObjectifTT[8][i].CDGMaj;
-	}
-
-
-	//Ajout de la molette
-	for (var i = 0; i !== 2 + 4 * delta_angleMoletteReglage; i++)
-		Ordre[nbr_cdg_init + i + nbrPolygonesObjectif * NbrPolygonesParCylindre] = PolygomesMolette[i].CDGMaj;
-
-	//Ajout des miroirs de la visée reflex
-	var cdg_mir = mod_miroir.CDGMaj;
-	var cdg_mir_h = mod_miroir_haut.CDGMaj;
-	var cdg_mir_b = mod_miroir_bas.CDGMaj;
-	Ordre[nbr_cdg_init + nbrPolygonesObjectif * NbrPolygonesParCylindre + 2 + 4 * delta_angleMoletteReglage] = cdg_mir;
-	Ordre[nbr_cdg_init + nbrPolygonesObjectif * NbrPolygonesParCylindre + 2 + 4 * delta_angleMoletteReglage + 1] = cdg_mir_h;
-	Ordre[nbr_cdg_init + nbrPolygonesObjectif * NbrPolygonesParCylindre + 2 + 4 * delta_angleMoletteReglage + 2] = cdg_mir_b;
-
-
-	//Ajout des rayons
-	var cdg_rayons = cdg_j - 0.000001;
-	Ordre[nbr_cdg_init + nbrPolygonesObjectif * NbrPolygonesParCylindre + 2 + 4 * delta_angleMoletteReglage + 3] = cdg_rayons;
-
-
-
-	//-Trie du tableau
-	Ordre.sort(sortNumber);
-
-	if (haut)
-		drawSol();
-
-	//Balaye les CDG dans l'ordre de profondeur.
-	//Une fois dessiné, le CDG passe à 'X' pour ne pas déssiner deux fois en cas de différents CDG de mêmes valeurs
-	for (var i = 0; i !== Ordre.length; i++) {
-
-		ct.fillStyle = 'rgba(0,0,0,0.5)';
-		ct.strokeStyle = 'rgba(0,0,0,0.5)';
-		var lum_max = 220;
-		var lum_min = 50;
-		var temp_lum = 0;
-		var opp = 0.29;
-
-		//Objectif
-		for (var ii = 0; ii !== NbrPolygonesParCylindre; ii++) {
-			for (var iii = 0; iii !== nbrPolygonesObjectif; iii++) {
-<<<<<<< HEAD
-				if (Ordre[i] == PolynomesObjectifTT[iii][ii].CDGMaj) {
-=======
-				if (Ordre[i] === PolynomesObjectifTT[iii][ii].CDGMaj) {
->>>>>>> ménage, tuning et fix
-					PolynomesObjectifTT[iii][ii].draw();
-					PolynomesObjectifTT[iii][ii].CDGMaj = 'X';
-					ii = NbrPolygonesParCylindre - 1;
-				}
-			}
-		}
-
-		//Molette
-		for (var ii = 0; ii !== 2 + 4 * delta_angleMoletteReglage; ii++) {
-<<<<<<< HEAD
-			if (Ordre[i] == PolygomesMolette[ii].CDGMaj) {
-=======
-			if (Ordre[i] === PolygomesMolette[ii].CDGMaj) {
->>>>>>> ménage, tuning et fix
-				PolygomesMolette[ii].draw();
-				PolygomesMolette[ii].CDGMaj = 'X';
-				ii = 2 + 4 * delta_angleMoletteReglage - 1;
-			}
-		}
-
-
-
-		switch (Ordre[i]) {
-
-			//Miroirs
-			case cdg_mir_b:
-				mod_miroir_bas.draw();
-				cdg_mir_b = "X";
-				break;
-			case cdg_mir_h:
-				mod_miroir_haut.draw();
-				cdg_mir_h = "X";
-				break;
-			case cdg_mir:
-				mod_miroir.draw();
-				cdg_mir = "X";
-				break;
-				//Boitier et viseur
-			case cdg_a:
-				mod_Boitier_a.draw();
-				cdg_a = "X";
-				break;
-			case cdg_b:
-				mod_Boitier_b.draw();
-				cdg_b = "X";
-				break;
-			case cdg_c:
-				mod_Boitier_c.draw();
-				cdg_c = "X";
-				break;
-			case cdg_d:
-				mod_Boitier_d.draw();
-				cdg_d = "X";
-				break;
-			case cdg_e:
-				mod_Boitier_e.draw();
-				cdg_e = "X";
-				break;
-			case cdg_f:
-				mod_Boitier_f.draw();
-				cdg_f = "X";
-				break;
-			case cdg_g:
-				mod_Boitier_g.draw();
-				cdg_g = "X";
-				break;
-			case cdg_h:
-				mod_Boitier_h.draw();
-				cdg_h = "X";
-				break;
-			case cdg_i:
-				mod_Boitier_i.draw();
-				cdg_i = "X";
-				break;
-			case cdg_ii:
-				mod_Boitier_ii.draw();
-				cdg_ii = "X";
-				break;
-			case cdg_j:
-				mod_Boitier_j.draw();
-				cdg_j = "X";
-				break;
-			case cdg_k:
-				mod_Boitier_k.draw();
-				cdg_k = "X";
-				break;
-			case cdg_l:
-				mod_Boitier_l.draw();
-				cdg_l = "X";
-				break;
-			case cdg_m:
-				mod_Boitier_m.draw();
-				cdg_m = "X";
-
-				var x1 = mod_miroir_bas.Pts[0][0];
-				var y1 = mod_miroir_bas.Pts[0][1];
-				var p1 = dP - p_foyer_corps;
-				var x2 = mod_miroir_bas.Pts[1][0];
-				var y2 = mod_miroir_bas.Pts[1][1];
-				var p2 = p1;
-				var x4 = mod_miroir_bas.Pts[3][0];
-				var y4 = mod_miroir_bas.Pts[3][1];
-				var p4 = p1;
-
-				var proj_temp = xyp2XYmaj(x1, y1, p1);
-				x1 = proj_temp.X;
-				y1 = proj_temp.Y;
-				proj_temp = xyp2XYmaj(x2, y2, p2);
-				x2 = proj_temp.X;
-				y2 = proj_temp.Y;
-				proj_temp = xyp2XYmaj(x4, y4, p4);
-				x4 = proj_temp.X;
-				y4 = proj_temp.Y;
-
-				//TBD: ajouter le cadre et réduire la taille du viseur et ajouter une lentille
-				var cvs1 = document.getElementById("id_cvs_viseur_illustrations");
-				drawImg2Dto3D(cvs1, x1, y1, x2, y2, x4, y4);
-
-
-
-				break;
-
-				//Capteurs
-			case cdg_ff:
-				mod_capteurFF.draw();
-				cdg_ff = "X";
-				break;
-			case cdg_ca:
-				mod_capteurCourant.draw();
-				cdg_ca = "X";
-				break;
-				//Diaphragme
-			case cdg_dia:
-				drawDiaphragme();
-				cdg_dia = 'X';
-				break;
-				//Silhouettes
-			case cdg_avantPlan:
-				var x1 = w_m_img_avantPlan / 2 - offset_x_img_avantPlan;
-				var y1 = (w_m_img_avantPlan * h_img_avantPlan / w_img_avantPlan) - offset_y_avantPlan;
-				var p1 = d_avantPlan + dP + p_f;
-				var x2 = -w_m_img_avantPlan / 2 - offset_x_img_avantPlan;
-				var y2 = y1;
-				var p2 = p1;
-				var x4 = x1;
-				var y4 = -offset_y_avantPlan;
-				var p4 = p1;
-
-				var proj_temp = xyp2XYmaj(x1, y1, p1);
-				x1 = proj_temp.X;
-				y1 = proj_temp.Y;
-				proj_temp = xyp2XYmaj(x2, y2, p2);
-				x2 = proj_temp.X;
-				y2 = proj_temp.Y;
-				proj_temp = xyp2XYmaj(x4, y4, p4);
-				x4 = proj_temp.X;
-				y4 = proj_temp.Y;
-
-				if (img_avantPlan.width)
-					drawImg2Dto3D(img_avantPlan, x1, y1, x2, y2, x4, y4);
-
-				cdg_avantPlan = 'X';
-				break;
-
-			case cdg_map:
-				var x1 = w_m_img_map / 2;
-				var y1 = (w_m_img_map * h_img_map / w_img_map) - offset_y_map;
-				var p1 = d_map + dP + p_f;
-				var x2 = -w_m_img_map / 2;
-				var y2 = y1;
-				var p2 = p1;
-				var x4 = x1;
-				var y4 = -offset_y_map;
-				var p4 = p1;
-
-				var proj_temp = xyp2XYmaj(x1, y1, p1);
-				x1 = proj_temp.X;
-				y1 = proj_temp.Y;
-				proj_temp = xyp2XYmaj(x2, y2, p2);
-				x2 = proj_temp.X;
-				y2 = proj_temp.Y;
-				proj_temp = xyp2XYmaj(x4, y4, p4);
-				x4 = proj_temp.X;
-				y4 = proj_temp.Y;
-
-				if (img_map.width)
-					drawImg2Dto3D(img_map, x1, y1, x2, y2, x4, y4);
-
-				cdg_map = 'X';
-				break;
-
-			case cdg_arrierePlan:
-				var x1 = w_m_img_arrierePlan / 2 - offset_x_img_arrierePlan;
-				var y1 = (w_m_img_arrierePlan * h_img_arrierePlan / w_img_arrierePlan) - offset_y_arrierePlan;
-				var p1 = d_arrierePlan + dP + p_f;
-				var x2 = -w_m_img_arrierePlan / 2 - offset_x_img_arrierePlan;
-				var y2 = y1;
-				var p2 = p1;
-				var x4 = x1;
-				var y4 = -offset_y_arrierePlan;
-				var p4 = p1;
-
-				var proj_temp = xyp2XYmaj(x1, y1, p1);
-				x1 = proj_temp.X;
-				y1 = proj_temp.Y;
-				proj_temp = xyp2XYmaj(x2, y2, p2);
-				x2 = proj_temp.X;
-				y2 = proj_temp.Y;
-				proj_temp = xyp2XYmaj(x4, y4, p4);
-				x4 = proj_temp.X;
-				y4 = proj_temp.Y;
-
-				if (img_arrierePlan.width)
-					drawImg2Dto3D(img_arrierePlan, x1, y1, x2, y2, x4, y4);
-
-				cdg_arrierePlan = 'X';
-				break;
-
-				//PDC				
-			case cdg_pdc:
-				drawZonePDC();
-				cdg_pdc = 'X';
-				break;
-
-
-				//Rayons
-			case cdg_rayons:
-				drawIllustrationsOptiques();
-				cdg_rayons = 'X';
-
-		}
-
-	}
-
-	if (bas)
-		drawSol();
-
-
-	//--CADRE
-	ct.fillStyle = '#000000';
-	ct.beginPath();
-	ct.fillRect(0, 0, w_cvs_3D, 1);
-	ct.fillRect(0, h_cvs_3D - 1, w_cvs_3D, 1);
-	ct.fillRect(0, 0, 1, h_cvs_3D);
-	ct.fillRect(w_cvs_3D - 1, 0, 1, h_cvs_3D);
 }
 
 function drawIllustrationsOptiques() {
@@ -2414,45 +1915,7 @@ function drawIllustrationsOptiques() {
 	var cvs = document.getElementById('id_cvs_Fenetre3D');
 	var ct = cvs.getContext('2d');
 
-	var xo = 1.0;
-	var yo = 1.0;
-	var po = 1.0;
-	var xa = 1.0;
-	var ya = 1.0;
-	var pa = 1.0;
-	var xb = 1.0;
-	var yb = 1.0;
-	var pb = 1.0;
-	var xc = 1.0;
-	var yc = 1.0;
-	var pc = 1.0;
-	var xd = 1.0;
-	var yd = 1.0;
-	var pd = 1.0;
-	var xe = 1.0;
-	var ye = 1.0;
-	var pe = 1.0;
-	var xf = 1.0;
-	var yf = 1.0;
-	var pf = 1.0;
-	var xg = 1.0;
-	var yg = 1.0;
-	var pg = 1.0;
-	var xh = 1.0;
-	var yh = 1.0;
-	var ph = 1.0;
-	var xi = 1.0;
-	var yi = 1.0;
-	var pi = 1.0;
-	var xj = 1.0;
-	var yj = 1.0;
-	var pj = 1.0;
-	var xk = 1.0;
-	var yk = 1.0;
-	var pk = 1.0;
-	var xl = 1.0;
-	var yl = 1.0;
-	var pl = 1.0;
+	var xo, yo, po, xa, ya, pa, xb, yb, pb, xc, yc, pc, xd, yd, pd, xe, ye, pe, xf, yf, pf, xg, yg, pg, xh, yh, ph, xi, yi, pi, xj, yj, pj, xk, yk, pk, xl, yl, pl;
 
 	//-RAYONS
 	var f_m = focale / 1000;
@@ -2460,20 +1923,20 @@ function drawIllustrationsOptiques() {
 	var df = (f_m * f_m) / (d_map - f_m);
 	var dfeq = (feq_m * feq_m) / (d_map - feq_m);
 	var p_f = df + f_m;
-	var xa = -l_capteur / 2000 - (-dX);
-	var ya = h_capteur / 2000 + dY;
-	var xb = l_capteur / 2000 - (-dX);
-	var yd = -h_capteur / 2000 + dY;
+	xa = -l_capteur / 2000 - (-dX);
+	ya = h_capteur / 2000 + dY;
+	xb = l_capteur / 2000 - (-dX);
+	yd = -h_capteur / 2000 + dY;
 	var X0_cc = (xa + xb) / 2;
 	var Y0_cc = (ya + yd) / 2;
 	var xf_cc = X0_cc - (-dX) * (l_capteur / 1000) / w_m_avantPlan;
 	var yf_cc = Y0_cc + dY * (h_capteur / 1000) / h_m_avantPlan;
 	var inc_angle = 2 * Math.PI / 50;
 
-
+	var coord_3D;
 
 	//--CHAMP DE VISION
-	if (illuOptiqueFenetre3D == 'dim') {
+	if (illuOptiqueFenetre3D === 'dim') {
 
 
 		var dxc = d_arrierePlan * Math.tan(angleChampHorizontal * Math.PI / 360.0); //demi largeur de la scène au niveau de l'arrière plan
@@ -2533,7 +1996,7 @@ function drawIllustrationsOptiques() {
 		if (pg < pf) {
 
 			ct.beginPath();
-			var coord_3D = xyp2XYmaj(xi, yi, pi);
+			coord_3D = xyp2XYmaj(xi, yi, pi);
 			xt = coord_3D.X;
 			yt = coord_3D.Y;
 			ct.moveTo(xt, yt);
@@ -2632,7 +2095,7 @@ function drawIllustrationsOptiques() {
 
 			//Arrière plan
 			ct.beginPath();
-			var coord_3D = xyp2XYmaj(xa, ya, pa);
+			coord_3D = xyp2XYmaj(xa, ya, pa);
 			xt = coord_3D.X;
 			yt = coord_3D.Y;
 			ct.moveTo(xt, yt);
@@ -2716,16 +2179,11 @@ function drawIllustrationsOptiques() {
 			yt = coord_3D.Y;
 			ct.lineTo(xt, yt);
 			ct.stroke();
-
-
-
 		}
-
-
 	}
 
 	//--FLOU AVANT
-	else if (illuOptiqueFenetre3D == 'flou_avantPlan') {
+	else if (illuOptiqueFenetre3D === 'flou_avantPlan') {
 
 		ct.fillStyle = 'rgba(' + color_avantPlan + ',0.5)';
 		ct.lineWidth = 1;
@@ -2775,10 +2233,10 @@ function drawIllustrationsOptiques() {
 		}
 	}
 	//--FLOU ARRIERE
-	else if (illuOptiqueFenetre3D == 'flou_arrierePlan') {
+	else if (illuOptiqueFenetre3D === 'flou_arrierePlan') {
 		//-Arrière plan
-		var xf_cc = X0_cc - (-dX) * (l_capteur / 1000) / w_m_arrierePlan;
-		var yf_cc = Y0_cc + dY * (h_capteur / 1000) / h_m_arrierePlan;
+		xf_cc = X0_cc - (-dX) * (l_capteur / 1000) / w_m_arrierePlan;
+		yf_cc = Y0_cc + dY * (h_capteur / 1000) / h_m_arrierePlan;
 
 		ct.fillStyle = 'rgba(' + color_arrierePlan + ',0.5)';
 		ct.lineWidth = 1;
@@ -2829,7 +2287,7 @@ function drawIllustrationsOptiques() {
 
 	}
 	//--VISEE REFLEX
-	else if (illuOptiqueFenetre3D == 'visee_reflex') {
+	else if (illuOptiqueFenetre3D === 'visee_reflex') {
 
 		ct.beginPath();
 		ct.strokeStyle = 'rgba(' + color_rayonLumineux + ',0.5)';
@@ -2841,10 +2299,7 @@ function drawIllustrationsOptiques() {
 		drawLine3D(mod_miroir_haut.CDG[0], mod_miroir_haut.CDG[1], mod_miroir_haut.CDG[2], mod_miroir_bas.CDG[0], mod_miroir_bas.CDG[1], mod_miroir_bas.CDG[2]);
 		drawLine3D(mod_miroir_bas.CDG[0], mod_miroir_bas.CDG[1], mod_miroir_bas.CDG[2], -(-dX), dY + y_foyer_corps + h_finVisee - (h_finVisee - h_debutVisee) / 2, dP - p_foyer_corps);
 
-
 	}
-
-
 }
 
 function drawImg2Dto3D(img, X0, Y0, X1, Y1, X2, Y2) {
@@ -2885,18 +2340,34 @@ function drawDiaphragme() {
 	var cvs_photographe = document.getElementById('id_cvs_Fenetre3D');
 	var ct_photographe = cvs_photographe.getContext('2d');
 
-	var Xpho = -1 * (-dX);
-	var Ypho = dY;
-	var Ppho = dP;
-
 	var f_m = focale / 1000;
-	var feq_m = focaleEquivalente / 1000;
 	var df = (f_m * f_m) / (d_map - f_m);
-	var dfeq = (feq_m * feq_m) / (d_map - feq_m);
 	var p_f = df + f_m;
 
 	var inc_angle = 2 * Math.PI / 50;
+	var i = 0;
 
+	//Le centre du daphragme est en (0,0)
+	//point sur le grand cercle
+	var xa = 1.0;
+	var ya = 1.0;
+	//point sur le petit cercle
+	var xb = 1.0;
+	var yb = 1.0;
+	//point entre A et B
+	var XM = 1.0;
+
+	//centre du nouveau cercle
+	var xc = 1.0;
+	var yc = 1.0;
+
+	var AB = 1.0; //distance entre A et B
+	var MC = 1.0; //distance entre M et C
+
+	//angle entre l'axe des abscices et le premier point puis entre le second point
+	var omega0 = 1.0;
+	var omega1 = 1.0;
+	var omega2 = 1.0;
 
 	//-Disque plein
 	ct_photographe.beginPath();
@@ -2949,29 +2420,7 @@ function drawDiaphragme() {
 	var theta0 = 0; //angle entre le centre et le point sur le grand cercle
 	var NbrLamelles = 6;
 	var delta_angle = 2 * Math.PI / NbrLamelles;
-	var i = 0;
 
-	//Le centre du daphragme est en (0,0)
-	//point sur le grand cercle
-	var xa = 1.0;
-	var ya = 1.0;
-	//point sur le petit cercle
-	var xb = 1.0;
-	var yb = 1.0;
-	//point entre A et B
-	var XM = 1.0;
-	var XM = 1.0;
-	//centre du nouveau cercle
-	var xc = 1.0;
-	var yc = 1.0;
-
-	var AB = 1.0; //distance entre A et B
-	var MC = 1.0; //distance entre M et C
-
-	//angle entre l'axe des abscices et le premier point puis entre le second point
-	var omega0 = 1.0;
-	var omega1 = 1.0
-	var omega2 = 1.0;
 
 	var R = (f_m / ouvertureMin) / 2;
 	var r = f_m / (2 * ouverture);
@@ -3053,37 +2502,17 @@ function drawDiaphragme() {
 
 		ct_photographe.stroke();
 	}
-
-
-
 }
 
 function drawSol() {
-<<<<<<< HEAD
-	//TBD: largeur du sol = max(largeur max illus, cahmp de vision à l'arrière)
-	//TBD: grille jusqu'à #1m derrière le photographe
-=======
->>>>>>> ménage, tuning et fix
+
+
 
 	//--SOL
 	ct_3D.fillStyle = color_sol;
 	ct_3D.beginPath();
 
-<<<<<<< HEAD
-	coord_3D = xyp2XYmaj(-grand, 0, -grand);
-	xt = coord_3D.X;
-	yt = coord_3D.Y;
-	ct_3D.moveTo(xt, yt);
-	coord_3D = xyp2XYmaj(grand, 0, -grand);
-	xt = coord_3D.X;
-	yt = coord_3D.Y;
-	ct_3D.lineTo(xt, yt);
-	coord_3D = xyp2XYmaj(grand, 0, grand);
-	xt = coord_3D.X;
-	yt = coord_3D.Y;
-	ct_3D.lineTo(xt, yt);
-	coord_3D = xyp2XYmaj(-grand, 0, grand);
-=======
+
 	coord_3D = xyp2XYmaj(-grand + dX, 0, -grand + dP);
 	xt = coord_3D.X;
 	yt = coord_3D.Y;
@@ -3097,7 +2526,7 @@ function drawSol() {
 	yt = coord_3D.Y;
 	ct_3D.lineTo(xt, yt);
 	coord_3D = xyp2XYmaj(-grand + dX, 0, grand + dP);
->>>>>>> ménage, tuning et fix
+
 	xt = coord_3D.X;
 	yt = coord_3D.Y;
 	ct_3D.lineTo(xt, yt);
@@ -3108,38 +2537,24 @@ function drawSol() {
 
 
 	//--GRILLE DE PERSPECTIVE
-<<<<<<< HEAD
 
-=======
 	//TBD: la grille ne doit pas dépasser du sol en cas de déplacement
->>>>>>> ménage, tuning et fix
+
 	if (haut) {
 		ct_3D.strokeStyle = color_grillePerspective;
 		//Traits // x
 		for (i = 0; i < grand + dP; i += ecartLignesSol) {
-<<<<<<< HEAD
-			drawLine3D(-0.5 * grand - (-dX), 0, i, 0.5 * grand - (-dX), 0, i);
-			drawLine3D(-0.5 * grand - (-dX), 0, -1 * i, 0.5 * grand - (-dX), 0, -1 * i);
-		}
-		//Traits //p
-		for (i = 0; i < 0.5 * grand - (-dX); i += ecartLignesSol) {
-=======
+
 			drawLine3D(-grand - (-dX), 0, i, grand - (-dX), 0, i);
 			drawLine3D(-grand - (-dX), 0, -1 * i, grand - (-dX), 0, -1 * i);
 		}
 		//Traits //p
 		for (i = 0; i < grand - (-dX); i += ecartLignesSol) {
->>>>>>> ménage, tuning et fix
+
 			drawLine3D(i, 0, -1 * (grand + dP), i, 0, grand + dP);
 			drawLine3D(-1 * i, 0, -1 * (grand + dP), -1 * i, 0, grand + dP);
 		}
 	}
-
-<<<<<<< HEAD
-
-
-=======
->>>>>>> ménage, tuning et fix
 }
 
 function drawZonePDC() {
@@ -3148,9 +2563,7 @@ function drawZonePDC() {
 	var ct_photographe = cvs_photographe.getContext('2d');
 
 	var f_m = focale / 1000;
-	var feq_m = focaleEquivalente / 1000;
 	var df = (f_m * f_m) / (d_map - f_m);
-	var dfeq = (feq_m * feq_m) / (d_map - feq_m);
 	var p_f = df + f_m;
 
 	//--pdC
@@ -3167,44 +2580,7 @@ function drawZonePDC() {
 	if (finPDC_t > 999999)
 		finPDC_t = 999999;
 
-<<<<<<< HEAD
-	ct_photographe.beginPath();
-	if (0) {
-		coord_3D = xyp2XYmaj(-0.5 * w_m_arrierePlan - (-dX), 0, debutPDC + dP + p_f);
-		xt = coord_3D.X;
-		yt = coord_3D.Y;
-		ct_photographe.moveTo(xt, yt);
-		coord_3D = xyp2XYmaj(-0.5 * w_m_arrierePlan - (-dX), 0, finPDC_t + dP + p_f);
-		xt = coord_3D.X;
-		yt = coord_3D.Y;
-		ct_photographe.lineTo(xt, yt);
-		coord_3D = xyp2XYmaj(0.5 * w_m_arrierePlan - (-dX), 0, finPDC_t + dP + p_f);
-		xt = coord_3D.X;
-		yt = coord_3D.Y;
-		ct_photographe.lineTo(xt, yt);
-		coord_3D = xyp2XYmaj(0.5 * w_m_arrierePlan - (-dX), 0, debutPDC + dP + p_f);
-		xt = coord_3D.X;
-		yt = coord_3D.Y;
-		ct_photographe.lineTo(xt, yt);
-	} else {
-		coord_3D = xyp2XYmaj(-0.5 * grand - (-dX), 0, debutPDC + dP + p_f);
-		xt = coord_3D.X;
-		yt = coord_3D.Y;
-		ct_photographe.moveTo(xt, yt);
-		coord_3D = xyp2XYmaj(-0.5 * grand - (-dX), 0, finPDC_t + dP + p_f);
-		xt = coord_3D.X;
-		yt = coord_3D.Y;
-		ct_photographe.lineTo(xt, yt);
-		coord_3D = xyp2XYmaj(0.5 * grand - (-dX), 0, finPDC_t + dP + p_f);
-		xt = coord_3D.X;
-		yt = coord_3D.Y;
-		ct_photographe.lineTo(xt, yt);
-		coord_3D = xyp2XYmaj(0.5 * grand - (-dX), 0, debutPDC + dP + p_f);
-		xt = coord_3D.X;
-		yt = coord_3D.Y;
-		ct_photographe.lineTo(xt, yt);
-	}
-=======
+
 	if (finPDC_t > grand)
 		finPDC_t = grand;
 
@@ -3228,7 +2604,7 @@ function drawZonePDC() {
 	yt = coord_3D.Y;
 	ct_photographe.lineTo(xt, yt);
 
->>>>>>> ménage, tuning et fix
+
 	ct_photographe.closePath();
 
 	ct_photographe.stroke();
@@ -3245,8 +2621,6 @@ function majVecteursLuminosite() {
 		lum_y = lum_y * normalise;
 		lum_p = lum_p * normalise;
 	}
-
-
 
 	//Devant
 	v_x = 0;
@@ -3285,4 +2659,426 @@ function majVecteursLuminosite() {
 		lum_derriere = v_x * lum_x + v_y * lum_y + v_p * lum_p;
 	} else
 		lum_derriere = 0;
+}
+
+function drawFenetre3D() {
+
+	//INIT
+	init_3D("Fenetre3D");
+
+	majVecteursLuminosite();
+
+	majOrientationFenetre3D();
+	majPtsFenetre3D();
+
+
+	var i = 0;
+
+	//Dimensions du canvas
+	var cvs = document.getElementById('id_cvs_Fenetre3D');
+	var ct = cvs.getContext('2d');
+	cvs.width = w_cvs_3D;
+	cvs.height = h_cvs_3D;
+
+	//RAZ et fond blanc
+	ct.fillStyle = '#FFFFFF';
+	ct.beginPath();
+	ct.fillRect(0, 0, w_cvs_3D - 1, h_cvs_3D - 1);
+
+
+	//-MAJ DES CDG
+	var cdg_a = mod_Boitier_a.CDGMaj;
+	var cdg_b = mod_Boitier_b.CDGMaj;
+	var cdg_c = mod_Boitier_c.CDGMaj;
+	var cdg_d = mod_Boitier_d.CDGMaj;
+	var cdg_e = mod_Boitier_e.CDGMaj;
+	var cdg_f = mod_Boitier_f.CDGMaj;
+	var cdg_g = mod_Boitier_g.CDGMaj;
+	var cdg_h = mod_Boitier_h.CDGMaj;
+	var cdg_i = mod_Boitier_i.CDGMaj;
+	var cdg_ii = mod_Boitier_ii.CDGMaj;
+	var cdg_j = mod_Boitier_j.CDGMaj;
+	var cdg_k = mod_Boitier_k.CDGMaj;
+	var cdg_l = mod_Boitier_l.CDGMaj;
+	var cdg_m = mod_Boitier_m.CDGMaj;
+
+	//--Capteurs
+	var cdg_ff = mod_capteurFF.CDGMaj;
+	var cdg_ca = mod_capteurCourant.CDGMaj;
+
+
+
+	//--Diaphragme
+	var f_m = focale / 1000;
+	var df = (f_m * f_m) / (d_map - f_m);
+	var p_f = df + f_m;
+	var dia_x = -(-dX);
+	var dia_y = 0 + dY;
+	var dia_p = p_f + dP - p_foyer_corps;
+	var cdg_dia = majCoord3D(dia_x, dia_y, dia_p).p.toFixed(6);
+
+
+	//--Silhouttes
+	var cdg_avantPlan = majCoord3D(0, 0, d_avantPlan + dP + p_f).p.toFixed(6);
+	var cdg_map = majCoord3D(0, 0, d_map + dP + p_f).p.toFixed(6);
+	var cdg_arrierePlan = majCoord3D(0, 0, d_arrierePlan + dP + p_f).p.toFixed(6);
+
+	//--PDC
+
+	var cdg_pdc = majCoord3D(0, 0, finPDC + dP + p_f).p.toFixed(6);
+
+
+
+	//1ier maj du tableau
+	var nbr_cdg_init = 21;
+	Ordre = new Array(nbr_cdg_init + nbrPolygonesObjectif * NbrPolygonesParCylindre + 2 + 4 * delta_angleMoletteReglage + 3 + 1);
+
+	Ordre[0] = cdg_a;
+	Ordre[1] = cdg_b;
+	Ordre[2] = cdg_c;
+	Ordre[3] = cdg_d;
+	Ordre[4] = cdg_e;
+	Ordre[5] = cdg_f;
+	Ordre[6] = cdg_g;
+	Ordre[7] = cdg_h;
+	Ordre[8] = cdg_i;
+	Ordre[9] = cdg_ii;
+	Ordre[10] = cdg_j;
+	Ordre[11] = cdg_k;
+	Ordre[12] = cdg_l;
+	Ordre[13] = cdg_m;
+	Ordre[14] = cdg_ff;
+	Ordre[15] = cdg_ca;
+	Ordre[16] = cdg_dia;
+	Ordre[17] = cdg_avantPlan;
+	Ordre[18] = cdg_map;
+	Ordre[19] = cdg_arrierePlan;
+	Ordre[20] = cdg_pdc;
+
+
+	//Ajout de l'objectif
+	for (i = 0; i !== NbrPolygonesParCylindre; i++) {
+		Ordre[nbr_cdg_init + i] = PolynomesObjectifTT[0][i].CDGMaj;
+	}
+
+	if (nbrPolygonesObjectif >= 3) {
+		for (i = 0; i !== NbrPolygonesParCylindre; i++)
+			Ordre[nbr_cdg_init + NbrPolygonesParCylindre + i] = PolynomesObjectifTT[1][i].CDGMaj;
+
+		for (i = 0; i !== NbrPolygonesParCylindre; i++)
+			Ordre[nbr_cdg_init + 2 * NbrPolygonesParCylindre + i] = PolynomesObjectifTT[2][i].CDGMaj;
+	}
+
+	if (nbrPolygonesObjectif >= 5) {
+		for (i = 0; i !== NbrPolygonesParCylindre; i++)
+			Ordre[nbr_cdg_init + 3 * NbrPolygonesParCylindre + i] = PolynomesObjectifTT[3][i].CDGMaj;
+
+		for (i = 0; i !== NbrPolygonesParCylindre; i++)
+			Ordre[nbr_cdg_init + 4 * NbrPolygonesParCylindre + i] = PolynomesObjectifTT[4][i].CDGMaj;
+	}
+
+	if (nbrPolygonesObjectif >= 7) {
+		for (i = 0; i !== NbrPolygonesParCylindre; i++)
+			Ordre[nbr_cdg_init + 5 * NbrPolygonesParCylindre + i] = PolynomesObjectifTT[5][i].CDGMaj;
+
+		for (i = 0; i !== NbrPolygonesParCylindre; i++)
+			Ordre[nbr_cdg_init + 6 * NbrPolygonesParCylindre + i] = PolynomesObjectifTT[6][i].CDGMaj;
+	}
+
+	if (nbrPolygonesObjectif >= 9) {
+		for (i = 0; i !== NbrPolygonesParCylindre; i++)
+			Ordre[nbr_cdg_init + 7 * NbrPolygonesParCylindre + i] = PolynomesObjectifTT[7][i].CDGMaj;
+
+		for (i = 0; i !== NbrPolygonesParCylindre; i++)
+			Ordre[nbr_cdg_init + 8 * NbrPolygonesParCylindre + i] = PolynomesObjectifTT[8][i].CDGMaj;
+	}
+
+
+	//Ajout de la molette
+	for (i = 0; i !== 2 + 4 * delta_angleMoletteReglage; i++)
+		Ordre[nbr_cdg_init + i + nbrPolygonesObjectif * NbrPolygonesParCylindre] = PolygomesMolette[i].CDGMaj;
+
+	//Ajout des miroirs de la visée reflex
+	var cdg_mir = mod_miroir.CDGMaj;
+	var cdg_mir_h = mod_miroir_haut.CDGMaj;
+	var cdg_mir_b = mod_miroir_bas.CDGMaj;
+	Ordre[nbr_cdg_init + nbrPolygonesObjectif * NbrPolygonesParCylindre + 2 + 4 * delta_angleMoletteReglage] = cdg_mir;
+	Ordre[nbr_cdg_init + nbrPolygonesObjectif * NbrPolygonesParCylindre + 2 + 4 * delta_angleMoletteReglage + 1] = cdg_mir_h;
+	Ordre[nbr_cdg_init + nbrPolygonesObjectif * NbrPolygonesParCylindre + 2 + 4 * delta_angleMoletteReglage + 2] = cdg_mir_b;
+
+
+	//Ajout des rayons
+	var cdg_rayons = cdg_j - 0.000001;
+	Ordre[nbr_cdg_init + nbrPolygonesObjectif * NbrPolygonesParCylindre + 2 + 4 * delta_angleMoletteReglage + 3] = cdg_rayons;
+
+
+
+	//-Trie du tableau
+	Ordre.sort(sortNumber);
+
+	if (haut)
+		drawSol();
+
+	//Balaye les CDG dans l'ordre de profondeur.
+	//Une fois dessiné, le CDG passe à 'X' pour ne pas déssiner deux fois en cas de différents CDG de mêmes valeurs
+
+
+	var x1, y1, p1, x2, y2, p2, x4, y4, p4; //pour dessiner des images 2D
+	var ii, iii;
+	var proj_temp;
+
+	for (i = 0; i !== Ordre.length; i++) {
+
+		ct.fillStyle = 'rgba(0,0,0,0.5)';
+		ct.strokeStyle = 'rgba(0,0,0,0.5)';
+
+		//Objectif
+		for (ii = 0; ii !== NbrPolygonesParCylindre; ii++) {
+			for (iii = 0; iii !== nbrPolygonesObjectif; iii++) {
+
+				if (Ordre[i] === PolynomesObjectifTT[iii][ii].CDGMaj) {
+
+					PolynomesObjectifTT[iii][ii].draw();
+					PolynomesObjectifTT[iii][ii].CDGMaj = 'X';
+					ii = NbrPolygonesParCylindre - 1;
+				}
+			}
+		}
+
+		//Molette
+		for (ii = 0; ii !== 2 + 4 * delta_angleMoletteReglage; ii++) {
+
+			if (Ordre[i] === PolygomesMolette[ii].CDGMaj) {
+
+				PolygomesMolette[ii].draw();
+				PolygomesMolette[ii].CDGMaj = 'X';
+				ii = 2 + 4 * delta_angleMoletteReglage - 1;
+			}
+		}
+
+
+
+		switch (Ordre[i]) {
+
+			//Miroirs
+			case cdg_mir_b:
+				mod_miroir_bas.draw();
+				cdg_mir_b = "X";
+				break;
+			case cdg_mir_h:
+				mod_miroir_haut.draw();
+				cdg_mir_h = "X";
+				break;
+			case cdg_mir:
+				mod_miroir.draw();
+				cdg_mir = "X";
+				break;
+				//Boitier et viseur
+			case cdg_a:
+				mod_Boitier_a.draw();
+				cdg_a = "X";
+				break;
+			case cdg_b:
+				mod_Boitier_b.draw();
+				cdg_b = "X";
+				break;
+			case cdg_c:
+				mod_Boitier_c.draw();
+				cdg_c = "X";
+				break;
+			case cdg_d:
+				mod_Boitier_d.draw();
+				cdg_d = "X";
+				break;
+			case cdg_e:
+				mod_Boitier_e.draw();
+				cdg_e = "X";
+				break;
+			case cdg_f:
+				mod_Boitier_f.draw();
+				cdg_f = "X";
+				break;
+			case cdg_g:
+				mod_Boitier_g.draw();
+				cdg_g = "X";
+				break;
+			case cdg_h:
+				mod_Boitier_h.draw();
+				cdg_h = "X";
+				break;
+			case cdg_i:
+				mod_Boitier_i.draw();
+				cdg_i = "X";
+				break;
+			case cdg_ii:
+				mod_Boitier_ii.draw();
+				cdg_ii = "X";
+				break;
+			case cdg_j:
+				mod_Boitier_j.draw();
+				cdg_j = "X";
+				break;
+			case cdg_k:
+				mod_Boitier_k.draw();
+				cdg_k = "X";
+				break;
+			case cdg_l:
+				mod_Boitier_l.draw();
+				cdg_l = "X";
+				break;
+			case cdg_m:
+				mod_Boitier_m.draw();
+				cdg_m = "X";
+
+				x1 = mod_miroir_bas.Pts[0][0];
+				y1 = mod_miroir_bas.Pts[0][1];
+				p1 = dP - p_foyer_corps;
+				x2 = mod_miroir_bas.Pts[1][0];
+				y2 = mod_miroir_bas.Pts[1][1];
+				p2 = p1;
+				x4 = mod_miroir_bas.Pts[3][0];
+				y4 = mod_miroir_bas.Pts[3][1];
+				p4 = p1;
+
+				proj_temp = xyp2XYmaj(x1, y1, p1);
+				x1 = proj_temp.X;
+				y1 = proj_temp.Y;
+				proj_temp = xyp2XYmaj(x2, y2, p2);
+				x2 = proj_temp.X;
+				y2 = proj_temp.Y;
+				proj_temp = xyp2XYmaj(x4, y4, p4);
+				x4 = proj_temp.X;
+				y4 = proj_temp.Y;
+
+				//TBD: ajouter le cadre et réduire la taille du viseur et ajouter une lentille
+				var cvs1 = document.getElementById("id_cvs_viseur_illustrations");
+				drawImg2Dto3D(cvs1, x1, y1, x2, y2, x4, y4);
+
+
+
+				break;
+
+				//Capteurs
+			case cdg_ff:
+				mod_capteurFF.draw();
+				cdg_ff = "X";
+				break;
+			case cdg_ca:
+				mod_capteurCourant.draw();
+				cdg_ca = "X";
+				break;
+				//Diaphragme
+			case cdg_dia:
+				drawDiaphragme();
+				cdg_dia = 'X';
+				break;
+				//Silhouettes
+			case cdg_avantPlan:
+				x1 = w_m_img_avantPlan / 2 - offset_x_img_avantPlan;
+				y1 = (w_m_img_avantPlan * h_img_avantPlan / w_img_avantPlan) - offset_y_avantPlan;
+				p1 = d_avantPlan + dP + p_f;
+				x2 = -w_m_img_avantPlan / 2 - offset_x_img_avantPlan;
+				y2 = y1;
+				p2 = p1;
+				x4 = x1;
+				y4 = -offset_y_avantPlan;
+				p4 = p1;
+
+				proj_temp = xyp2XYmaj(x1, y1, p1);
+				x1 = proj_temp.X;
+				y1 = proj_temp.Y;
+				proj_temp = xyp2XYmaj(x2, y2, p2);
+				x2 = proj_temp.X;
+				y2 = proj_temp.Y;
+				proj_temp = xyp2XYmaj(x4, y4, p4);
+				x4 = proj_temp.X;
+				y4 = proj_temp.Y;
+
+				if (img_avantPlan.width)
+					drawImg2Dto3D(img_avantPlan, x1, y1, x2, y2, x4, y4);
+
+				cdg_avantPlan = 'X';
+				break;
+
+			case cdg_map:
+				x1 = w_m_img_map / 2;
+				y1 = (w_m_img_map * h_img_map / w_img_map) - offset_y_map;
+				p1 = d_map + dP + p_f;
+				x2 = -w_m_img_map / 2;
+				y2 = y1;
+				p2 = p1;
+				x4 = x1;
+				y4 = -offset_y_map;
+				p4 = p1;
+
+				proj_temp = xyp2XYmaj(x1, y1, p1);
+				x1 = proj_temp.X;
+				y1 = proj_temp.Y;
+				proj_temp = xyp2XYmaj(x2, y2, p2);
+				x2 = proj_temp.X;
+				y2 = proj_temp.Y;
+				proj_temp = xyp2XYmaj(x4, y4, p4);
+				x4 = proj_temp.X;
+				y4 = proj_temp.Y;
+
+				if (img_map.width)
+					drawImg2Dto3D(img_map, x1, y1, x2, y2, x4, y4);
+
+				cdg_map = 'X';
+				break;
+
+			case cdg_arrierePlan:
+				x1 = w_m_img_arrierePlan / 2 - offset_x_img_arrierePlan;
+				y1 = (w_m_img_arrierePlan * h_img_arrierePlan / w_img_arrierePlan) - offset_y_arrierePlan;
+				p1 = d_arrierePlan + dP + p_f;
+				x2 = -w_m_img_arrierePlan / 2 - offset_x_img_arrierePlan;
+				y2 = y1;
+				p2 = p1;
+				x4 = x1;
+				y4 = -offset_y_arrierePlan;
+				p4 = p1;
+
+				proj_temp = xyp2XYmaj(x1, y1, p1);
+				x1 = proj_temp.X;
+				y1 = proj_temp.Y;
+				proj_temp = xyp2XYmaj(x2, y2, p2);
+				x2 = proj_temp.X;
+				y2 = proj_temp.Y;
+				proj_temp = xyp2XYmaj(x4, y4, p4);
+				x4 = proj_temp.X;
+				y4 = proj_temp.Y;
+
+				if (img_arrierePlan.width)
+					drawImg2Dto3D(img_arrierePlan, x1, y1, x2, y2, x4, y4);
+
+				cdg_arrierePlan = 'X';
+				break;
+
+				//PDC				
+			case cdg_pdc:
+				drawZonePDC();
+				cdg_pdc = 'X';
+				break;
+
+
+				//Rayons
+			case cdg_rayons:
+				drawIllustrationsOptiques();
+				cdg_rayons = 'X';
+
+		}
+
+	}
+
+	if (bas)
+		drawSol();
+
+
+	//--CADRE
+	ct.fillStyle = '#000000';
+	ct.beginPath();
+	ct.fillRect(0, 0, w_cvs_3D, 1);
+	ct.fillRect(0, h_cvs_3D - 1, w_cvs_3D, 1);
+	ct.fillRect(0, 0, 1, h_cvs_3D);
+	ct.fillRect(w_cvs_3D - 1, 0, 1, h_cvs_3D);
 }

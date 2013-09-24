@@ -247,72 +247,10 @@ function initPtsMoletteR() {
 }
 
 
-<<<<<<< HEAD
-//Clic
-document.getElementById('id_cvs_moletteReglage').addEventListener('mousedown', function(e) {
-
-	//Flag passe à 1
-	flag_clicMoletteReglage = 1;
-
-	//MAj de la position 0
-	var cvs = document.getElementById('id_cvs_moletteReglage');
-	Xt0_cvs_moletteReglage = e.clientX - cvs.getBoundingClientRect().left - document.documentElement.scrollLeft - marge_X_distances;
-
-}, false);
-
-//Relache clic
-document.getElementById('id_cvs_moletteReglage').addEventListener('mouseup', function() {
-	flag_clicMoletteReglage = 0;
-}, false);
-
-//Bouge
-document.getElementById('id_cvs_moletteReglage').addEventListener('mousemove', function(e) {
-	if (flag_clicMoletteReglage)
-		souris3D("MoletteReglage", e);
-}, false);
-
-//Sort
-document.getElementById('id_cvs_moletteReglage').addEventListener('mouseout', function() {
-	document.body.style.cursor = 'auto';
-	flag_clicMoletteReglage = 0;
-}, false);
-
-//Entre
-document.getElementById('id_cvs_moletteReglage').addEventListener('mouseover', function() {
-	document.body.style.cursor = 'e-resize';
-}, false);
-
-
-//Appelé après souris3D qui gère la rotation de la molette
-//:TBD: animer la molette
-function majTriangleExpo(Xt1) {
-
-	var dx_cran = 1 / 5;
-
-	var dx = (Xt1 - Xt0_cvs_moletteReglage);
-	dx = dx / X0_3D;
-
-	//Incrément de la valeur
-	if (dx > 0) {
-		if (dx > dx_cran) {
-			majValTriangleExpo(Math.round(dx / dx_cran));
-			Xt0_cvs_moletteReglage = Xt1;
-		}
-	}
-	//Décrément de la valeur
-	if (dx < 0) {
-		if (-dx > dx_cran) {
-			majValTriangleExpo(Math.round(dx / dx_cran));
-			Xt0_cvs_moletteReglage = Xt1;
-		}
-	}
-}
 
 //Appelé par majTriangleExpo si la rotation est suffisante
-=======
-//Appelé par majTriangleExpo si la rotation est suffisante
 
->>>>>>> ménage, tuning et fix
+
 function majValTriangleExpo(incr) {
 
 	//Vitesse
@@ -1275,11 +1213,7 @@ function majValTriangleExpo(incr) {
 						vitesse = 60;
 						break;
 				}
-<<<<<<< HEAD
-				
-=======
 
->>>>>>> ménage, tuning et fix
 				if (temp !== '')
 					vitesse_string = temp;
 			}
@@ -1287,9 +1221,7 @@ function majValTriangleExpo(incr) {
 		calculs();
 		drawViseur();
 	}
-<<<<<<< HEAD
-}
-=======
+
 }
 
 //Appelé après souris3D qui gère la rotation de la molette
@@ -1353,4 +1285,3 @@ document.getElementById('id_cvs_moletteReglage').addEventListener('mouseout', fu
 document.getElementById('id_cvs_moletteReglage').addEventListener('mouseover', function() {
 	document.body.style.cursor = 'e-resize';
 }, false);
->>>>>>> ménage, tuning et fix

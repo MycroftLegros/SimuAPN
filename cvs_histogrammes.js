@@ -19,11 +19,9 @@
 	if (flag_histoNB === 0) {
 
 		//RAZ
-<<<<<<< HEAD
-		ct_rvb.fillStyle = '#FFFFFF';
-=======
+
 		ct_rvb.fillStyle = 'rgba(255,255,255,0.33)';
->>>>>>> ménage, tuning et fix
+
 		ct_rvb.beginPath();
 		ct_rvb.fillRect(0, 0, w_cvs_HistoRVB - 1, h_cvs_HistoRVB - 1);
 
@@ -105,11 +103,8 @@
 		cvs_rvb.height = 30;
 
 		//RAZ
-<<<<<<< HEAD
-		ct_rvb.fillStyle = '#FFFFFF';
-=======
+
 		ct_rvb.fillStyle = 'rgba(255,255,255,0.33)';
->>>>>>> ménage, tuning et fix
 		ct_rvb.beginPath();
 		ct_rvb.fillRect(0, 0, w_cvs_HistoRVB - 1, cvs_rvb.height - 1);
 
@@ -141,11 +136,8 @@
 	cvs_lum.height = h_cvs_histoLum;
 
 	//RAZ
-<<<<<<< HEAD
-	ct_lum.fillStyle = '#FFFFFF';
-=======
+
 	ct_lum.fillStyle = 'rgba(255,255,255,0.33)';
->>>>>>> ménage, tuning et fix
 	ct_lum.beginPath();
 	ct_lum.fillRect(0, 0, w_cvs_histoLum - 1, h_cvs_histoLum - 1);
 
