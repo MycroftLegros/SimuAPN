@@ -1,7 +1,12 @@
 var FlouDeMAPView = require('./view/fenetres/FlouDeMAPView');
 var Sujet = require('./model/Sujet');
+var Configuration = require('./utils/Configuration');
 
 window.onload = function() {
+
+    var configuration = new Configuration();
+    configuration.systemeMesure = "IMPERIAL";
+
     // Init model
     var sujets = [
         new Sujet("Masque", 10),
@@ -10,5 +15,5 @@ window.onload = function() {
     ];
 
     // Init views
-    new FlouDeMAPView(sujets);
+    new FlouDeMAPView(configuration, sujets);
 };

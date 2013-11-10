@@ -1,16 +1,31 @@
-var COLORS = [
+var DrawingHelper = require('../../utils/DrawingHelper');
+var TextHelper = require('../../utils/TextHelper');
+
+var COULEURS_SUJETS = [
     "red",
     "green",
     "blue"
 ];
 
-FlouDeMAPView = function(sujets) {
-    console.log("init FlouDeMAPView");
+var COULEUR_AXES = '#000000';
+
+var LARGEUR = 200;
+var HAUTEUR = Math.round(LARGEUR * 2 / 3);
+var MARGE_HAUT=10;
+var MARGE_BAS=35;
+var MARGE_GAUCHE=30;
+var MARGE_DROITE=40;
+
+
+FlouDeMAPView = function(configuration, sujets) {
+
 
     this.dom = {
         root: document.getElementById("FlouDeMAPView"),
         canvas: document.getElementById("FlouDeMAPCanvas")
     };
+
+    this.textHelper = new TextHelper(configuration);
 
     this.sujets = sujets;
 
@@ -20,18 +35,26 @@ FlouDeMAPView = function(sujets) {
 FlouDeMAPView.prototype.render = function() {
 
     var ct = this.dom.canvas.getContext('2d');
-    this.dom.canvas.width = 200;
-    this.dom.canvas.height = 50;
 
-    var distanceMax = this.sujets.reduce(function(previousValue, currentValue){
+    this.dom.canvas.width = LARGEUR;
+    this.dom.canvas.height = HAUTEUR;
+
+    ct.beginPath();
+    ct.fillStyle = 'rgba(255,255,255,0.9)';
+    ct.fillRect(0, 0, LARGEUR - 1, HAUTEUR - 1);
+
+    DrawingHelper.demiFlecheHorizontale(ct,  HAUTEUR - MARGE_BAS - 1, MARGE_GAUCHE, LARGEUR - MARGE_DROITE - 1,COULEUR_AXES);
+    DrawingHelper.demiFlecheVerticale(ct, MARGE_GAUCHE, HAUTEUR - MARGE_BAS - 1, MARGE_HAUT, COULEUR_AXES);
+
+    var distanceMax = this.sujets.reduce(function(previousValue, currentValue) {
         return previousValue.distance > currentValue.distance ? previousValue : currentValue;
     }).distance;
 
-    this.sujets.forEach(function(sujet, index){
-        var positionEnPixels = Math.round(sujet.distance *  200 / (1.25 * distanceMax));
-        ct.fillStyle = COLORS[index];
-        ct.fillText(sujet.distance.toFixed(2) + 'm', positionEnPixels, 50-10*index);
-    });
+    this.sujets.forEach(function(sujet, index) {
+        var positionEnPixels = Math.round(sujet.distance * LARGEUR / (1.25 * distanceMax));
+        ct.fillStyle = COULEURS_SUJETS[index];
+        ct.fillText(this.textHelper.distanceAffichable(sujet.distance), positionEnPixels, 50 - 10 * index);
+    }.bind(this));
 
     /*
     var ct = this.dom.canvas.getContext('2d');

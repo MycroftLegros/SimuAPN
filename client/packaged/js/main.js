@@ -1,8 +1,13 @@
 ;(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var FlouDeMAPView = require('./view/fenetres/FlouDeMAPView');
 var Sujet = require('./model/Sujet');
+var Configuration = require('./utils/Configuration');
 
 window.onload = function() {
+
+    var configuration = new Configuration();
+    configuration.systemeMesure = "IMPERIAL";
+
     // Init model
     var sujets = [
         new Sujet("Masque", 10),
@@ -11,9 +16,9 @@ window.onload = function() {
     ];
 
     // Init views
-    new FlouDeMAPView(sujets);
+    new FlouDeMAPView(configuration, sujets);
 };
-},{"./model/Sujet":2,"./view/fenetres/FlouDeMAPView":3}],2:[function(require,module,exports){
+},{"./model/Sujet":2,"./utils/Configuration":3,"./view/fenetres/FlouDeMAPView":6}],2:[function(require,module,exports){
 Sujet = function(nom, distance) {
     this.nom = nom;
     this.distance = distance;
@@ -21,19 +26,152 @@ Sujet = function(nom, distance) {
 
 module.exports = Sujet;
 },{}],3:[function(require,module,exports){
-var COLORS = [
+var Configuration = function(){
+    this.systemeMesure = "METRIQUE";
+};
+
+module.exports = Configuration;
+},{}],4:[function(require,module,exports){
+var tailleDeLaPointeDeLaFleche = 3;
+
+DrawingHelper = function() {};
+
+DrawingHelper.demiFlecheHorizontale = function(ct, y, xDebut, xFin, couleur) {
+
+    var temp;
+
+    if (xFin < xDebut) {
+        temp = xDebut;
+        xDebut = xFin;
+        xFin = temp;
+    }
+    ct.beginPath();
+    ct.strokeStyle = couleur;
+    ct.moveTo(xDebut, y);
+    ct.lineTo(xFin, y);
+    ct.lineTo(xFin - tailleDeLaPointeDeLaFleche, y - tailleDeLaPointeDeLaFleche);
+    ct.lineTo(xFin, y);
+    ct.lineTo(xFin - tailleDeLaPointeDeLaFleche, y + tailleDeLaPointeDeLaFleche);
+    ct.stroke();
+};
+
+
+DrawingHelper.flecheHorizontale = function(ct, y, xDebut, xFin, couleur) {
+
+    var temp;
+
+    if (xFin < xDebut) {
+        temp = xDebut;
+        xDebut = xFin;
+        xFin = temp;
+    }
+    ct.strokeStyle = couleur;
+    ct.beginPath();
+    ct.moveTo(xDebut + tailleDeLaPointeDeLaFleche, y - tailleDeLaPointeDeLaFleche);
+    ct.lineTo(xDebut, y);
+    ct.lineTo(xDebut + tailleDeLaPointeDeLaFleche, y + tailleDeLaPointeDeLaFleche);
+    ct.lineTo(xDebut, y);
+    ct.lineTo(xFin, y);
+    ct.lineTo(xFin - tailleDeLaPointeDeLaFleche, y - tailleDeLaPointeDeLaFleche);
+    ct.lineTo(xFin, y);
+    ct.lineTo(xFin - tailleDeLaPointeDeLaFleche, y + tailleDeLaPointeDeLaFleche);
+    ct.stroke();
+};
+
+DrawingHelper.flecheVerticale = function(ct, x, yDebut, yFin, couleur) {
+
+    var temp;
+
+    if (yDebut < yFin) {
+        temp = yDebut;
+        yDebut = yFin;
+        yFin = temp;
+    }
+
+    ct.beginPath();
+    ct.strokeStyle = couleur;
+    ct.moveTo(x - tailleDeLaPointeDeLaFleche, yDebut - tailleDeLaPointeDeLaFleche);
+    ct.lineTo(x, yDebut);
+    ct.lineTo(x + tailleDeLaPointeDeLaFleche, yDebut - tailleDeLaPointeDeLaFleche);
+    ct.lineTo(x, yDebut);
+    ct.lineTo(x, yFin);
+    ct.lineTo(x - tailleDeLaPointeDeLaFleche, yFin + tailleDeLaPointeDeLaFleche);
+    ct.lineTo(x, yFin);
+    ct.lineTo(x + tailleDeLaPointeDeLaFleche, yFin + tailleDeLaPointeDeLaFleche);
+
+    ct.stroke();
+
+};
+
+DrawingHelper.demiFlecheVerticale = function(ct, x, yDebut, yFin, couleur) {
+
+    var temp;
+
+    if (yDebut < yFin) {
+        temp = yDebut;
+        yDebut = yFin;
+        yFin = temp;
+    }
+    ct.beginPath();
+    ct.strokeStyle = couleur;
+    ct.lineTo(x, yDebut);
+    ct.lineTo(x, yFin);
+    ct.lineTo(x - tailleDeLaPointeDeLaFleche, yFin + tailleDeLaPointeDeLaFleche);
+    ct.lineTo(x, yFin);
+    ct.lineTo(x + tailleDeLaPointeDeLaFleche, yFin + tailleDeLaPointeDeLaFleche);
+
+    ct.stroke();
+
+};
+
+module.exports = DrawingHelper;
+},{}],5:[function(require,module,exports){
+var METRES_VERS_PIEDS = 3.2808399;
+
+
+TextHelper = function(configuration){
+    this.configuration = configuration;
+};
+
+
+TextHelper.prototype.distanceAffichable = function(distance) {
+    if(this.configuration.systemeMesure === "IMPERIAL") {
+        return (distance * METRES_VERS_PIEDS).toFixed(2) + " ft";
+    } else {
+        return distance.toFixed(2) + " m";
+    }
+};
+
+module.exports = TextHelper;
+},{}],6:[function(require,module,exports){
+var DrawingHelper = require('../../utils/DrawingHelper');
+var TextHelper = require('../../utils/TextHelper');
+
+var COULEURS_SUJETS = [
     "red",
     "green",
     "blue"
 ];
 
-FlouDeMAPView = function(sujets) {
-    console.log("init FlouDeMAPView");
+var COULEUR_AXES = '#000000';
+
+var LARGEUR = 200;
+var HAUTEUR = Math.round(LARGEUR * 2 / 3);
+var MARGE_HAUT=10;
+var MARGE_BAS=35;
+var MARGE_GAUCHE=30;
+var MARGE_DROITE=40;
+
+
+FlouDeMAPView = function(configuration, sujets) {
+
 
     this.dom = {
         root: document.getElementById("FlouDeMAPView"),
         canvas: document.getElementById("FlouDeMAPCanvas")
     };
+
+    this.textHelper = new TextHelper(configuration);
 
     this.sujets = sujets;
 
@@ -43,18 +181,26 @@ FlouDeMAPView = function(sujets) {
 FlouDeMAPView.prototype.render = function() {
 
     var ct = this.dom.canvas.getContext('2d');
-    this.dom.canvas.width = 200;
-    this.dom.canvas.height = 50;
 
-    var distanceMax = this.sujets.reduce(function(previousValue, currentValue){
+    this.dom.canvas.width = LARGEUR;
+    this.dom.canvas.height = HAUTEUR;
+
+    ct.beginPath();
+    ct.fillStyle = 'rgba(255,255,255,0.9)';
+    ct.fillRect(0, 0, LARGEUR - 1, HAUTEUR - 1);
+
+    DrawingHelper.demiFlecheHorizontale(ct,  HAUTEUR - MARGE_BAS - 1, MARGE_GAUCHE, LARGEUR - MARGE_DROITE - 1,COULEUR_AXES);
+    DrawingHelper.demiFlecheVerticale(ct, MARGE_GAUCHE, HAUTEUR - MARGE_BAS - 1, MARGE_HAUT, COULEUR_AXES);
+
+    var distanceMax = this.sujets.reduce(function(previousValue, currentValue) {
         return previousValue.distance > currentValue.distance ? previousValue : currentValue;
     }).distance;
 
-    this.sujets.forEach(function(sujet, index){
-        var positionEnPixels = Math.round(sujet.distance *  200 / (1.25 * distanceMax));
-        ct.fillStyle = COLORS[index];
-        ct.fillText(sujet.distance.toFixed(2) + 'm', positionEnPixels, 50-10*index);
-    });
+    this.sujets.forEach(function(sujet, index) {
+        var positionEnPixels = Math.round(sujet.distance * LARGEUR / (1.25 * distanceMax));
+        ct.fillStyle = COULEURS_SUJETS[index];
+        ct.fillText(this.textHelper.distanceAffichable(sujet.distance), positionEnPixels, 50 - 10 * index);
+    }.bind(this));
 
     /*
     var ct = this.dom.canvas.getContext('2d');
@@ -227,5 +373,5 @@ FlouDeMAPView.prototype.drawSujet = function(sujet) {
 };
 
 module.exports = FlouDeMAPView;
-},{}]},{},[1])
+},{"../../utils/DrawingHelper":4,"../../utils/TextHelper":5}]},{},[1])
 ;
